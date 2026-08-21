@@ -147,27 +147,79 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
 .chart-wrap{position:relative; height:250px;}
 .small-note{font-size:12px; color:var(--ink-soft); margin-top:8px; font-family:'IBM Plex Mono',monospace; line-height:1.6;}
 
-.mobile-topbar{display:none;}
+/* ===== APP MOBILE (cabeçalho fixo + gaveta + barra inferior) ===== */
+.mobile-header{display:none;}
+.drawer-overlay{display:none;}
+.drawer{display:none;}
+.bottom-tabbar{display:none;}
+
 @media(max-width:880px){
   #app{flex-direction:column;}
-  .sidebar{position:relative; height:auto; width:100%; flex-direction:row; align-items:center;}
-  .brand{border-bottom:none; padding:12px 14px; display:flex; align-items:center; gap:9px;}
-  .brand .mark{margin-bottom:0;}
-  .brand h1{font-size:14px;}
-  .brand .sub{display:none;}
-  .nav{display:none;}
-  .user-badge{display:none;}
-  .sidebar-footer{display:none;}
-  .mobile-topbar{display:flex; overflow-x:auto; gap:4px; padding:0 10px 10px; width:100%;}
-  .mobile-topbar .nav-item{white-space:nowrap; border-left:none; border-bottom:3px solid transparent; padding:8px 12px; border-radius:3px 3px 0 0;}
-  .mobile-topbar .nav-item.active{border-bottom-color:var(--gold-light); background:rgba(251,249,241,0.09);}
-  .mobile-topbar .nav-actions{display:none !important;}
-  .main{padding:18px 14px 60px;}
-  .page-header{flex-direction:column;}
-  .stamp{width:82px;height:82px;}
+  .sidebar{display:none;}
+
+  .mobile-header{
+    display:flex; align-items:center; justify-content:space-between;
+    position:sticky; top:0; z-index:40; background:var(--forest); color:var(--white);
+    padding:12px 16px; gap:10px; box-shadow:0 2px 10px rgba(0,0,0,0.15);
+  }
+  .mobile-header .mh-left{display:flex; align-items:center; gap:10px; min-width:0;}
+  .mobile-header .mh-mark{
+    width:30px;height:30px;border-radius:50%; border:2px solid var(--gold-light); flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces',serif; font-weight:700; font-size:14px; color:var(--gold-light);
+  }
+  .mobile-header .mh-title{font-family:'Fraunces',serif; font-weight:700; font-size:16px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .mh-burger{background:none; border:none; color:var(--white); font-size:22px; padding:6px 8px; line-height:1;}
+
+  .drawer-overlay{
+    display:block; position:fixed; inset:0; background:rgba(15,25,20,0.5); z-index:60;
+    opacity:0; pointer-events:none; transition:opacity .2s ease;
+  }
+  .drawer-overlay.open{opacity:1; pointer-events:auto;}
+  .drawer{
+    display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; width:84%; max-width:310px;
+    background:var(--forest); color:var(--white); z-index:70; overflow-y:auto;
+    transform:translateX(-105%); transition:transform .25s ease;
+  }
+  .drawer.open{transform:translateX(0);}
+  .drawer .brand{padding:22px 20px 16px; border-bottom:1px solid rgba(251,249,241,0.15);}
+  .drawer .nav{padding:8px 0; flex:1;}
+  .drawer .user-badge, .drawer .sidebar-footer{display:flex;}
+  .drawer .sidebar-footer{display:block;}
+
+  .bottom-tabbar{
+    display:flex; position:fixed; left:0; right:0; bottom:0; z-index:40;
+    background:var(--white); border-top:1px solid var(--paper-line);
+    box-shadow:0 -4px 16px rgba(0,0,0,0.10);
+    padding:4px 2px calc(4px + env(safe-area-inset-bottom, 0px));
+  }
+  .bottom-tab{
+    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+    padding:7px 2px 6px; background:none; border:none; color:var(--ink-soft);
+    font-size:10px; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.01em;
+  }
+  .bottom-tab .bt-icon{
+    width:22px;height:22px;border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces',serif; font-weight:700; font-size:11px; color:var(--ink-soft); border:1.5px solid var(--paper-line);
+  }
+  .bottom-tab.active{color:var(--forest); font-weight:700;}
+  .bottom-tab.active .bt-icon{color:var(--white); background:var(--forest); border-color:var(--forest);}
+
+  .main{padding:14px 12px 88px;}
+  .page-header{flex-direction:column; margin-bottom:18px;}
+  .stamp{width:74px;height:74px; align-self:flex-end; margin-top:-8px;}
   .card{padding:16px 15px;}
-  th, td{padding:8px 6px;}
+  th, td{padding:9px 7px;}
   .btn.small{padding:9px 12px; font-size:12.5px;}
+  .grid-3{grid-template-columns:1fr 1fr; gap:10px;}
+  .stat{padding:12px 13px;}
+  .stat .value{font-size:18px;}
+  .stat .label{font-size:9px;}
+  .toolbar{gap:8px;}
+  .tag-select{padding:9px 12px; font-size:12.5px;}
+}
+@media(min-width:881px){
+  .mobile-header, .drawer-overlay, .drawer, .bottom-tabbar{display:none !important;}
 }
 
 .loading-screen{position:fixed; inset:0; background:var(--paper); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:12px; z-index:100;}
@@ -267,7 +319,6 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
       </div>
     </div>
     <div class="nav" id="navList"></div>
-    <div class="mobile-topbar" id="navListMobile"></div>
     <div class="user-badge"><span class="dot"></span> <b id="currentUserLabel"></b></div>
     <div class="sidebar-footer">
       Dados salvos na sua conta
@@ -279,6 +330,38 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
       <input type="file" id="importFile" accept="application/json" style="display:none;">
     </div>
   </div>
+
+  <div class="mobile-header" id="mobileHeader">
+    <div class="mh-left">
+      <div class="mh-mark">$</div>
+      <div class="mh-title" id="mobileHeaderTitle">Caderneta</div>
+    </div>
+    <button class="mh-burger" id="btnOpenDrawer" aria-label="Menu">☰</button>
+  </div>
+
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <div class="drawer" id="drawer">
+    <div class="brand">
+      <div class="mark">$</div>
+      <div>
+        <h1>Caderneta<br>Financeira</h1>
+        <div class="sub">controle financeiro</div>
+      </div>
+    </div>
+    <div class="nav" id="navListDrawer"></div>
+    <div class="user-badge"><span class="dot"></span> <b id="currentUserLabelDrawer"></b></div>
+    <div class="sidebar-footer">
+      Dados salvos na sua conta
+      <div>
+        <button id="btnExportDrawer">Exportar backup</button>
+        <button id="btnImportDrawer">Importar</button>
+        <button id="btnLogoutDrawer">Sair</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-tabbar" id="bottomTabbar"></div>
+
   <div class="main"><div id="sections"></div></div>
 </div>
 
@@ -428,6 +511,15 @@ function renderNav(){
     activeSection = visible[0] ? visible[0].id : null;
   }
 
+  buildNavInto('navList', visible, hidden, true);
+  buildNavInto('navListDrawer', visible, hidden, true);
+  renderBottomTabs(visible);
+  updateMobileHeaderTitle(visible);
+}
+
+function buildNavInto(containerId, visible, hidden, withManage){
+  const container = document.getElementById(containerId);
+  if(!container) return;
   const itemHtml = (s,i)=>`
     <div class="nav-item ${s.id===activeSection?'active':''}" data-nav="${escAttr(s.id)}">
       <span class="num">${String(i+1).padStart(2,'0')}</span>
@@ -438,35 +530,79 @@ function renderNav(){
       </span>
     </div>`;
   const html = visible.map(itemHtml).join('');
-  const addBtn = `<div class="nav-add-btn" id="btnAddSection">+ adicionar item</div>`;
-  const hiddenBlock = hidden.length ? `
-    <div class="nav-hidden-toggle" id="navHiddenToggle">seções ocultas (${hidden.length}) ▾</div>
-    <div class="nav-hidden-list" id="navHiddenList" style="display:none;">
+  const addBtn = withManage ? `<div class="nav-add-btn" data-addsection="1">+ adicionar item</div>` : '';
+  const hiddenBlock = (withManage && hidden.length) ? `
+    <div class="nav-hidden-toggle" data-hiddentoggle="1">seções ocultas (${hidden.length}) ▾</div>
+    <div class="nav-hidden-list" data-hiddenlist="1" style="display:none;">
       ${hidden.map(s=>`<div class="nav-hidden-item" data-restore="${escAttr(s.id)}">${escapeHtml(s.label)} <span>restaurar</span></div>`).join('')}
     </div>` : '';
 
-  document.getElementById('navList').innerHTML = html + addBtn + hiddenBlock;
-  document.getElementById('navListMobile').innerHTML = html;
+  container.innerHTML = html + addBtn + hiddenBlock;
+  wireNav(container);
 
-  wireNav(document.getElementById('navList'));
-  wireNav(document.getElementById('navListMobile'));
-
-  const addBtnEl = document.getElementById('btnAddSection');
+  const addBtnEl = container.querySelector('[data-addsection]');
   if(addBtnEl) addBtnEl.addEventListener('click', onAddCustomSection);
 
-  const hiddenToggle = document.getElementById('navHiddenToggle');
+  const hiddenToggle = container.querySelector('[data-hiddentoggle]');
   if(hiddenToggle){
     hiddenToggle.addEventListener('click', ()=>{
-      const list = document.getElementById('navHiddenList');
+      const list = container.querySelector('[data-hiddenlist]');
       list.style.display = list.style.display==='none' ? 'block' : 'none';
     });
   }
-  document.querySelectorAll('[data-restore]').forEach(el=>{
+  container.querySelectorAll('[data-restore]').forEach(el=>{
     el.addEventListener('click', ()=>{
       const item = state.navConfig.find(n=>n.id===el.dataset.restore);
       if(item){ item.hidden = false; scheduleSave(); renderNav(); }
     });
   });
+}
+
+const BOTTOM_TAB_LIMIT = 4;
+function renderBottomTabs(visible){
+  const bar = document.getElementById('bottomTabbar');
+  if(!bar) return;
+  const primary = visible.slice(0, BOTTOM_TAB_LIMIT);
+  const rest = visible.slice(BOTTOM_TAB_LIMIT);
+  const tabHtml = (s)=>`
+    <button class="bottom-tab ${s.id===activeSection?'active':''}" data-bnav="${escAttr(s.id)}">
+      <span class="bt-icon">${escapeHtml((s.label||'?').trim().charAt(0).toUpperCase())}</span>
+      <span class="bt-label">${escapeHtml(shortLabel(s.label))}</span>
+    </button>`;
+  const moreActive = rest.some(s=>s.id===activeSection);
+  const moreHtml = rest.length ? `
+    <button class="bottom-tab more ${moreActive?'active':''}" data-bmore="1">
+      <span class="bt-icon">⋯</span>
+      <span class="bt-label">Mais</span>
+    </button>` : '';
+  bar.innerHTML = primary.map(tabHtml).join('') + moreHtml;
+  bar.querySelectorAll('[data-bnav]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      activeSection = btn.dataset.bnav;
+      renderNav(); renderSection();
+    });
+  });
+  const moreBtn = bar.querySelector('[data-bmore]');
+  if(moreBtn) moreBtn.addEventListener('click', openDrawer);
+}
+function shortLabel(label){
+  const l = String(label||'');
+  return l.length > 9 ? l.slice(0,8)+'…' : l;
+}
+function updateMobileHeaderTitle(visible){
+  const el = document.getElementById('mobileHeaderTitle');
+  if(!el) return;
+  const cur = visible.find(v=>v.id===activeSection);
+  el.textContent = cur ? cur.label : 'Caderneta';
+}
+
+function openDrawer(){
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+}
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
 }
 
 function wireNav(container){
@@ -477,6 +613,7 @@ function wireNav(container){
       activeSection = el.dataset.nav;
       renderNav();
       renderSection();
+      closeDrawer();
     });
   });
   container.querySelectorAll('[data-edit]').forEach(btn=>{
@@ -1458,25 +1595,42 @@ async function enterApp(session){
   renderStampAll();
   const name = (session.user.user_metadata && session.user.user_metadata.full_name) || session.user.email;
   document.getElementById('currentUserLabel').textContent = name;
+  document.getElementById('currentUserLabelDrawer').textContent = name;
   document.getElementById('authScreen').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
   wireAppButtons();
 }
 
 function wireAppButtons(){
-  const exportBtn = document.getElementById('btnExport');
-  const importBtn = document.getElementById('btnImport');
   const importFile = document.getElementById('importFile');
-  const logoutBtn = document.getElementById('btnLogout');
 
-  exportBtn.onclick = ()=>{
+  const doExport = ()=>{
     const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = `caderneta-financeira-${new Date().toISOString().slice(0,10)}.json`;
     a.click();
   };
-  importBtn.onclick = ()=>{ importFile.click(); };
+  const doImportClick = ()=>{ importFile.click(); };
+  const doLogout = async ()=>{
+    await sb.auth.signOut();
+    currentSession = null;
+    state = null;
+    closeDrawer();
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('loginForm').reset();
+    document.getElementById('registerForm').reset();
+    setAuthForm('login');
+    document.getElementById('authScreen').style.display = 'flex';
+  };
+
+  document.getElementById('btnExport').onclick = doExport;
+  document.getElementById('btnExportDrawer').onclick = doExport;
+  document.getElementById('btnImport').onclick = doImportClick;
+  document.getElementById('btnImportDrawer').onclick = doImportClick;
+  document.getElementById('btnLogout').onclick = doLogout;
+  document.getElementById('btnLogoutDrawer').onclick = doLogout;
+
   importFile.onchange = async (e)=>{
     const file = e.target.files[0];
     if(!file) return;
@@ -1495,16 +1649,11 @@ function wireAppButtons(){
     }
     e.target.value = '';
   };
-  logoutBtn.onclick = async ()=>{
-    await sb.auth.signOut();
-    currentSession = null;
-    state = null;
-    document.getElementById('app').style.display = 'none';
-    document.getElementById('loginForm').reset();
-    document.getElementById('registerForm').reset();
-    setAuthForm('login');
-    document.getElementById('authScreen').style.display = 'flex';
-  };
+
+  const burger = document.getElementById('btnOpenDrawer');
+  if(burger) burger.onclick = openDrawer;
+  const overlay = document.getElementById('drawerOverlay');
+  if(overlay) overlay.onclick = closeDrawer;
 }
 </script>
 </body>
