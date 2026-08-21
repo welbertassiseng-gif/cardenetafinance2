@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Caderneta Financeira</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Source+Serif+4:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+:root{
+  --paper:#F3EEE0; --paper-dark:#E8E0C8; --paper-line:#CFC4A0;
+  --ink:#1F2B23; --ink-soft:#4B5A50;
+  --forest:#173A2C; --forest-light:#2C5C46; --forest-pale:#DDE6DE;
+  --gold:#A9823C; --gold-light:#CBA658;
+  --rust:#8C3B32; --rust-pale:#F2DCD6; --green-pale:#DCE9DC;
+  --white:#FBF9F1; --shadow:0 6px 18px rgba(23,58,44,0.12); --radius:3px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--paper); color:var(--ink); font-family:'Source Serif 4', Georgia, serif; min-height:100vh;
+  background-image: repeating-linear-gradient(180deg, transparent, transparent 27px, rgba(199,188,160,0.35) 28px);
+  background-attachment:local;
+}
+h1,h2,h3,h4{font-family:'Fraunces', serif; margin:0; color:var(--forest); font-weight:700;}
+.mono{font-family:'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums;}
+a{color:inherit;}
+button{font-family:inherit; cursor:pointer;}
+input,select{font-family:inherit;}
+
+#app{display:flex; min-height:100vh;}
+.sidebar{
+  width:250px; flex-shrink:0; background:var(--forest); color:var(--white);
+  display:flex; flex-direction:column; position:sticky; top:0; height:100vh; overflow-y:auto;
+}
+.brand{padding:26px 20px 16px; border-bottom:1px solid rgba(251,249,241,0.15);}
+.brand .mark{
+  width:36px;height:36px;border-radius:50%; border:2px solid var(--gold-light);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fraunces',serif; font-weight:700; font-size:16px; color:var(--gold-light); margin-bottom:10px;
+}
+.brand h1{color:var(--white); font-size:18px; line-height:1.25;}
+.brand .sub{font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--gold-light); margin-top:5px; font-family:'IBM Plex Mono',monospace;}
+
+.nav{padding:10px 0; flex:1;}
+.nav-item{
+  display:flex; align-items:center; gap:9px; padding:10px 18px; font-size:14px;
+  color:rgba(251,249,241,0.72); cursor:pointer; border-left:3px solid transparent;
+  transition:background .15s, color .15s, border-color .15s; user-select:none; position:relative;
+}
+.nav-item .num{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--gold-light); width:16px; flex-shrink:0;}
+.nav-label{flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.nav-item:hover{background:rgba(251,249,241,0.06); color:var(--white);}
+.nav-item.active{background:rgba(251,249,241,0.09); color:var(--white); border-left-color:var(--gold-light); font-weight:600;}
+.nav-actions{display:none; gap:2px; flex-shrink:0;}
+.nav-item:hover .nav-actions{display:flex;}
+.nav-icon-btn{background:none; border:none; color:rgba(251,249,241,0.55); font-size:12px; padding:3px 5px; border-radius:2px;}
+.nav-icon-btn:hover{color:var(--gold-light); background:rgba(251,249,241,0.08);}
+.nav-edit-input{
+  flex:1; background:rgba(251,249,241,0.12); border:1px solid var(--gold-light); border-radius:2px;
+  color:var(--white); font-size:13.5px; padding:3px 6px; font-family:inherit;
+}
+.nav-add-btn{
+  margin:6px 18px 4px; padding:8px 10px; border:1px dashed rgba(251,249,241,0.35); border-radius:3px;
+  color:rgba(251,249,241,0.65); font-size:12.5px; text-align:center; cursor:pointer; font-family:'IBM Plex Mono',monospace;
+}
+.nav-add-btn:hover{border-color:var(--gold-light); color:var(--gold-light);}
+.nav-hidden-toggle{padding:9px 18px; font-size:10.5px; font-family:'IBM Plex Mono',monospace; color:rgba(251,249,241,0.45); cursor:pointer; text-transform:uppercase; letter-spacing:0.05em;}
+.nav-hidden-toggle:hover{color:var(--gold-light);}
+.nav-hidden-list{padding:0 18px 8px;}
+.nav-hidden-item{font-size:12.5px; color:rgba(251,249,241,0.72); padding:6px 0; display:flex; justify-content:space-between; align-items:center; cursor:pointer; gap:8px;}
+.nav-hidden-item span{color:var(--gold-light); font-family:'IBM Plex Mono',monospace; font-size:10.5px; white-space:nowrap;}
+.nav-hidden-item:hover{color:var(--white);}
+
+.user-badge{display:flex; align-items:center; gap:8px; padding:10px 20px; border-top:1px solid rgba(251,249,241,0.15); border-bottom:1px solid rgba(251,249,241,0.15); font-size:12px; color:rgba(251,249,241,0.85);}
+.user-badge .dot{width:7px;height:7px;border-radius:50%; background:var(--gold-light); flex-shrink:0;}
+.user-badge b{font-weight:600; color:var(--white); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.sidebar-footer{padding:14px 20px 18px; font-size:11px; color:rgba(251,249,241,0.55); font-family:'IBM Plex Mono',monospace;}
+.sidebar-footer button{background:none;border:1px solid rgba(251,249,241,0.3); color:rgba(251,249,241,0.75); font-size:10.5px; padding:6px 9px; border-radius:2px; margin-top:8px; margin-right:6px;}
+.sidebar-footer button:hover{border-color:var(--gold-light); color:var(--gold-light);}
+
+.main{flex:1; min-width:0; padding:34px 42px 80px; max-width:1180px;}
+.page-header{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:26px; gap:20px; flex-wrap:wrap;}
+.page-header h2{font-size:28px;}
+.page-header .desc{color:var(--ink-soft); font-size:14.5px; margin-top:5px; max-width:560px;}
+
+.stamp{border:2px solid var(--rust); color:var(--rust); border-radius:50%; width:106px; height:106px; display:flex; align-items:center; justify-content:center; transform:rotate(-8deg); flex-shrink:0; position:relative; opacity:0.88;}
+.stamp::before{content:""; position:absolute; inset:5px; border:1px dashed var(--rust); border-radius:50%;}
+.stamp .txt{font-family:'IBM Plex Mono',monospace; font-size:8.5px; text-align:center; line-height:1.5; text-transform:uppercase; letter-spacing:0.05em; font-weight:600;}
+.stamp .txt b{display:block; font-size:10.5px;}
+
+.card{background:var(--white); border:1px solid var(--paper-line); border-radius:var(--radius); box-shadow:var(--shadow); padding:22px 24px; margin-bottom:22px;}
+.card h3{font-size:17px; margin-bottom:14px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;}
+.card h3 .hint{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-soft); font-weight:400; text-transform:none;}
+
+.grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
+.grid-2{display:grid; grid-template-columns:2fr 1fr; gap:18px;}
+@media(max-width:900px){.grid-3{grid-template-columns:1fr 1fr;} .grid-2{grid-template-columns:1fr;}}
+@media(max-width:600px){.grid-3{grid-template-columns:1fr;}}
+
+.stat{background:var(--forest-pale); border-radius:var(--radius); padding:16px 18px; border-left:4px solid var(--forest-light);}
+.stat.neg{border-left-color:var(--rust); background:var(--rust-pale);}
+.stat.pos{border-left-color:var(--gold); background:#F3EAD2;}
+.stat .label{font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace;}
+.stat .value{font-family:'IBM Plex Mono',monospace; font-size:23px; font-weight:600; color:var(--forest); margin-top:4px; word-break:break-word;}
+.stat.neg .value{color:var(--rust);}
+
+.table-wrap{width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch;}
+table{width:100%; border-collapse:collapse; font-size:14px; min-width:520px;}
+th{text-align:left; font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-soft); padding:8px 8px; border-bottom:2px solid var(--forest); white-space:nowrap;}
+td{padding:7px 8px; border-bottom:1px solid var(--paper-line); vertical-align:middle;}
+tr.total-row td{font-weight:700; background:var(--forest); color:var(--white); font-family:'IBM Plex Mono',monospace; font-size:15px;}
+td.num, th.num{text-align:right; font-family:'IBM Plex Mono',monospace;}
+td input[type=text], td input[type=date], td select{width:100%; min-width:90px; border:1px solid transparent; background:transparent; padding:7px 6px; border-radius:2px; font-size:13.5px; color:var(--ink);}
+td input.money{width:100%; min-width:90px; border:1px solid transparent; background:transparent; padding:7px 6px; border-radius:2px; font-size:13.5px; color:var(--ink); text-align:right; font-family:'IBM Plex Mono',monospace;}
+td input:hover, td select:hover{border-color:var(--paper-line);}
+td input:focus, td select:focus{border-color:var(--gold); outline:none; background:var(--white);}
+
+.icon-btn{background:none; border:none; color:var(--ink-soft); font-size:16px; padding:5px 7px; border-radius:2px;}
+.icon-btn:hover{color:var(--rust); background:var(--rust-pale);}
+
+.btn{background:var(--forest); color:var(--white); border:none; padding:10px 16px; border-radius:2px; font-size:13px; font-weight:600; letter-spacing:0.02em;}
+.btn:hover{background:var(--forest-light);}
+.btn.secondary{background:none; border:1.5px solid var(--forest); color:var(--forest);}
+.btn.secondary:hover{background:var(--forest-pale);}
+.btn.small{padding:7px 12px; font-size:12px;}
+.btn.gold{background:var(--gold); color:var(--white);}
+.btn.gold:hover{background:var(--gold-light);}
+.btn.link{background:none; border:none; color:var(--forest); text-decoration:underline; padding:4px 0; font-weight:400;}
+.btn:disabled{opacity:0.55; cursor:default;}
+
+.toolbar{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:18px;}
+.tag-select{border:1.5px solid var(--forest); border-radius:20px; padding:9px 14px; font-family:'IBM Plex Mono',monospace; font-size:13px; background:var(--white); color:var(--forest);}
+
+.status-pill{display:inline-block; padding:3px 10px; border-radius:20px; font-size:11.5px; font-family:'IBM Plex Mono',monospace; font-weight:600;}
+.status-pill.pendente{background:var(--rust-pale); color:var(--rust);}
+.status-pill.recebido{background:var(--green-pale); color:var(--forest);}
+
+.empty-state{text-align:center; padding:34px 20px; color:var(--ink-soft); font-size:14px;}
+
+.save-toast{position:fixed; bottom:22px; right:26px; background:var(--forest); color:var(--white); padding:10px 18px; border-radius:3px; font-size:12.5px; font-family:'IBM Plex Mono',monospace; opacity:0; transform:translateY(8px); transition:opacity .25s, transform .25s; pointer-events:none; box-shadow:var(--shadow); z-index:50; max-width:80vw;}
+.save-toast.show{opacity:1; transform:translateY(0);}
+.save-toast.error{background:var(--rust);}
+
+.chart-wrap{position:relative; height:250px;}
+.small-note{font-size:12px; color:var(--ink-soft); margin-top:8px; font-family:'IBM Plex Mono',monospace; line-height:1.6;}
+
+.mobile-topbar{display:none;}
+@media(max-width:880px){
+  #app{flex-direction:column;}
+  .sidebar{position:relative; height:auto; width:100%; flex-direction:row; align-items:center;}
+  .brand{border-bottom:none; padding:12px 14px; display:flex; align-items:center; gap:9px;}
+  .brand .mark{margin-bottom:0;}
+  .brand h1{font-size:14px;}
+  .brand .sub{display:none;}
+  .nav{display:none;}
+  .user-badge{display:none;}
+  .sidebar-footer{display:none;}
+  .mobile-topbar{display:flex; overflow-x:auto; gap:4px; padding:0 10px 10px; width:100%;}
+  .mobile-topbar .nav-item{white-space:nowrap; border-left:none; border-bottom:3px solid transparent; padding:8px 12px; border-radius:3px 3px 0 0;}
+  .mobile-topbar .nav-item.active{border-bottom-color:var(--gold-light); background:rgba(251,249,241,0.09);}
+  .mobile-topbar .nav-actions{display:none !important;}
+  .main{padding:18px 14px 60px;}
+  .page-header{flex-direction:column;}
+  .stamp{width:82px;height:82px;}
+  .card{padding:16px 15px;}
+  th, td{padding:8px 6px;}
+  .btn.small{padding:9px 12px; font-size:12.5px;}
+}
+
+.loading-screen{position:fixed; inset:0; background:var(--paper); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:12px; z-index:100;}
+.loading-screen .mark{width:48px;height:48px;border-radius:50%; border:2.5px solid var(--gold); border-top-color:transparent; animation:spin 0.9s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-screen p{font-family:'IBM Plex Mono',monospace; color:var(--forest); font-size:13px;}
+
+.auth-screen{position:fixed; inset:0; background:var(--forest); display:flex; align-items:center; justify-content:center; padding:18px; z-index:90; overflow-y:auto;
+  background-image: radial-gradient(circle at 20% 20%, rgba(251,249,241,0.05), transparent 40%), radial-gradient(circle at 80% 80%, rgba(169,130,60,0.12), transparent 45%);}
+.auth-card{background:var(--white); width:100%; max-width:390px; border-radius:4px; padding:32px 28px 26px; box-shadow:0 20px 50px rgba(0,0,0,0.35); border:1px solid var(--paper-line); position:relative; margin:20px 0;}
+.auth-card::before{content:""; position:absolute; top:13px; left:13px; right:13px; bottom:13px; border:1px solid var(--paper-line); border-radius:2px; pointer-events:none;}
+.auth-brand{text-align:center; margin-bottom:20px;}
+.auth-brand .mark{width:44px;height:44px;border-radius:50%; margin:0 auto 10px; border:2px solid var(--gold); display:flex; align-items:center; justify-content:center; font-family:'Fraunces',serif; font-weight:700; font-size:19px; color:var(--gold);}
+.auth-brand h1{font-size:19px;}
+.auth-brand .sub{font-size:11px; text-transform:uppercase; letter-spacing:0.07em; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace; margin-top:5px;}
+.auth-tabs{display:flex; border-bottom:1px solid var(--paper-line); margin-bottom:20px;}
+.auth-tab{flex:1; text-align:center; padding:9px 0; font-size:12.5px; font-family:'IBM Plex Mono',monospace; color:var(--ink-soft); cursor:pointer; border-bottom:2px solid transparent; text-transform:uppercase; letter-spacing:0.03em;}
+.auth-tab.active{color:var(--forest); border-bottom-color:var(--gold); font-weight:600;}
+.auth-field{margin-bottom:14px;}
+.auth-field label{display:block; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace; margin-bottom:5px;}
+.auth-field input{width:100%; padding:11px; border:1px solid var(--paper-line); border-radius:2px; font-size:14.5px; background:var(--paper); font-family:'Source Serif 4',serif;}
+.auth-field input:focus{outline:none; border-color:var(--gold); background:var(--white);}
+.auth-error{background:var(--rust-pale); color:var(--rust); font-size:12.5px; padding:10px 12px; border-radius:2px; margin-bottom:14px; font-family:'IBM Plex Mono',monospace; display:none; line-height:1.5;}
+.auth-error.show{display:block;}
+.auth-success{background:var(--green-pale); color:var(--forest); font-size:12.5px; padding:10px 12px; border-radius:2px; margin-bottom:14px; font-family:'IBM Plex Mono',monospace; display:none; line-height:1.5;}
+.auth-success.show{display:block;}
+.auth-submit{width:100%; padding:12px; margin-top:4px;}
+.auth-note{font-size:11.5px; color:var(--ink-soft); text-align:center; margin-top:16px; line-height:1.6; font-family:'IBM Plex Mono',monospace;}
+.auth-links{text-align:center; margin-top:12px; font-size:12.5px;}
+.auth-form{display:none;}
+.auth-form.active{display:block;}
+.config-warning{background:var(--rust-pale); color:var(--rust); font-size:12px; padding:12px 14px; border-radius:3px; margin-bottom:16px; font-family:'IBM Plex Mono',monospace; line-height:1.6;}
+</style>
+</head>
+<body>
+
+<div class="loading-screen" id="loadingScreen">
+  <div class="mark"></div>
+  <p>abrindo a caderneta…</p>
+</div>
+
+<div class="auth-screen" id="authScreen" style="display:none;">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <div class="mark">$</div>
+      <h1>Caderneta Financeira</h1>
+      <div class="sub">acesso pela sua conta</div>
+    </div>
+    <div id="configWarning" class="config-warning" style="display:none;">
+      Este site ainda não foi conectado a um banco de dados. Configure SUPABASE_URL e SUPABASE_ANON_KEY no início do arquivo antes de publicar.
+    </div>
+    <div class="auth-tabs" id="authTabs">
+      <div class="auth-tab active" data-tab="login">Entrar</div>
+      <div class="auth-tab" data-tab="register">Criar conta</div>
+    </div>
+    <div class="auth-error" id="authError"></div>
+    <div class="auth-success" id="authSuccess"></div>
+
+    <form class="auth-form active" id="loginForm">
+      <div class="auth-field"><label>E-mail</label><input type="email" id="loginEmail" autocomplete="email" required></div>
+      <div class="auth-field"><label>Senha</label><input type="password" id="loginPass" autocomplete="current-password" required></div>
+      <button type="submit" class="btn auth-submit" id="loginSubmitBtn">Entrar</button>
+      <div class="auth-links"><button type="button" class="btn link" id="btnForgotOpen">Esqueci minha senha</button></div>
+    </form>
+
+    <form class="auth-form" id="registerForm">
+      <div class="auth-field"><label>Seu nome</label><input type="text" id="regName" autocomplete="name" required></div>
+      <div class="auth-field"><label>E-mail</label><input type="email" id="regEmail" autocomplete="email" required></div>
+      <div class="auth-field"><label>Senha</label><input type="password" id="regPass" autocomplete="new-password" required minlength="6"></div>
+      <div class="auth-field"><label>Confirme a senha</label><input type="password" id="regPass2" autocomplete="new-password" required minlength="6"></div>
+      <button type="submit" class="btn gold auth-submit" id="registerSubmitBtn">Criar minha conta</button>
+    </form>
+
+    <form class="auth-form" id="forgotForm">
+      <div class="auth-field"><label>E-mail da sua conta</label><input type="email" id="forgotEmail" autocomplete="email" required></div>
+      <button type="submit" class="btn auth-submit" id="forgotSubmitBtn">Enviar link de recuperação</button>
+      <div class="auth-links"><button type="button" class="btn link" id="btnForgotBack">Voltar para o login</button></div>
+    </form>
+
+    <form class="auth-form" id="resetForm">
+      <div class="auth-field"><label>Nova senha</label><input type="password" id="resetPass" autocomplete="new-password" required minlength="6"></div>
+      <div class="auth-field"><label>Confirme a nova senha</label><input type="password" id="resetPass2" autocomplete="new-password" required minlength="6"></div>
+      <button type="submit" class="btn gold auth-submit" id="resetSubmitBtn">Salvar nova senha</button>
+    </form>
+
+    <div class="auth-note" id="authNote">Seus dados ficam salvos com segurança na sua conta e acompanham você em qualquer navegador ou aparelho.</div>
+  </div>
+</div>
+
+<div id="app" style="display:none;">
+  <div class="sidebar">
+    <div class="brand">
+      <div class="mark">$</div>
+      <div>
+        <h1>Caderneta<br>Financeira</h1>
+        <div class="sub">controle financeiro</div>
+      </div>
+    </div>
+    <div class="nav" id="navList"></div>
+    <div class="mobile-topbar" id="navListMobile"></div>
+    <div class="user-badge"><span class="dot"></span> <b id="currentUserLabel"></b></div>
+    <div class="sidebar-footer">
+      Dados salvos na sua conta
+      <div>
+        <button id="btnExport">Exportar backup</button>
+        <button id="btnImport">Importar</button>
+        <button id="btnLogout">Sair</button>
+      </div>
+      <input type="file" id="importFile" accept="application/json" style="display:none;">
+    </div>
+  </div>
+  <div class="main"><div id="sections"></div></div>
+</div>
+
+<div class="save-toast" id="saveToast">✓ salvo</div>
+
+<script>
+/* =========================================================
+   CONFIGURAÇÃO DO SUPABASE
+   Preencha com os dados do SEU projeto (Project Settings > API).
+   Sem isso, o site não consegue entrar, cadastrar ou salvar nada.
+========================================================= */
+const SUPABASE_URL = "https://apcspognnfymkemmqyzd.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_3EVv-sQvRcQAoebiCoUdFw_2FtXb_I8";
+
+const supabaseReady = SUPABASE_URL.startsWith('http') && SUPABASE_ANON_KEY.length > 20;
+const sb = supabaseReady ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+/* =========================================================
+   HELPERS GERAIS
+========================================================= */
+const fmt = (n) => (Number(n)||0).toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2,9));
+
+function parseMoney(v){
+  if(v===null||v===undefined) return 0;
+  let s = String(v).trim();
+  if(s==='') return 0;
+  s = s.replace(/[^\d,.\-]/g,'');
+  if(s.includes(',') && s.includes('.')){ s = s.replace(/\./g,'').replace(',', '.'); }
+  else if(s.includes(',')){ s = s.replace(',', '.'); }
+  const n = parseFloat(s);
+  return isNaN(n) ? 0 : n;
+}
+function moneyDisplay(v){
+  if(v===null||v===undefined||v==='') return '';
+  return String(v).replace('.', ',');
+}
+function bindMoneyInput(inputEl, getVal, setVal, onChange){
+  inputEl.value = moneyDisplay(getVal());
+  inputEl.addEventListener('input', e=>{
+    setVal(parseMoney(e.target.value));
+    scheduleSave();
+    if(onChange) onChange();
+  });
+  inputEl.addEventListener('blur', e=>{ e.target.value = moneyDisplay(getVal()); });
+}
+function escapeHtml(str){
+  return String(str??'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function escAttr(str){ return escapeHtml(str); }
+
+/* =========================================================
+   ESTADO
+========================================================= */
+function emptyState(){
+  return {
+    months: [], fixedExpenses: [], salaries: [], receivables: [], loans: [], investments: [],
+    customSections: [],
+    navConfig: null, // preenchido por ensureNavConfig()
+    lastUpdated: null, selectedMonth: null, dashboardMonth: null,
+  };
+}
+
+let state = null;
+let currentSession = null; // sessão do Supabase (user + token)
+let saveTimer = null;
+let saving = false;
+
+async function loadStateFromServer(){
+  const userId = currentSession.user.id;
+  const { data, error } = await sb.from('financial_data').select('data').eq('user_id', userId).maybeSingle();
+  if(error){ console.error(error); state = emptyState(); return; }
+  if(data && data.data && Object.keys(data.data).length){
+    state = Object.assign(emptyState(), data.data);
+  } else {
+    state = emptyState();
+    await sb.from('financial_data').insert({ user_id: userId, data: state });
+  }
+}
+
+function scheduleSave(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(persistState, 700);
+}
+
+async function persistState(){
+  if(!currentSession) return;
+  state.lastUpdated = new Date().toISOString();
+  saving = true;
+  try{
+    const { error } = await sb.from('financial_data')
+      .upsert({ user_id: currentSession.user.id, data: state, updated_at: new Date().toISOString() });
+    if(error) throw error;
+    showToast('✓ salvo', false);
+    renderStampAll();
+  }catch(e){
+    console.error('Falha ao salvar', e);
+    showToast('Não foi possível salvar. Verifique sua conexão e tente novamente.', true);
+  }finally{
+    saving = false;
+  }
+}
+
+function showToast(msg, isError){
+  const t = document.getElementById('saveToast');
+  t.textContent = msg;
+  t.classList.toggle('error', !!isError);
+  t.classList.add('show');
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(()=>t.classList.remove('show'), isError ? 3200 : 1600);
+}
+
+/* =========================================================
+   MENU LATERAL — editável, com exclusão e restauração
+========================================================= */
+const DEFAULT_NAV = [
+  {id:'dashboard', label:'Visão Geral'},
+  {id:'gastos', label:'Gastos Mensais'},
+  {id:'fixos', label:'Gastos Fixos'},
+  {id:'salarios', label:'Salários'},
+  {id:'receber', label:'Dinheiro a Receber'},
+  {id:'investimentos', label:'Investimentos'},
+];
+let activeSection = 'dashboard';
+
+function ensureNavConfig(){
+  if(!Array.isArray(state.navConfig)) state.navConfig = [];
+  DEFAULT_NAV.forEach(def=>{
+    if(!state.navConfig.find(n=>n.id===def.id)){
+      state.navConfig.push({id:def.id, label:def.label, hidden:false, core:true});
+    }
+  });
+  if(!Array.isArray(state.customSections)) state.customSections = [];
+  state.customSections.forEach(cs=>{
+    if(!state.navConfig.find(n=>n.id===cs.id)){
+      state.navConfig.push({id:cs.id, label:cs.label, hidden:false, core:false});
+    }
+  });
+}
+
+function renderNav(){
+  ensureNavConfig();
+  const all = state.navConfig;
+  const visible = all.filter(n=>!n.hidden);
+  const hidden = all.filter(n=>n.hidden);
+  if(!visible.find(v=>v.id===activeSection)){
+    activeSection = visible[0] ? visible[0].id : null;
+  }
+
+  const itemHtml = (s,i)=>`
+    <div class="nav-item ${s.id===activeSection?'active':''}" data-nav="${escAttr(s.id)}">
+      <span class="num">${String(i+1).padStart(2,'0')}</span>
+      <span class="nav-label">${escapeHtml(s.label)}</span>
+      <span class="nav-actions">
+        <button class="nav-icon-btn" data-edit="${escAttr(s.id)}" title="renomear">✎</button>
+        <button class="nav-icon-btn" data-delnav="${escAttr(s.id)}" title="excluir">✕</button>
+      </span>
+    </div>`;
+  const html = visible.map(itemHtml).join('');
+  const addBtn = `<div class="nav-add-btn" id="btnAddSection">+ adicionar item</div>`;
+  const hiddenBlock = hidden.length ? `
+    <div class="nav-hidden-toggle" id="navHiddenToggle">seções ocultas (${hidden.length}) ▾</div>
+    <div class="nav-hidden-list" id="navHiddenList" style="display:none;">
+      ${hidden.map(s=>`<div class="nav-hidden-item" data-restore="${escAttr(s.id)}">${escapeHtml(s.label)} <span>restaurar</span></div>`).join('')}
+    </div>` : '';
+
+  document.getElementById('navList').innerHTML = html + addBtn + hiddenBlock;
+  document.getElementById('navListMobile').innerHTML = html;
+
+  wireNav(document.getElementById('navList'));
+  wireNav(document.getElementById('navListMobile'));
+
+  const addBtnEl = document.getElementById('btnAddSection');
+  if(addBtnEl) addBtnEl.addEventListener('click', onAddCustomSection);
+
+  const hiddenToggle = document.getElementById('navHiddenToggle');
+  if(hiddenToggle){
+    hiddenToggle.addEventListener('click', ()=>{
+      const list = document.getElementById('navHiddenList');
+      list.style.display = list.style.display==='none' ? 'block' : 'none';
+    });
+  }
+  document.querySelectorAll('[data-restore]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const item = state.navConfig.find(n=>n.id===el.dataset.restore);
+      if(item){ item.hidden = false; scheduleSave(); renderNav(); }
+    });
+  });
+}
+
+function wireNav(container){
+  if(!container) return;
+  container.querySelectorAll('[data-nav]').forEach(el=>{
+    el.addEventListener('click', (e)=>{
+      if(e.target.closest('[data-edit]') || e.target.closest('[data-delnav]')) return;
+      activeSection = el.dataset.nav;
+      renderNav();
+      renderSection();
+    });
+  });
+  container.querySelectorAll('[data-edit]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      startInlineRename(btn.dataset.edit, btn.closest('.nav-item'));
+    });
+  });
+  container.querySelectorAll('[data-delnav]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      onDeleteNavItem(btn.dataset.delnav);
+    });
+  });
+}
+
+function startInlineRename(id, itemEl){
+  const cfg = state.navConfig.find(n=>n.id===id);
+  if(!cfg || !itemEl) return;
+  const labelEl = itemEl.querySelector('.nav-label');
+  const current = cfg.label;
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.className = 'nav-edit-input';
+  input.value = current;
+  labelEl.replaceWith(input);
+  input.focus();
+  input.select();
+  const commit = ()=>{
+    const val = input.value.trim() || current;
+    cfg.label = val;
+    if(!cfg.core){
+      const cs = state.customSections.find(c=>c.id===id);
+      if(cs) cs.label = val;
+    }
+    scheduleSave();
+    renderNav();
+  };
+  input.addEventListener('blur', commit);
+  input.addEventListener('keydown', e=>{
+    if(e.key==='Enter'){ e.preventDefault(); input.blur(); }
+    if(e.key==='Escape'){ e.preventDefault(); renderNav(); }
+  });
+}
+
+function onDeleteNavItem(id){
+  const cfg = state.navConfig.find(n=>n.id===id);
+  if(!cfg) return;
+  const visibleCount = state.navConfig.filter(n=>!n.hidden).length;
+  if(visibleCount<=1){ alert('Deixe pelo menos um item no menu.'); return; }
+  if(!confirm('Tem certeza que deseja excluir este item?')) return;
+
+  if(cfg.core){
+    cfg.hidden = true; // seções do sistema só somem do menu; dados continuam intactos
+  } else {
+    state.navConfig = state.navConfig.filter(n=>n.id!==id);
+    state.customSections = state.customSections.filter(c=>c.id!==id);
+  }
+  if(activeSection===id) activeSection = null;
+  scheduleSave();
+  renderNav();
+  renderSection();
+}
+
+function onAddCustomSection(){
+  const label = prompt('Nome da nova seção (ex: Contas da Casa):');
+  if(!label) return;
+  const id = 'custom-' + uid();
+  state.customSections.push({id, label: label.trim(), items:[]});
+  state.navConfig.push({id, label: label.trim(), hidden:false, core:false});
+  activeSection = id;
+  scheduleSave();
+  renderNav();
+  renderSection();
+}
+
+/* =========================================================
+   CÁLCULOS
+========================================================= */
+function monthTotal(month){ return month.categories.reduce((sum,c)=> sum + c.items.reduce((s,i)=>s+(Number(i.value)||0),0), 0); }
+function categoryTotal(cat){ return cat.items.reduce((s,i)=>s+(Number(i.value)||0),0); }
+function salaryTotal(sal){ return sal.items.reduce((s,i)=>s+(Number(i.value)||0),0); }
+function receivablesPendingTotal(){ return state.receivables.filter(r=>r.status!=='recebido').reduce((s,r)=>s+(Number(r.valor)||0),0); }
+function loanRemaining(loan){ const restantes = Math.max(0, loan.parcelas - loan.parcelasPagas); return restantes * (Number(loan.valorParcela)||0); }
+function futureValue(P, PMT, anos, taxaAnualPct){
+  const ta = taxaAnualPct/100;
+  const im = Math.pow(1+ta, 1/12) - 1;
+  const n = anos*12;
+  const growth = Math.pow(1+im, n);
+  const fromP = P*growth;
+  const fromPMT = im===0 ? PMT*n : PMT*((growth-1)/im);
+  return fromP + fromPMT;
+}
+function investmentValue(inv, useHigh){
+  if(inv.tipo==='fixo') return Number(inv.valorFixo)||0;
+  const taxa = useHigh ? inv.taxaAlta : inv.taxaBaixa;
+  return futureValue(Number(inv.valorInicial)||0, Number(inv.aporteMensal)||0, Number(inv.anos)||0, Number(taxa)||0);
+}
+function investmentsTotal(useHigh){ return state.investments.reduce((s,inv)=>s+investmentValue(inv,useHigh),0); }
+function fmtStampDate(iso){
+  if(!iso) return '—';
+  const d = new Date(iso);
+  const dd = String(d.getDate()).padStart(2,'0'), mm = String(d.getMonth()+1).padStart(2,'0');
+  const hh = String(d.getHours()).padStart(2,'0'), mi = String(d.getMinutes()).padStart(2,'0');
+  return `${dd}/${mm} · ${hh}:${mi}`;
+}
+function renderStampAll(){
+  document.querySelectorAll('.js-stamp-date').forEach(el=>{ el.textContent = fmtStampDate(state.lastUpdated); });
+}
+
+/* =========================================================
+   RENDER: VISÃO GERAL (com seletor de mês)
+========================================================= */
+let chartRef = null;
+function renderDashboard(){
+  const months = state.months;
+  if(!state.dashboardMonth || !months.find(m=>m.id===state.dashboardMonth)){
+    state.dashboardMonth = months.length ? months[months.length-1].id : null;
+  }
+  const month = months.find(m=>m.id===state.dashboardMonth);
+  const sal = month ? state.salaries.find(s=>s.monthId===month.id) : null;
+  const gastos = month ? monthTotal(month) : 0;
+  const receitas = sal ? salaryTotal(sal) : 0;
+  const saldo = receitas - gastos;
+  const pendente = receivablesPendingTotal();
+  const investTotalBaixa = investmentsTotal(false);
+
+  const el = document.createElement('div');
+  el.innerHTML = `
+    <div class="page-header">
+      <div>
+        <h2>Visão Geral</h2>
+        <div class="desc">Escolha o mês para comparar receita e gastos daquele período. Tudo recalculado sozinho.</div>
+      </div>
+      <div class="stamp"><div class="txt"><b>ATUALIZADO</b><span class="js-stamp-date">${fmtStampDate(state.lastUpdated)}</span><br>caderneta financeira</div></div>
+    </div>
+
+    <div class="toolbar">
+      <select class="tag-select" id="dashMonthSelect"></select>
+    </div>
+
+    <div class="grid-3">
+      <div class="stat pos"><div class="label">Receita ${month?'· '+escAttr(month.label):''}</div><div class="value mono">${fmt(receitas)}</div></div>
+      <div class="stat neg"><div class="label">Gastos ${month?'· '+escAttr(month.label):''}</div><div class="value mono">${fmt(gastos)}</div></div>
+      <div class="stat ${saldo<0?'neg':''}"><div class="label">Sobra do mês</div><div class="value mono">${fmt(saldo)}</div></div>
+    </div>
+
+    <div class="grid-2" style="margin-top:22px;">
+      <div class="card">
+        <h3>Receita × Gastos por mês</h3>
+        <div class="chart-wrap"><canvas id="chartMain"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Resumo geral</h3>
+        <div class="table-wrap"><table>
+          <tr><td>A receber (pendente)</td><td class="num mono">${fmt(pendente)}</td></tr>
+          <tr><td>Investimentos (cenário conservador)</td><td class="num mono">${fmt(investTotalBaixa)}</td></tr>
+          <tr><td>Gastos fixos mensais</td><td class="num mono">${fmt(state.fixedExpenses.reduce((s,f)=>s+(Number(f.value)||0),0))}</td></tr>
+          <tr><td>Empréstimos em aberto</td><td class="num mono">${fmt(state.loans.reduce((s,l)=>s+loanRemaining(l),0))}</td></tr>
+        </table></div>
+        <div class="small-note">Esses números seguem os dados das outras abas — edite lá e eles mudam aqui sozinhos.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Todos os meses <span class="hint">clique em "Gastos Mensais" para editar cada um</span></h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Mês</th><th class="num">Gastos</th><th class="num">Receita</th><th class="num">Sobra</th></tr></thead>
+        <tbody>
+          ${months.map(m=>{
+            const s2 = state.salaries.find(s=>s.monthId===m.id);
+            const g = monthTotal(m); const r = s2? salaryTotal(s2):0; const sd = r-g;
+            return `<tr><td>${escapeHtml(m.label)}</td><td class="num mono">${fmt(g)}</td><td class="num mono">${fmt(r)}</td><td class="num mono" style="color:${sd<0?'var(--rust)':'var(--forest)'}">${fmt(sd)}</td></tr>`;
+          }).join('') || `<tr><td colspan="4"><div class="empty-state">Nenhum mês cadastrado ainda.</div></td></tr>`}
+        </tbody>
+      </table></div>
+    </div>
+  `;
+  const sel = el.querySelector('#dashMonthSelect');
+  sel.innerHTML = months.length ? months.map(m=>`<option value="${m.id}" ${m.id===state.dashboardMonth?'selected':''}>${escapeHtml(m.label)}</option>`).join('') : `<option>Nenhum mês cadastrado</option>`;
+  sel.addEventListener('change', ()=>{ state.dashboardMonth = sel.value; renderSection(); });
+  return el;
+}
+
+function drawChart(){
+  const canvas = document.getElementById('chartMain');
+  if(!canvas || typeof Chart==='undefined') return;
+  if(chartRef) chartRef.destroy();
+  const months = state.months;
+  const labels = months.map(m=>m.label.split(' / ')[0]);
+  const gastosData = months.map(m=>monthTotal(m));
+  const salData = months.map(m=>{ const s = state.salaries.find(x=>x.monthId===m.id); return s? salaryTotal(s):0; });
+  chartRef = new Chart(canvas.getContext('2d'), {
+    type:'bar',
+    data:{ labels, datasets:[
+      {label:'Receita', data:salData, backgroundColor:'#A9823C', borderRadius:2},
+      {label:'Gastos', data:gastosData, backgroundColor:'#8C3B32', borderRadius:2},
+    ]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{labels:{font:{family:'IBM Plex Mono', size:11}}}},
+      scales:{
+        y:{ticks:{font:{family:'IBM Plex Mono', size:10}}, grid:{color:'#E8E0C8'}},
+        x:{ticks:{font:{family:'IBM Plex Mono', size:11}}, grid:{display:false}}
+      }
+    }
+  });
+}
+
+/* =========================================================
+   RENDER: GASTOS MENSAIS
+========================================================= */
+function renderGastos(){
+  const el = document.createElement('div');
+  if(!state.months.find(m=>m.id===state.selectedMonth) && state.months.length){
+    state.selectedMonth = state.months[0].id;
+  }
+  const month = state.months.find(m=>m.id===state.selectedMonth);
+
+  el.innerHTML = `
+    <div class="page-header">
+      <div><h2>Gastos Mensais</h2><div class="desc">Adicione categorias e itens à vontade. O subtotal de cada categoria e o total do mês somam sozinhos.</div></div>
+    </div>
+    <div class="toolbar">
+      <select class="tag-select" id="monthSelect"></select>
+      <button class="btn secondary small" id="btnNewMonth">+ novo mês</button>
+      <button class="btn secondary small" id="btnDupMonth">duplicar mês atual</button>
+      <button class="btn gold small" id="btnApplyFixed">aplicar gastos fixos</button>
+      ${month ? `<button class="btn secondary small" id="btnDelMonth" style="border-color:var(--rust); color:var(--rust);">excluir mês</button>` : ''}
+    </div>
+    <div id="monthContent"></div>
+  `;
+
+  const sel = el.querySelector('#monthSelect');
+  sel.innerHTML = state.months.map(m=>`<option value="${m.id}" ${m.id===state.selectedMonth?'selected':''}>${escapeHtml(m.label)}</option>`).join('');
+  sel.addEventListener('change', ()=>{ state.selectedMonth = sel.value; renderSection(); });
+
+  el.querySelector('#btnNewMonth').addEventListener('click', ()=>{
+    const label = prompt('Nome do novo mês (ex: Novembro / 2026):');
+    if(!label) return;
+    const id = uid();
+    state.months.push({id, label, categories:[]});
+    state.selectedMonth = id;
+    scheduleSave(); renderSection();
+  });
+
+  el.querySelector('#btnDupMonth').addEventListener('click', ()=>{
+    if(!month) return;
+    const label = prompt('Nome do novo mês (cópia de ' + month.label + '):', '');
+    if(!label) return;
+    const clone = JSON.parse(JSON.stringify(month));
+    clone.id = uid(); clone.label = label;
+    state.months.push(clone);
+    state.selectedMonth = clone.id;
+    scheduleSave(); renderSection();
+  });
+
+  el.querySelector('#btnApplyFixed').addEventListener('click', ()=>{
+    if(!month) return;
+    let cat = month.categories.find(c=>c.name==='Gastos Fixos');
+    if(!cat){ cat = {name:'Gastos Fixos', items:[]}; month.categories.unshift(cat); }
+    state.fixedExpenses.forEach(f=>{
+      if(!cat.items.find(i=>i.desc===f.name)) cat.items.push({desc:f.name, value:f.value});
+    });
+    scheduleSave(); renderSection();
+  });
+
+  const delBtn = el.querySelector('#btnDelMonth');
+  if(delBtn){
+    delBtn.addEventListener('click', ()=>{
+      if(!confirm(`Excluir "${month.label}" e todos os gastos dele?`)) return;
+      state.months = state.months.filter(m=>m.id!==month.id);
+      const salIdx = state.salaries.findIndex(s=>s.monthId===month.id);
+      if(salIdx>=0) state.salaries.splice(salIdx,1);
+      state.selectedMonth = state.months[0] ? state.months[0].id : null;
+      scheduleSave(); renderSection();
+    });
+  }
+
+  const content = el.querySelector('#monthContent');
+  if(!month){
+    content.innerHTML = `<div class="card"><div class="empty-state">Nenhum mês cadastrado ainda. Clique em "+ novo mês" para começar.</div></div>`;
+    return el;
+  }
+
+  const total = monthTotal(month);
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <h3>${escapeHtml(month.label)} <span class="hint">${month.categories.length} categorias</span></h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th style="width:26%">Categoria</th><th>Descrição</th><th class="num" style="width:110px">Valor</th><th style="width:70px"></th></tr></thead>
+      <tbody id="catBody"></tbody>
+      <tfoot><tr class="total-row"><td colspan="2">TOTAL DO MÊS</td><td class="num" id="month-total-cell">${fmt(total)}</td><td></td></tr></tfoot>
+    </table></div>
+    <button class="btn secondary small" id="btnAddCat" style="margin-top:14px;">+ nova categoria</button>
+  `;
+  content.appendChild(card);
+
+  const body = card.querySelector('#catBody');
+  month.categories.forEach((cat, ci)=>{
+    const catTotal = categoryTotal(cat);
+    cat.items.forEach((item, ii)=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${ii===0 ? catInputHtml(cat.name) : ''}</td>
+        <td><input type="text" value="${escAttr(item.desc)}" data-role="desc"></td>
+        <td class="num"><input type="text" inputmode="decimal" class="money" data-role="value"></td>
+        <td><button class="icon-btn" data-role="delItem" title="remover item">✕</button></td>
+      `;
+      tr.querySelector('[data-role=desc]').addEventListener('input', e=>{ item.desc=e.target.value; scheduleSave(); });
+      bindMoneyInput(tr.querySelector('[data-role=value]'), ()=>item.value, v=>item.value=v, ()=>recalcGastos(month, ci));
+      tr.querySelector('[data-role=delItem]').addEventListener('click', ()=>{ cat.items.splice(ii,1); scheduleSave(); renderSection(); });
+      if(ii===0){
+        const catInput = tr.querySelector('[data-role=catname]');
+        catInput.addEventListener('input', e=>{ cat.name = e.target.value; scheduleSave(); });
+      }
+      body.appendChild(tr);
+    });
+    const addRow = document.createElement('tr');
+    addRow.innerHTML = `
+      <td>${cat.items.length===0 ? catInputHtml(cat.name) : ''}</td>
+      <td><button class="btn secondary small" data-role="addItem">+ item em "${escAttr(cat.name)}"</button></td>
+      <td class="num mono" id="cat-total-${ci}" style="font-weight:600;">${fmt(catTotal)}</td>
+      <td><button class="icon-btn" data-role="delCat" title="remover categoria">🗑</button></td>
+    `;
+    addRow.querySelector('[data-role=addItem]').addEventListener('click', ()=>{
+      cat.items.push({desc:'', value:0}); scheduleSave(); renderSection();
+    });
+    addRow.querySelector('[data-role=delCat]').addEventListener('click', ()=>{
+      if(!confirm(`Remover categoria "${cat.name}"?`)) return;
+      month.categories.splice(ci,1); scheduleSave(); renderSection();
+    });
+    if(cat.items.length===0){
+      const ci2 = addRow.querySelector('[data-role=catname]');
+      if(ci2) ci2.addEventListener('input', e=>{ cat.name = e.target.value; scheduleSave(); });
+    }
+    body.appendChild(addRow);
+  });
+
+  card.querySelector('#btnAddCat').addEventListener('click', ()=>{
+    month.categories.push({name:'Nova categoria', items:[{desc:'', value:0}]});
+    scheduleSave(); renderSection();
+  });
+
+  return el;
+}
+function catInputHtml(name){
+  return `<input type="text" value="${escAttr(name)}" data-role="catname" style="font-weight:600; color:var(--forest);">`;
+}
+function recalcGastos(month, ci){
+  const catCell = document.getElementById('cat-total-'+ci);
+  if(catCell) catCell.textContent = fmt(categoryTotal(month.categories[ci]));
+  const totalCell = document.getElementById('month-total-cell');
+  if(totalCell) totalCell.textContent = fmt(monthTotal(month));
+}
+
+/* =========================================================
+   RENDER: GASTOS FIXOS
+========================================================= */
+function renderFixos(){
+  const el = document.createElement('div');
+  const total = state.fixedExpenses.reduce((s,f)=>s+(Number(f.value)||0),0);
+  el.innerHTML = `
+    <div class="page-header">
+      <div><h2>Gastos Fixos</h2><div class="desc">O modelo que se repete todo mês. Use o botão "aplicar gastos fixos" dentro de um mês para importar tudo de uma vez.</div></div>
+    </div>
+    <div class="card">
+      <h3>Modelo de gastos fixos</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Descrição</th><th class="num" style="width:130px">Valor mensal</th><th style="width:60px"></th></tr></thead>
+        <tbody id="fixedBody"></tbody>
+        <tfoot><tr class="total-row"><td>TOTAL</td><td class="num" id="fixed-total-cell">${fmt(total)}</td><td></td></tr></tfoot>
+      </table></div>
+      <button class="btn secondary small" id="btnAddFixed" style="margin-top:14px;">+ novo gasto fixo</button>
+    </div>
+  `;
+  const body = el.querySelector('#fixedBody');
+  if(state.fixedExpenses.length===0){
+    body.innerHTML = `<tr><td colspan="3"><div class="empty-state">Nenhum gasto fixo cadastrado ainda. Clique em "+ novo gasto fixo" para começar.</div></td></tr>`;
+  }
+  state.fixedExpenses.forEach((f, i)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="text" value="${escAttr(f.name)}" data-role="name"></td>
+      <td class="num"><input type="text" inputmode="decimal" class="money" data-role="value"></td>
+      <td><button class="icon-btn" data-role="del">✕</button></td>
+    `;
+    tr.querySelector('[data-role=name]').addEventListener('input', e=>{ f.name=e.target.value; scheduleSave(); });
+    bindMoneyInput(tr.querySelector('[data-role=value]'), ()=>f.value, v=>f.value=v, ()=>{
+      const cell = document.getElementById('fixed-total-cell');
+      if(cell) cell.textContent = fmt(state.fixedExpenses.reduce((s,x)=>s+(Number(x.value)||0),0));
+    });
+    tr.querySelector('[data-role=del]').addEventListener('click', ()=>{ state.fixedExpenses.splice(i,1); scheduleSave(); renderSection(); });
+    body.appendChild(tr);
+  });
+  el.querySelector('#btnAddFixed').addEventListener('click', ()=>{
+    state.fixedExpenses.push({name:'', value:0}); scheduleSave(); renderSection();
+  });
+  return el;
+}
+
+/* =========================================================
+   RENDER: SALÁRIOS
+========================================================= */
+function renderSalarios(){
+  const el = document.createElement('div');
+  if(!state.salaries.find(s=>s.monthId===state.selectedMonth) && state.months.length){
+    const first = state.salaries[0];
+    state.selectedMonth = first ? first.monthId : state.months[0].id;
+  }
+  const month = state.months.find(m=>m.id===state.selectedMonth);
+  let sal = state.salaries.find(s=>s.monthId===state.selectedMonth);
+
+  el.innerHTML = `
+    <div class="page-header">
+      <div><h2>Salários</h2><div class="desc">Horas extras calculam o valor sozinhas (valor da hora × quantidade de horas). O total soma automaticamente.</div></div>
+    </div>
+    <div class="toolbar">
+      <select class="tag-select" id="monthSelect"></select>
+      ${!sal && month ? `<button class="btn gold small" id="btnCreateSal">criar salário deste mês</button>` : ''}
+    </div>
+    <div id="salContent"></div>
+  `;
+  const sel = el.querySelector('#monthSelect');
+  sel.innerHTML = state.months.map(m=>`<option value="${m.id}" ${m.id===state.selectedMonth?'selected':''}>${escapeHtml(m.label)}</option>`).join('');
+  sel.addEventListener('change', ()=>{ state.selectedMonth = sel.value; renderSection(); });
+
+  const createBtn = el.querySelector('#btnCreateSal');
+  if(createBtn){
+    createBtn.addEventListener('click', ()=>{
+      state.salaries.push({monthId: month.id, items:[{desc:'Salário', valorHE:null, horas:null, value:0}]});
+      scheduleSave(); renderSection();
+    });
+  }
+
+  const content = el.querySelector('#salContent');
+  if(!month){
+    content.innerHTML = `<div class="card"><div class="empty-state">Cadastre um mês em "Gastos Mensais" primeiro.</div></div>`;
+    return el;
+  }
+  if(!sal){
+    content.innerHTML = `<div class="card"><div class="empty-state">Ainda não há salário lançado para ${escapeHtml(month.label)}.</div></div>`;
+    return el;
+  }
+
+  const total = salaryTotal(sal);
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <h3>${escapeHtml(month.label)}</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Descrição</th><th class="num" style="width:100px">Valor h.e.</th><th class="num" style="width:90px">Horas</th><th class="num" style="width:120px">Valor</th><th style="width:50px"></th></tr></thead>
+      <tbody id="salBody"></tbody>
+      <tfoot><tr class="total-row"><td colspan="3">TOTAL</td><td class="num" id="sal-total-cell">${fmt(total)}</td><td></td></tr></tfoot>
+    </table></div>
+    <button class="btn secondary small" id="btnAddSalItem" style="margin-top:14px;">+ novo item</button>
+  `;
+  content.appendChild(card);
+  const body = card.querySelector('#salBody');
+  sal.items.forEach((item,i)=>{
+    const isHE = item.valorHE !== null && item.valorHE !== undefined;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="text" value="${escAttr(item.desc)}" data-role="desc"></td>
+      <td class="num"><input type="text" inputmode="decimal" class="money" placeholder="—" data-role="valorHE"></td>
+      <td class="num"><input type="text" inputmode="decimal" class="money" placeholder="—" data-role="horas"></td>
+      <td class="num"><input type="text" inputmode="decimal" class="money" data-role="value" id="sal-value-${i}" ${isHE?'readonly style="color:var(--ink-soft)"':''}></td>
+      <td><button class="icon-btn" data-role="del">✕</button></td>
+    `;
+    tr.querySelector('[data-role=desc]').addEventListener('input', e=>{ item.desc=e.target.value; scheduleSave(); });
+    const heInput = tr.querySelector('[data-role=valorHE]');
+    heInput.value = item.valorHE===null||item.valorHE===undefined ? '' : moneyDisplay(item.valorHE);
+    heInput.addEventListener('input', e=>{
+      item.valorHE = e.target.value===''? null : parseMoney(e.target.value);
+      if(item.valorHE!==null && item.horas) item.value = round2(item.valorHE*item.horas);
+      scheduleSave(); recalcSalarios(sal, i);
+    });
+    heInput.addEventListener('blur', e=>{ e.target.value = item.valorHE===null||item.valorHE===undefined?'':moneyDisplay(item.valorHE); });
+
+    const horasInput = tr.querySelector('[data-role=horas]');
+    horasInput.value = item.horas===null||item.horas===undefined ? '' : moneyDisplay(item.horas);
+    horasInput.addEventListener('input', e=>{
+      item.horas = e.target.value===''? null : parseMoney(e.target.value);
+      if(item.valorHE!==null && item.horas) item.value = round2(item.valorHE*item.horas);
+      scheduleSave(); recalcSalarios(sal, i);
+    });
+    horasInput.addEventListener('blur', e=>{ e.target.value = item.horas===null||item.horas===undefined?'':moneyDisplay(item.horas); });
+
+    if(!isHE){
+      bindMoneyInput(tr.querySelector('[data-role=value]'), ()=>item.value, v=>item.value=v, ()=>{
+        const cell = document.getElementById('sal-total-cell');
+        if(cell) cell.textContent = fmt(salaryTotal(sal));
+      });
+    } else {
+      tr.querySelector('[data-role=value]').value = moneyDisplay(item.value);
+    }
+    tr.querySelector('[data-role=del]').addEventListener('click', ()=>{ sal.items.splice(i,1); scheduleSave(); renderSection(); });
+    body.appendChild(tr);
+  });
+  card.querySelector('#btnAddSalItem').addEventListener('click', ()=>{
+    sal.items.push({desc:'', valorHE:null, horas:null, value:0}); scheduleSave(); renderSection();
+  });
+
+  return el;
+}
+function round2(n){ return Math.round(n*100)/100; }
+function recalcSalarios(sal, i){
+  const valInput = document.getElementById('sal-value-'+i);
+  if(valInput) valInput.value = moneyDisplay(sal.items[i].value);
+  const totalCell = document.getElementById('sal-total-cell');
+  if(totalCell) totalCell.textContent = fmt(salaryTotal(sal));
+}
+
+/* =========================================================
+   RENDER: DINHEIRO A RECEBER
+========================================================= */
+function renderReceber(){
+  const el = document.createElement('div');
+  const totalPend = receivablesPendingTotal();
+  const totalReceb = state.receivables.filter(r=>r.status==='recebido').reduce((s,r)=>s+(Number(r.valor)||0),0);
+  const loansTotal = state.loans.reduce((s,l)=>s+loanRemaining(l),0);
+
+  el.innerHTML = `
+    <div class="page-header">
+      <div><h2>Dinheiro a Receber</h2><div class="desc">Valores que outras pessoas te devem, e empréstimos parcelados que você fez. Marque como recebido/pago e os totais se ajustam sozinhos.</div></div>
+    </div>
+    <div class="grid-3">
+      <div class="stat pos"><div class="label">Pendente</div><div class="value mono" id="stat-pendente">${fmt(totalPend)}</div></div>
+      <div class="stat"><div class="label">Já recebido</div><div class="value mono" id="stat-recebido">${fmt(totalReceb)}</div></div>
+      <div class="stat neg"><div class="label">Empréstimos em aberto</div><div class="value mono" id="stat-loans">${fmt(loansTotal)}</div></div>
+    </div>
+
+    <div class="card" style="margin-top:22px;">
+      <h3>A receber de terceiros</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th style="width:120px">Data</th><th>Devedor</th><th>Descrição</th><th class="num" style="width:110px">Valor</th><th style="width:110px">Status</th><th style="width:50px"></th></tr></thead>
+        <tbody id="recvBody"></tbody>
+      </table></div>
+      <button class="btn secondary small" id="btnAddRecv" style="margin-top:14px;">+ novo registro</button>
+    </div>
+
+    <div class="card">
+      <h3>Empréstimos parcelados (que você concedeu)</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Nome</th><th class="num">Valor total</th><th class="num">Parcelas</th><th class="num">Valor/parcela</th><th class="num">Pagas</th><th class="num">Restante</th><th style="width:50px"></th></tr></thead>
+        <tbody id="loanBody"></tbody>
+      </table></div>
+      <button class="btn secondary small" id="btnAddLoan" style="margin-top:14px;">+ novo empréstimo</button>
+    </div>
+  `;
+
+  const recvBody = el.querySelector('#recvBody');
+  if(state.receivables.length===0){
+    recvBody.innerHTML = `<tr><td colspan="6"><div class="empty-state">Nenhum registro ainda. Clique em "+ novo registro" para adicionar.</div></td></tr>`;
+  }
+  state.receivables.forEach((r,i)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="date" value="${r.data||''}" data-role="data"></td>
+      <td><input type="text" value="${escAttr(r.devedor)}" data-role="devedor"></td>
+      <td><input type="text" value="${escAttr(r.descricao)}" data-role="descricao"></td>
+      <td class="num"><input type="text" inputmode="decimal" class="money" data-role="valor"></td>
+      <td>
+        <select data-role="status">
+          <option value="pendente" ${r.status==='pendente'?'selected':''}>Pendente</option>
+          <option value="recebido" ${r.status==='recebido'?'selected':''}>Recebido</option>
+        </select>
+      </td>
+      <td><button class="icon-btn" data-role="del">✕</button></td>
+    `;
+    tr.querySelector('[data-role=data]').addEventListener('input', e=>{ r.data=e.target.value; scheduleSave(); });
+    tr.querySelector('[data-role=devedor]').addEventListener('input', e=>{ r.devedor=e.target.value; scheduleSave(); });
+    tr.querySelector('[data-role=descricao]').addEventListener('input', e=>{ r.descricao=e.target.value; scheduleSave(); });
+    bindMoneyInput(tr.querySelector('[data-role=valor]'), ()=>r.valor, v=>r.valor=v, recalcReceber);
+    tr.querySelector('[data-role=status]').addEventListener('change', e=>{ r.status=e.target.value; scheduleSave(); recalcReceber(); });
+    tr.querySelector('[data-role=del]').addEventListener('click', ()=>{ state.receivables.splice(i,1); scheduleSave(); renderSection(); });
+    recvBody.appendChild(tr);
+  });
+  el.querySelector('#btnAddRecv').addEventListener('click', ()=>{
+    state.receivables.push({id:uid(), data:'', devedor:'', descricao:'', valor:0, status:'pendente'});
+    scheduleSave(); renderSection();
+  });
+
+  const loanBody = el.querySelector('#loanBody');
+  if(state.loans.length===0){
+    loanBody.innerHTML = `<tr><td colspan="7"><div class="empty-state">Nenhum empréstimo cadastrado ainda.</div></td></tr>`;
+  }
+  state.loans.forEach((l,i)=>{
+    const restante = loanRemaining(l);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="text" value="${escAttr(l.nome)}" data-role="nome"></td>
+      <td class="num"><input type="text" inputmode="decimal" class="money" data-role="valorTotal"></td>
+      <td class="num"><input type="text" inputmode="decimal" class="money" data-role="parcelas"></td>
+      <td class="num"><input type="text" inputmode="decimal" class="money" data-role="valorParcela"></td>
+      <td class="num"><input type="text" inputmode="decimal" class="money" data-role="parcelasPagas"></td>
+      <td class="num mono" id="loan-restante-${i}" style="font-weight:600;">${fmt(restante)}</td>
+      <td><button class="icon-btn" data-role="del">✕</button></td>
+    `;
+    tr.querySelector('[data-role=nome]').addEventListener('input', e=>{ l.nome=e.target.value; scheduleSave(); });
+    bindMoneyInput(tr.querySelector('[data-role=valorTotal]'), ()=>l.valorTotal, v=>l.valorTotal=v);
+    bindMoneyInput(tr.querySelector('[data-role=parcelas]'), ()=>l.parcelas, v=>l.parcelas=Math.round(v), recalcLoans);
+    bindMoneyInput(tr.querySelector('[data-role=valorParcela]'), ()=>l.valorParcela, v=>l.valorParcela=v, recalcLoans);
+    bindMoneyInput(tr.querySelector('[data-role=parcelasPagas]'), ()=>l.parcelasPagas, v=>l.parcelasPagas=Math.round(v), recalcLoans);
+    tr.querySelector('[data-role=del]').addEventListener('click', ()=>{ state.loans.splice(i,1); scheduleSave(); renderSection(); });
+    loanBody.appendChild(tr);
+  });
+  el.querySelector('#btnAddLoan').addEventListener('click', ()=>{
+    state.loans.push({id:uid(), nome:'', valorTotal:0, parcelas:1, valorParcela:0, parcelasPagas:0});
+    scheduleSave(); renderSection();
+  });
+
+  return el;
+}
+function recalcReceber(){
+  const pend = document.getElementById('stat-pendente');
+  if(pend) pend.textContent = fmt(receivablesPendingTotal());
+  const rec = document.getElementById('stat-recebido');
+  if(rec) rec.textContent = fmt(state.receivables.filter(r=>r.status==='recebido').reduce((s,r)=>s+(Number(r.valor)||0),0));
+  const loansEl = document.getElementById('stat-loans');
+  if(loansEl) loansEl.textContent = fmt(state.loans.reduce((s,l)=>s+loanRemaining(l),0));
+}
+function recalcLoans(){
+  state.loans.forEach((l,i)=>{
+    const cell = document.getElementById('loan-restante-'+i);
+    if(cell) cell.textContent = fmt(loanRemaining(l));
+  });
+  recalcReceber();
+}
+
+/* =========================================================
+   RENDER: INVESTIMENTOS
+========================================================= */
+function renderInvestimentos(){
+  const el = document.createElement('div');
+  const totalBaixa = investmentsTotal(false);
+  const totalAlta = investmentsTotal(true);
+  const totalAporte = state.investments.reduce((s,i)=>s+(Number(i.valorInicial)||Number(i.valorFixo)||0),0);
+
+  el.innerHTML = `
+    <div class="page-header">
+      <div><h2>Investimentos</h2><div class="desc">Informe valor inicial, aporte mensal, prazo e taxa — o valor futuro é calculado automaticamente (juros compostos), em dois cenários de taxa.</div></div>
+    </div>
+    <div class="grid-3">
+      <div class="stat"><div class="label">Total investido/aportado hoje</div><div class="value mono" id="stat-inv-aportado">${fmt(totalAporte)}</div></div>
+      <div class="stat pos"><div class="label">Projeção · taxa conservadora</div><div class="value mono" id="stat-inv-baixa">${fmt(totalBaixa)}</div></div>
+      <div class="stat pos"><div class="label">Projeção · taxa otimista</div><div class="value mono" id="stat-inv-alta">${fmt(totalAlta)}</div></div>
+    </div>
+    <div class="card" style="margin-top:22px;">
+      <h3>Carteira</h3>
+      <div class="table-wrap"><table>
+        <thead><tr>
+          <th>Nome</th><th style="width:110px">Tipo</th>
+          <th class="num" style="width:100px">Inicial</th>
+          <th class="num" style="width:90px">Aporte/mês</th>
+          <th class="num" style="width:70px">Anos</th>
+          <th class="num" style="width:80px">Taxa a.a. baixa</th>
+          <th class="num" style="width:80px">Taxa a.a. alta</th>
+          <th class="num" style="width:130px">Valor projetado</th>
+          <th style="width:50px"></th>
+        </tr></thead>
+        <tbody id="invBody"></tbody>
+        <tfoot>
+          <tr class="total-row"><td colspan="7">TOTAL (conservador / otimista)</td><td class="num" id="inv-total-cell">${fmt(totalBaixa)}<br><span style="opacity:0.75; font-size:12px;">${fmt(totalAlta)}</span></td><td></td></tr>
+        </tfoot>
+      </table></div>
+      <button class="btn secondary small" id="btnAddInv" style="margin-top:14px;">+ novo item</button>
+      <div class="small-note">Fórmula: valor futuro = inicial × (1+taxa mensal)^meses + aporte × [((1+taxa mensal)^meses − 1) ÷ taxa mensal], com a taxa mensal derivada da taxa anual informada.</div>
+    </div>
+  `;
+  const body = el.querySelector('#invBody');
+  if(state.investments.length===0){
+    body.innerHTML = `<tr><td colspan="9"><div class="empty-state">Nenhum investimento cadastrado ainda. Clique em "+ novo item" para começar.</div></td></tr>`;
+  }
+  state.investments.forEach((inv,i)=>{
+    const isFixo = inv.tipo==='fixo';
+    const projBaixa = investmentValue(inv,false);
+    const projAlta = investmentValue(inv,true);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="text" value="${escAttr(inv.nome)}" data-role="nome"></td>
+      <td>
+        <select data-role="tipo">
+          <option value="rendimento" ${!isFixo?'selected':''}>Rende juros</option>
+          <option value="fixo" ${isFixo?'selected':''}>Valor fixo</option>
+        </select>
+      </td>
+      ${isFixo ? `
+        <td class="num" colspan="4"><input type="text" inputmode="decimal" class="money" data-role="valorFixo" placeholder="valor fixo"></td>
+      ` : `
+        <td class="num"><input type="text" inputmode="decimal" class="money" data-role="valorInicial"></td>
+        <td class="num"><input type="text" inputmode="decimal" class="money" data-role="aporteMensal"></td>
+        <td class="num"><input type="text" inputmode="decimal" class="money" data-role="anos"></td>
+        <td class="num"><input type="text" inputmode="decimal" class="money" data-role="taxaBaixa"></td>
+        <td class="num"><input type="text" inputmode="decimal" class="money" data-role="taxaAlta"></td>
+      `}
+      <td class="num mono" id="inv-proj-${i}" style="font-weight:600;">${fmt(projBaixa)}${!isFixo?`<br><span style="opacity:0.6; font-size:11.5px;">${fmt(projAlta)}</span>`:''}</td>
+      <td><button class="icon-btn" data-role="del">✕</button></td>
+    `;
+    tr.querySelector('[data-role=nome]').addEventListener('input', e=>{ inv.nome=e.target.value; scheduleSave(); });
+    tr.querySelector('[data-role=tipo]').addEventListener('change', e=>{
+      inv.tipo = e.target.value;
+      if(inv.tipo==='fixo' && inv.valorFixo===undefined) inv.valorFixo = inv.valorInicial||0;
+      if(inv.tipo==='rendimento' && inv.valorInicial===undefined){ inv.valorInicial=inv.valorFixo||0; inv.aporteMensal=0; inv.anos=1; inv.taxaBaixa=6; inv.taxaAlta=12.5; }
+      scheduleSave(); renderSection();
+    });
+    tr.querySelector('[data-role=del]').addEventListener('click', ()=>{ state.investments.splice(i,1); scheduleSave(); renderSection(); });
+    ['valorFixo','valorInicial','aporteMensal','anos','taxaBaixa','taxaAlta'].forEach(role=>{
+      const input = tr.querySelector(`[data-role=${role}]`);
+      if(input) bindMoneyInput(input, ()=>inv[role], v=>inv[role]=v, recalcInvestimentos);
+    });
+    body.appendChild(tr);
+  });
+  el.querySelector('#btnAddInv').addEventListener('click', ()=>{
+    state.investments.push({id:uid(), nome:'', tipo:'rendimento', valorInicial:0, aporteMensal:0, anos:1, taxaBaixa:6, taxaAlta:12.5, obs:''});
+    scheduleSave(); renderSection();
+  });
+
+  return el;
+}
+function recalcInvestimentos(){
+  state.investments.forEach((inv,i)=>{
+    const cell = document.getElementById('inv-proj-'+i);
+    if(cell){
+      const projBaixa = investmentValue(inv,false);
+      const projAlta = investmentValue(inv,true);
+      const isFixo = inv.tipo==='fixo';
+      cell.innerHTML = fmt(projBaixa) + (!isFixo? `<br><span style="opacity:0.6; font-size:11.5px;">${fmt(projAlta)}</span>` : '');
+    }
+  });
+  const totalBaixa = investmentsTotal(false);
+  const totalAlta = investmentsTotal(true);
+  const totalAporte = state.investments.reduce((s,i)=>s+(Number(i.valorInicial)||Number(i.valorFixo)||0),0);
+  const a = document.getElementById('stat-inv-aportado'); if(a) a.textContent = fmt(totalAporte);
+  const b = document.getElementById('stat-inv-baixa'); if(b) b.textContent = fmt(totalBaixa);
+  const c = document.getElementById('stat-inv-alta'); if(c) c.textContent = fmt(totalAlta);
+  const t = document.getElementById('inv-total-cell'); if(t) t.innerHTML = fmt(totalBaixa) + `<br><span style="opacity:0.75; font-size:12px;">${fmt(totalAlta)}</span>`;
+}
+
+/* =========================================================
+   RENDER: SEÇÃO PERSONALIZADA (criada pelo usuário no menu)
+========================================================= */
+function renderCustomSection(sectionId){
+  const cs = state.customSections.find(c=>c.id===sectionId);
+  const el = document.createElement('div');
+  if(!cs){
+    el.innerHTML = `<div class="card"><div class="empty-state">Seção não encontrada.</div></div>`;
+    return el;
+  }
+  const total = cs.items.reduce((s,i)=>s+(Number(i.value)||0),0);
+  el.innerHTML = `
+    <div class="page-header"><div><h2>${escapeHtml(cs.label)}</h2><div class="desc">Seção personalizada — adicione o que quiser controlar aqui.</div></div></div>
+    <div class="card">
+      <h3>Itens</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Descrição</th><th class="num" style="width:130px">Valor</th><th style="width:60px"></th></tr></thead>
+        <tbody id="csBody"></tbody>
+        <tfoot><tr class="total-row"><td>TOTAL</td><td class="num" id="cs-total-cell">${fmt(total)}</td><td></td></tr></tfoot>
+      </table></div>
+      <button class="btn secondary small" id="btnAddCs" style="margin-top:14px;">+ novo item</button>
+    </div>
+  `;
+  const body = el.querySelector('#csBody');
+  if(cs.items.length===0){
+    body.innerHTML = `<tr><td colspan="3"><div class="empty-state">Nenhum item ainda.</div></td></tr>`;
+  }
+  cs.items.forEach((it,i)=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input type="text" value="${escAttr(it.desc)}" data-role="desc"></td>
+      <td class="num"><input type="text" inputmode="decimal" class="money" data-role="value"></td>
+      <td><button class="icon-btn" data-role="del">✕</button></td>
+    `;
+    tr.querySelector('[data-role=desc]').addEventListener('input', e=>{ it.desc=e.target.value; scheduleSave(); });
+    bindMoneyInput(tr.querySelector('[data-role=value]'), ()=>it.value, v=>it.value=v, ()=>{
+      const cell = document.getElementById('cs-total-cell');
+      if(cell) cell.textContent = fmt(cs.items.reduce((s,x)=>s+(Number(x.value)||0),0));
+    });
+    tr.querySelector('[data-role=del]').addEventListener('click', ()=>{ cs.items.splice(i,1); scheduleSave(); renderSection(); });
+    body.appendChild(tr);
+  });
+  el.querySelector('#btnAddCs').addEventListener('click', ()=>{
+    cs.items.push({desc:'', value:0}); scheduleSave(); renderSection();
+  });
+  return el;
+}
+
+/* =========================================================
+   ROTEADOR DE SEÇÕES
+========================================================= */
+function renderSection(){
+  const container = document.getElementById('sections');
+  container.innerHTML = '';
+  if(!activeSection){ container.innerHTML = `<div class="empty-state">Nenhuma seção visível. Restaure uma no menu lateral.</div>`; return; }
+  let node;
+  if(activeSection==='dashboard') node = renderDashboard();
+  else if(activeSection==='gastos') node = renderGastos();
+  else if(activeSection==='fixos') node = renderFixos();
+  else if(activeSection==='salarios') node = renderSalarios();
+  else if(activeSection==='receber') node = renderReceber();
+  else if(activeSection==='investimentos') node = renderInvestimentos();
+  else node = renderCustomSection(activeSection);
+  container.appendChild(node);
+  if(activeSection==='dashboard') requestAnimationFrame(drawChart);
+}
+
+/* =========================================================
+   AUTENTICAÇÃO (Supabase Auth — conta real, e-mail + senha)
+========================================================= */
+function showAuthError(msg){
+  hideAuthSuccess();
+  const el = document.getElementById('authError');
+  el.textContent = msg; el.classList.add('show');
+}
+function clearAuthError(){
+  const el = document.getElementById('authError');
+  el.classList.remove('show'); el.textContent = '';
+}
+function showAuthSuccess(msg){
+  clearAuthError();
+  const el = document.getElementById('authSuccess');
+  el.textContent = msg; el.classList.add('show');
+}
+function hideAuthSuccess(){
+  const el = document.getElementById('authSuccess');
+  el.classList.remove('show'); el.textContent = '';
+}
+function setAuthForm(name){
+  document.querySelectorAll('.auth-form').forEach(f=>f.classList.remove('active'));
+  const form = document.getElementById(name+'Form');
+  if(form) form.classList.add('active');
+  clearAuthError(); hideAuthSuccess();
+  const tabs = document.getElementById('authTabs');
+  tabs.style.display = (name==='login'||name==='register') ? 'flex' : 'none';
+  document.querySelectorAll('.auth-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===name));
+}
+
+function wireAuthForm(){
+  document.querySelectorAll('.auth-tab').forEach(tab=>{
+    tab.addEventListener('click', ()=> setAuthForm(tab.dataset.tab));
+  });
+  document.getElementById('btnForgotOpen').addEventListener('click', ()=> setAuthForm('forgot'));
+  document.getElementById('btnForgotBack').addEventListener('click', ()=> setAuthForm('login'));
+
+  document.getElementById('loginForm').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    if(!supabaseReady) return showAuthError('O site ainda não foi conectado ao banco de dados.');
+    clearAuthError();
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPass').value;
+    const btn = document.getElementById('loginSubmitBtn');
+    btn.disabled = true; btn.textContent = 'Entrando…';
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    btn.disabled = false; btn.textContent = 'Entrar';
+    if(error){ showAuthError(traduzErro(error)); return; }
+    await enterApp(data.session);
+  });
+
+  document.getElementById('registerForm').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    if(!supabaseReady) return showAuthError('O site ainda não foi conectado ao banco de dados.');
+    clearAuthError();
+    const name = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const pass = document.getElementById('regPass').value;
+    const pass2 = document.getElementById('regPass2').value;
+    if(pass !== pass2){ showAuthError('As senhas não coincidem.'); return; }
+    if(pass.length < 6){ showAuthError('Use pelo menos 6 caracteres na senha.'); return; }
+    const btn = document.getElementById('registerSubmitBtn');
+    btn.disabled = true; btn.textContent = 'Criando…';
+    const { data, error } = await sb.auth.signUp({
+      email, password: pass,
+      options: { data: { full_name: name }, emailRedirectTo: window.location.origin + window.location.pathname }
+    });
+    btn.disabled = false; btn.textContent = 'Criar minha conta';
+    if(error){ showAuthError(traduzErro(error)); return; }
+    if(data.session){
+      // confirmação de e-mail desabilitada no projeto: entra direto
+      await enterApp(data.session);
+    } else {
+      showAuthSuccess('Conta criada! Enviamos um link de confirmação para ' + email + '. Abra seu e-mail e clique no link para poder entrar.');
+      setAuthForm('login');
+      document.getElementById('authSuccess').classList.add('show');
+    }
+  });
+
+  document.getElementById('forgotForm').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    if(!supabaseReady) return showAuthError('O site ainda não foi conectado ao banco de dados.');
+    clearAuthError();
+    const email = document.getElementById('forgotEmail').value.trim();
+    const btn = document.getElementById('forgotSubmitBtn');
+    btn.disabled = true; btn.textContent = 'Enviando…';
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + window.location.pathname + '?reset=1'
+    });
+    btn.disabled = false; btn.textContent = 'Enviar link de recuperação';
+    if(error){ showAuthError(traduzErro(error)); return; }
+    showAuthSuccess('Se esse e-mail tiver uma conta, enviamos um link de recuperação. Verifique sua caixa de entrada.');
+  });
+
+  document.getElementById('resetForm').addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    clearAuthError();
+    const p1 = document.getElementById('resetPass').value;
+    const p2 = document.getElementById('resetPass2').value;
+    if(p1 !== p2){ showAuthError('As senhas não coincidem.'); return; }
+    if(p1.length < 6){ showAuthError('Use pelo menos 6 caracteres.'); return; }
+    const btn = document.getElementById('resetSubmitBtn');
+    btn.disabled = true; btn.textContent = 'Salvando…';
+    const { error } = await sb.auth.updateUser({ password: p1 });
+    btn.disabled = false; btn.textContent = 'Salvar nova senha';
+    if(error){ showAuthError(traduzErro(error)); return; }
+    showAuthSuccess('Senha alterada! Você já pode entrar com a nova senha.');
+    setTimeout(()=> setAuthForm('login'), 1400);
+  });
+}
+
+function traduzErro(error){
+  const msg = (error && error.message) || '';
+  if(/already registered|already exists/i.test(msg)) return 'Já existe uma conta com esse e-mail. Tente entrar.';
+  if(/invalid login credentials/i.test(msg)) return 'E-mail ou senha incorretos.';
+  if(/email not confirmed/i.test(msg)) return 'Confirme seu e-mail antes de entrar — verifique sua caixa de entrada.';
+  if(/rate limit/i.test(msg)) return 'Muitas tentativas seguidas. Aguarde um pouco e tente de novo.';
+  if(/network/i.test(msg)) return 'Falha de conexão. Verifique sua internet e tente novamente.';
+  return msg || 'Não foi possível concluir. Tente novamente.';
+}
+
+/* =========================================================
+   BOOT
+========================================================= */
+document.addEventListener('DOMContentLoaded', boot);
+
+async function boot(){
+  document.getElementById('loadingScreen').style.display = 'none';
+
+  if(!supabaseReady){
+    document.getElementById('configWarning').style.display = 'block';
+    document.getElementById('authScreen').style.display = 'flex';
+    wireAuthForm();
+    return;
+  }
+
+  wireAuthForm();
+
+  // fluxo de redefinição de senha (o link do e-mail volta com ?reset=1)
+  const isResetFlow = new URLSearchParams(window.location.search).get('reset') === '1';
+
+  sb.auth.onAuthStateChange((event, session)=>{
+    if(event === 'PASSWORD_RECOVERY'){
+      document.getElementById('authScreen').style.display = 'flex';
+      setAuthForm('reset');
+    }
+  });
+
+  const { data: { session } } = await sb.auth.getSession();
+
+  if(isResetFlow){
+    document.getElementById('authScreen').style.display = 'flex';
+    setAuthForm('reset');
+    return;
+  }
+
+  if(session){
+    await enterApp(session);
+  } else {
+    document.getElementById('authScreen').style.display = 'flex';
+    setAuthForm('login');
+  }
+}
+
+async function enterApp(session){
+  currentSession = session;
+  await loadStateFromServer();
+  ensureNavConfig();
+  renderNav();
+  renderSection();
+  renderStampAll();
+  const name = (session.user.user_metadata && session.user.user_metadata.full_name) || session.user.email;
+  document.getElementById('currentUserLabel').textContent = name;
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  wireAppButtons();
+}
+
+function wireAppButtons(){
+  const exportBtn = document.getElementById('btnExport');
+  const importBtn = document.getElementById('btnImport');
+  const importFile = document.getElementById('importFile');
+  const logoutBtn = document.getElementById('btnLogout');
+
+  exportBtn.onclick = ()=>{
+    const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `caderneta-financeira-${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+  };
+  importBtn.onclick = ()=>{ importFile.click(); };
+  importFile.onchange = async (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    try{
+      const text = await file.text();
+      const parsed = JSON.parse(text);
+      if(!parsed.months || !parsed.investments) throw new Error('formato inválido');
+      state = Object.assign(emptyState(), parsed);
+      ensureNavConfig();
+      await persistState();
+      renderNav();
+      renderSection();
+      alert('Backup importado com sucesso!');
+    }catch(err){
+      alert('Não foi possível importar esse arquivo. Verifique se é um backup válido desta caderneta.');
+    }
+    e.target.value = '';
+  };
+  logoutBtn.onclick = async ()=>{
+    await sb.auth.signOut();
+    currentSession = null;
+    state = null;
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('loginForm').reset();
+    document.getElementById('registerForm').reset();
+    setAuthForm('login');
+    document.getElementById('authScreen').style.display = 'flex';
+  };
+}
+</script>
+</body>
+</html>
