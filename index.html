@@ -86,10 +86,46 @@ input,select{font-family:inherit;}
 .page-header h2{font-size:28px;}
 .page-header .desc{color:var(--ink-soft); font-size:14.5px; margin-top:5px; max-width:560px;}
 
-.stamp{border:2px solid var(--rust); color:var(--rust); border-radius:50%; width:106px; height:106px; display:flex; align-items:center; justify-content:center; transform:rotate(-8deg); flex-shrink:0; position:relative; opacity:0.88;}
-.stamp::before{content:""; position:absolute; inset:5px; border:1px dashed var(--rust); border-radius:50%;}
-.stamp .txt{font-family:'IBM Plex Mono',monospace; font-size:8.5px; text-align:center; line-height:1.5; text-transform:uppercase; letter-spacing:0.05em; font-weight:600;}
-.stamp .txt b{display:block; font-size:10.5px;}
+.stamp{
+  display:flex; align-items:center; gap:8px; flex-shrink:0;
+  border:1px solid var(--paper-line); background:var(--white); color:var(--ink-soft);
+  border-radius:6px; padding:9px 13px; box-shadow:var(--shadow);
+}
+.stamp .dot{width:7px;height:7px;border-radius:50%; background:var(--gold); flex-shrink:0;}
+.stamp .txt{font-family:'IBM Plex Mono',monospace; font-size:10.5px; line-height:1.4; text-transform:uppercase; letter-spacing:0.04em;}
+.stamp .txt b{color:var(--forest); font-weight:700;}
+
+.bell-btn{
+  position:relative; background:none; border:1px solid var(--paper-line); border-radius:6px;
+  width:38px; height:38px; display:flex; align-items:center; justify-content:center;
+  font-size:16px; color:var(--forest); flex-shrink:0;
+}
+.bell-btn:hover{background:var(--forest-pale);}
+.bell-dot{
+  position:absolute; top:6px; right:7px; width:8px; height:8px; border-radius:50%;
+  background:var(--rust); border:1.5px solid var(--white); display:none;
+}
+.bell-dot.show{display:block;}
+.header-actions{display:flex; align-items:center; gap:10px; flex-shrink:0;}
+
+.notif-panel{
+  position:fixed; top:76px; right:34px; width:330px; max-width:calc(100vw - 32px);
+  background:var(--white); border:1px solid var(--paper-line); border-radius:6px; box-shadow:0 16px 40px rgba(0,0,0,0.18);
+  z-index:80; overflow:hidden; display:none;
+}
+.notif-panel.open{display:block;}
+.notif-panel-head{padding:14px 16px; border-bottom:1px solid var(--paper-line); font-family:'Fraunces',serif; font-weight:700; color:var(--forest); font-size:15px; display:flex; justify-content:space-between; align-items:center;}
+.notif-panel-head button{background:none; border:none; color:var(--ink-soft); font-size:18px; line-height:1; padding:2px 4px;}
+.notif-list{max-height:340px; overflow-y:auto;}
+.notif-item{padding:12px 16px; border-bottom:1px solid var(--paper-line); font-size:13px; line-height:1.5; display:flex; gap:10px; align-items:flex-start;}
+.notif-item:last-child{border-bottom:none;}
+.notif-item .ni-dot{width:7px;height:7px;border-radius:50%; margin-top:5px; flex-shrink:0;}
+.notif-item.warn .ni-dot{background:var(--rust);}
+.notif-item.info .ni-dot{background:var(--gold);}
+.notif-empty{padding:24px 16px; text-align:center; color:var(--ink-soft); font-size:13px;}
+@media(max-width:880px){
+  .notif-panel{top:66px; right:12px; left:12px; width:auto;}
+}
 
 .card{background:var(--white); border:1px solid var(--paper-line); border-radius:var(--radius); box-shadow:var(--shadow); padding:22px 24px; margin-bottom:22px;}
 .card h3{font-size:17px; margin-bottom:14px; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;}
@@ -108,7 +144,7 @@ input,select{font-family:inherit;}
 .stat.neg .value{color:var(--rust);}
 
 .table-wrap{width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch;}
-table{width:100%; border-collapse:collapse; font-size:14px; min-width:520px;}
+table{width:100%; border-collapse:collapse; font-size:14px;}
 th{text-align:left; font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-soft); padding:8px 8px; border-bottom:2px solid var(--forest); white-space:nowrap;}
 td{padding:7px 8px; border-bottom:1px solid var(--paper-line); vertical-align:middle;}
 tr.total-row td{font-weight:700; background:var(--forest); color:var(--white); font-family:'IBM Plex Mono',monospace; font-size:15px;}
@@ -199,7 +235,7 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
     font-size:10px; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.01em;
   }
   .bottom-tab .bt-icon{
-    width:22px;height:22px;border-radius:50%; display:flex; align-items:center; justify-content:center;
+    width:24px;height:24px;border-radius:7px; display:flex; align-items:center; justify-content:center;
     font-family:'Fraunces',serif; font-weight:700; font-size:11px; color:var(--ink-soft); border:1.5px solid var(--paper-line);
   }
   .bottom-tab.active{color:var(--forest); font-weight:700;}
@@ -207,7 +243,7 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
 
   .main{padding:14px 12px 88px;}
   .page-header{flex-direction:column; margin-bottom:18px;}
-  .stamp{width:74px;height:74px; align-self:flex-end; margin-top:-8px;}
+  .stamp{align-self:flex-end; margin-top:-4px;}
   .card{padding:16px 15px;}
   th, td{padding:9px 7px;}
   .btn.small{padding:9px 12px; font-size:12.5px;}
@@ -217,6 +253,35 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
   .stat .label{font-size:9px;}
   .toolbar{gap:8px;}
   .tag-select{padding:9px 12px; font-size:12.5px;}
+
+  /* Tabelas viram cartões empilhados — acaba o arrastar horizontal */
+  table.responsive-table{width:100%;}
+  table.responsive-table thead{display:none;}
+  table.responsive-table, table.responsive-table tbody, table.responsive-table tr, table.responsive-table td{
+    display:block; width:100%;
+  }
+  table.responsive-table tr{
+    position:relative; border:1px solid var(--paper-line); border-radius:5px;
+    margin-bottom:10px; padding:10px 40px 10px 12px; background:var(--white);
+  }
+  table.responsive-table tr.total-row{background:var(--forest); border-color:var(--forest); padding-right:12px;}
+  table.responsive-table td{
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+    border-bottom:1px dashed var(--paper-line); padding:8px 0; text-align:right; width:100%;
+  }
+  table.responsive-table td:last-child{
+    position:absolute; top:8px; right:6px; border-bottom:none; padding:2px; width:auto; display:block;
+  }
+  table.responsive-table td:empty{display:none;}
+  table.responsive-table td::before{
+    content:attr(data-label); font-family:'IBM Plex Mono',monospace; font-size:10px; text-transform:uppercase;
+    letter-spacing:0.03em; color:var(--ink-soft); text-align:left; flex-shrink:0; padding-right:10px;
+  }
+  table.responsive-table tr.total-row td::before{color:rgba(251,249,241,0.7);}
+  table.responsive-table td:not([data-label])::before{content:none;}
+  table.responsive-table td input, table.responsive-table td select{text-align:right; max-width:62%;}
+  table.responsive-table td.cell-plain{display:block; text-align:left; font-weight:600; color:var(--forest); border-bottom:none; padding-bottom:4px;}
+  table.responsive-table td.cell-plain::before{content:none;}
 }
 @media(min-width:881px){
   .mobile-header, .drawer-overlay, .drawer, .bottom-tabbar{display:none !important;}
@@ -311,12 +376,17 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
 
 <div id="app" style="display:none;">
   <div class="sidebar">
-    <div class="brand">
-      <div class="mark">$</div>
-      <div>
-        <h1>Caderneta<br>Financeira</h1>
-        <div class="sub">controle financeiro</div>
+    <div class="brand" style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px;">
+      <div style="display:flex; gap:10px;">
+        <div class="mark">$</div>
+        <div>
+          <h1>Caderneta<br>Financeira</h1>
+          <div class="sub">controle financeiro</div>
+        </div>
       </div>
+      <button class="bell-btn" id="btnBellDesktop" title="Notificações" style="border-color:rgba(251,249,241,0.3); color:var(--white);">
+        🔔<span class="bell-dot" id="bellDotDesktop"></span>
+      </button>
     </div>
     <div class="nav" id="navList"></div>
     <div class="user-badge"><span class="dot"></span> <b id="currentUserLabel"></b></div>
@@ -336,7 +406,17 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
       <div class="mh-mark">$</div>
       <div class="mh-title" id="mobileHeaderTitle">Caderneta</div>
     </div>
-    <button class="mh-burger" id="btnOpenDrawer" aria-label="Menu">☰</button>
+    <div class="header-actions">
+      <button class="bell-btn" id="btnBellMobile" title="Notificações" style="border-color:rgba(251,249,241,0.3); color:var(--white);">
+        🔔<span class="bell-dot" id="bellDotMobile"></span>
+      </button>
+      <button class="mh-burger" id="btnOpenDrawer" aria-label="Menu">☰</button>
+    </div>
+  </div>
+
+  <div class="notif-panel" id="notifPanel">
+    <div class="notif-panel-head">Notificações <button id="btnCloseNotif">✕</button></div>
+    <div class="notif-list" id="notifList"></div>
   </div>
 
   <div class="drawer-overlay" id="drawerOverlay"></div>
@@ -457,6 +537,7 @@ async function persistState(){
     if(error) throw error;
     showToast('✓ salvo', false);
     renderStampAll();
+    renderNotifications();
   }catch(e){
     console.error('Falha ao salvar', e);
     showToast('Não foi possível salvar. Verifique sua conexão e tente novamente.', true);
@@ -478,7 +559,7 @@ function showToast(msg, isError){
    MENU LATERAL — editável, com exclusão e restauração
 ========================================================= */
 const DEFAULT_NAV = [
-  {id:'dashboard', label:'Visão Geral'},
+  {id:'dashboard', label:'Início'},
   {id:'gastos', label:'Gastos Mensais'},
   {id:'fixos', label:'Gastos Fixos'},
   {id:'salarios', label:'Salários'},
@@ -494,6 +575,9 @@ function ensureNavConfig(){
       state.navConfig.push({id:def.id, label:def.label, hidden:false, core:true});
     }
   });
+  // migração: quem já tinha o rótulo antigo "Visão Geral" (não customizado) passa a ver "Início"
+  const dash = state.navConfig.find(n=>n.id==='dashboard');
+  if(dash && dash.label === 'Visão Geral') dash.label = 'Início';
   if(!Array.isArray(state.customSections)) state.customSections = [];
   state.customSections.forEach(cs=>{
     if(!state.navConfig.find(n=>n.id===cs.id)){
@@ -725,7 +809,56 @@ function renderStampAll(){
 }
 
 /* =========================================================
-   RENDER: VISÃO GERAL (com seletor de mês)
+   NOTIFICAÇÕES — alertas reais calculados a partir dos dados
+========================================================= */
+function computeNotifications(){
+  const list = [];
+  if(!state) return list;
+  const months = state.months || [];
+  const lastMonth = months[months.length-1];
+  if(lastMonth){
+    const sal = state.salaries.find(s=>s.monthId===lastMonth.id);
+    const gastos = monthTotal(lastMonth);
+    const receitas = sal ? salaryTotal(sal) : 0;
+    if(sal && (receitas - gastos) < 0){
+      list.push({type:'warn', text:`O saldo de ${lastMonth.label} está negativo: ${fmt(receitas-gastos)}.`});
+    }
+    if(!sal){
+      list.push({type:'info', text:`Ainda não há salário lançado para ${lastMonth.label}.`});
+    }
+  }
+  const pendCount = (state.receivables||[]).filter(r=>r.status!=='recebido').length;
+  if(pendCount>0){
+    list.push({type:'info', text:`Você tem ${pendCount} valor${pendCount>1?'es':''} pendente${pendCount>1?'s':''} a receber (${fmt(receivablesPendingTotal())}).`});
+  }
+  const loansOpen = (state.loans||[]).filter(l=>loanRemaining(l)>0);
+  if(loansOpen.length>0){
+    list.push({type:'info', text:`${loansOpen.length} empréstimo${loansOpen.length>1?'s':''} ainda em aberto (${fmt(loansOpen.reduce((s,l)=>s+loanRemaining(l),0))}).`});
+  }
+  return list;
+}
+
+function renderNotifications(){
+  const notifs = computeNotifications();
+  const dots = [document.getElementById('bellDotDesktop'), document.getElementById('bellDotMobile')];
+  dots.forEach(d=>{ if(d) d.classList.toggle('show', notifs.length>0); });
+  const list = document.getElementById('notifList');
+  if(!list) return;
+  list.innerHTML = notifs.length ? notifs.map(n=>`
+    <div class="notif-item ${n.type}"><span class="ni-dot"></span><span>${escapeHtml(n.text)}</span></div>
+  `).join('') : `<div class="notif-empty">Sem novidades por aqui. Tudo em dia.</div>`;
+}
+
+function toggleNotifPanel(){
+  const panel = document.getElementById('notifPanel');
+  const opening = !panel.classList.contains('open');
+  if(opening) renderNotifications();
+  panel.classList.toggle('open', opening);
+}
+function closeNotifPanel(){ document.getElementById('notifPanel').classList.remove('open'); }
+
+/* =========================================================
+   RENDER: INÍCIO (com seletor de mês)
 ========================================================= */
 let chartRef = null;
 function renderDashboard(){
@@ -740,15 +873,16 @@ function renderDashboard(){
   const saldo = receitas - gastos;
   const pendente = receivablesPendingTotal();
   const investTotalBaixa = investmentsTotal(false);
+  const hasChartData = months.length > 0;
 
   const el = document.createElement('div');
   el.innerHTML = `
     <div class="page-header">
       <div>
-        <h2>Visão Geral</h2>
+        <h2>Início</h2>
         <div class="desc">Escolha o mês para comparar receita e gastos daquele período. Tudo recalculado sozinho.</div>
       </div>
-      <div class="stamp"><div class="txt"><b>ATUALIZADO</b><span class="js-stamp-date">${fmtStampDate(state.lastUpdated)}</span><br>caderneta financeira</div></div>
+      <div class="stamp"><span class="dot"></span><div class="txt"><b>Atualizado</b> · <span class="js-stamp-date">${fmtStampDate(state.lastUpdated)}</span></div></div>
     </div>
 
     <div class="toolbar">
@@ -762,9 +896,12 @@ function renderDashboard(){
     </div>
 
     <div class="grid-2" style="margin-top:22px;">
-      <div class="card">
+      <div class="card" id="chartCard">
         <h3>Receita × Gastos por mês</h3>
-        <div class="chart-wrap"><canvas id="chartMain"></canvas></div>
+        ${hasChartData
+          ? `<div class="chart-wrap"><canvas id="chartMain"></canvas></div>`
+          : `<div class="empty-state">Assim que você cadastrar um mês em "Gastos Mensais" (com o salário lançado), esse gráfico aparece aqui sozinho.<br><br><button class="btn secondary small" id="btnGoToGastos">Ir para Gastos Mensais</button></div>`
+        }
       </div>
       <div class="card">
         <h3>Resumo geral</h3>
@@ -780,13 +917,13 @@ function renderDashboard(){
 
     <div class="card">
       <h3>Todos os meses <span class="hint">clique em "Gastos Mensais" para editar cada um</span></h3>
-      <div class="table-wrap"><table>
+      <div class="table-wrap"><table class="responsive-table">
         <thead><tr><th>Mês</th><th class="num">Gastos</th><th class="num">Receita</th><th class="num">Sobra</th></tr></thead>
         <tbody>
           ${months.map(m=>{
             const s2 = state.salaries.find(s=>s.monthId===m.id);
             const g = monthTotal(m); const r = s2? salaryTotal(s2):0; const sd = r-g;
-            return `<tr><td>${escapeHtml(m.label)}</td><td class="num mono">${fmt(g)}</td><td class="num mono">${fmt(r)}</td><td class="num mono" style="color:${sd<0?'var(--rust)':'var(--forest)'}">${fmt(sd)}</td></tr>`;
+            return `<tr><td class="cell-plain">${escapeHtml(m.label)}</td><td class="num mono" data-label="Gastos">${fmt(g)}</td><td class="num mono" data-label="Receita">${fmt(r)}</td><td class="num mono" data-label="Sobra" style="color:${sd<0?'var(--rust)':'var(--forest)'}">${fmt(sd)}</td></tr>`;
           }).join('') || `<tr><td colspan="4"><div class="empty-state">Nenhum mês cadastrado ainda.</div></td></tr>`}
         </tbody>
       </table></div>
@@ -795,12 +932,19 @@ function renderDashboard(){
   const sel = el.querySelector('#dashMonthSelect');
   sel.innerHTML = months.length ? months.map(m=>`<option value="${m.id}" ${m.id===state.dashboardMonth?'selected':''}>${escapeHtml(m.label)}</option>`).join('') : `<option>Nenhum mês cadastrado</option>`;
   sel.addEventListener('change', ()=>{ state.dashboardMonth = sel.value; renderSection(); });
+  const goBtn = el.querySelector('#btnGoToGastos');
+  if(goBtn) goBtn.addEventListener('click', ()=>{ activeSection='gastos'; renderNav(); renderSection(); });
   return el;
 }
 
 function drawChart(){
   const canvas = document.getElementById('chartMain');
-  if(!canvas || typeof Chart==='undefined') return;
+  if(!canvas) return;
+  if(typeof Chart==='undefined'){
+    const card = document.getElementById('chartCard');
+    if(card) card.innerHTML = `<h3>Receita × Gastos por mês</h3><div class="empty-state">Não foi possível carregar o gráfico agora. Recarregue a página.</div>`;
+    return;
+  }
   if(chartRef) chartRef.destroy();
   const months = state.months;
   const labels = months.map(m=>m.label.split(' / ')[0]);
@@ -904,10 +1048,10 @@ function renderGastos(){
   card.className = 'card';
   card.innerHTML = `
     <h3>${escapeHtml(month.label)} <span class="hint">${month.categories.length} categorias</span></h3>
-    <div class="table-wrap"><table>
+    <div class="table-wrap"><table class="responsive-table">
       <thead><tr><th style="width:26%">Categoria</th><th>Descrição</th><th class="num" style="width:110px">Valor</th><th style="width:70px"></th></tr></thead>
       <tbody id="catBody"></tbody>
-      <tfoot><tr class="total-row"><td colspan="2">TOTAL DO MÊS</td><td class="num" id="month-total-cell">${fmt(total)}</td><td></td></tr></tfoot>
+      <tfoot><tr class="total-row"><td colspan="2">TOTAL DO MÊS</td><td class="num" data-label="Total" id="month-total-cell">${fmt(total)}</td><td></td></tr></tfoot>
     </table></div>
     <button class="btn secondary small" id="btnAddCat" style="margin-top:14px;">+ nova categoria</button>
   `;
@@ -919,9 +1063,9 @@ function renderGastos(){
     cat.items.forEach((item, ii)=>{
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${ii===0 ? catInputHtml(cat.name) : ''}</td>
-        <td><input type="text" value="${escAttr(item.desc)}" data-role="desc"></td>
-        <td class="num"><input type="text" inputmode="decimal" class="money" data-role="value"></td>
+        <td${ii===0?' class="cell-plain"':''}>${ii===0 ? catInputHtml(cat.name) : ''}</td>
+        <td data-label="Descrição"><input type="text" value="${escAttr(item.desc)}" data-role="desc"></td>
+        <td class="num" data-label="Valor"><input type="text" inputmode="decimal" class="money" data-role="value"></td>
         <td><button class="icon-btn" data-role="delItem" title="remover item">✕</button></td>
       `;
       tr.querySelector('[data-role=desc]').addEventListener('input', e=>{ item.desc=e.target.value; scheduleSave(); });
@@ -935,9 +1079,9 @@ function renderGastos(){
     });
     const addRow = document.createElement('tr');
     addRow.innerHTML = `
-      <td>${cat.items.length===0 ? catInputHtml(cat.name) : ''}</td>
+      <td${cat.items.length===0?' class="cell-plain"':''}>${cat.items.length===0 ? catInputHtml(cat.name) : ''}</td>
       <td><button class="btn secondary small" data-role="addItem">+ item em "${escAttr(cat.name)}"</button></td>
-      <td class="num mono" id="cat-total-${ci}" style="font-weight:600;">${fmt(catTotal)}</td>
+      <td class="num mono" data-label="Subtotal da categoria" id="cat-total-${ci}" style="font-weight:600;">${fmt(catTotal)}</td>
       <td><button class="icon-btn" data-role="delCat" title="remover categoria">🗑</button></td>
     `;
     addRow.querySelector('[data-role=addItem]').addEventListener('click', ()=>{
@@ -983,10 +1127,10 @@ function renderFixos(){
     </div>
     <div class="card">
       <h3>Modelo de gastos fixos</h3>
-      <div class="table-wrap"><table>
+      <div class="table-wrap"><table class="responsive-table">
         <thead><tr><th>Descrição</th><th class="num" style="width:130px">Valor mensal</th><th style="width:60px"></th></tr></thead>
         <tbody id="fixedBody"></tbody>
-        <tfoot><tr class="total-row"><td>TOTAL</td><td class="num" id="fixed-total-cell">${fmt(total)}</td><td></td></tr></tfoot>
+        <tfoot><tr class="total-row"><td>TOTAL</td><td class="num" data-label="Total" id="fixed-total-cell">${fmt(total)}</td><td></td></tr></tfoot>
       </table></div>
       <button class="btn secondary small" id="btnAddFixed" style="margin-top:14px;">+ novo gasto fixo</button>
     </div>
@@ -998,8 +1142,8 @@ function renderFixos(){
   state.fixedExpenses.forEach((f, i)=>{
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td><input type="text" value="${escAttr(f.name)}" data-role="name"></td>
-      <td class="num"><input type="text" inputmode="decimal" class="money" data-role="value"></td>
+      <td data-label="Descrição"><input type="text" value="${escAttr(f.name)}" data-role="name"></td>
+      <td class="num" data-label="Valor"><input type="text" inputmode="decimal" class="money" data-role="value"></td>
       <td><button class="icon-btn" data-role="del">✕</button></td>
     `;
     tr.querySelector('[data-role=name]').addEventListener('input', e=>{ f.name=e.target.value; scheduleSave(); });
@@ -1065,10 +1209,10 @@ function renderSalarios(){
   card.className = 'card';
   card.innerHTML = `
     <h3>${escapeHtml(month.label)}</h3>
-    <div class="table-wrap"><table>
+    <div class="table-wrap"><table class="responsive-table">
       <thead><tr><th>Descrição</th><th class="num" style="width:100px">Valor h.e.</th><th class="num" style="width:90px">Horas</th><th class="num" style="width:120px">Valor</th><th style="width:50px"></th></tr></thead>
       <tbody id="salBody"></tbody>
-      <tfoot><tr class="total-row"><td colspan="3">TOTAL</td><td class="num" id="sal-total-cell">${fmt(total)}</td><td></td></tr></tfoot>
+      <tfoot><tr class="total-row"><td colspan="3">TOTAL</td><td class="num" data-label="Total" id="sal-total-cell">${fmt(total)}</td><td></td></tr></tfoot>
     </table></div>
     <button class="btn secondary small" id="btnAddSalItem" style="margin-top:14px;">+ novo item</button>
   `;
@@ -1078,10 +1222,10 @@ function renderSalarios(){
     const isHE = item.valorHE !== null && item.valorHE !== undefined;
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td><input type="text" value="${escAttr(item.desc)}" data-role="desc"></td>
-      <td class="num"><input type="text" inputmode="decimal" class="money" placeholder="—" data-role="valorHE"></td>
-      <td class="num"><input type="text" inputmode="decimal" class="money" placeholder="—" data-role="horas"></td>
-      <td class="num"><input type="text" inputmode="decimal" class="money" data-role="value" id="sal-value-${i}" ${isHE?'readonly style="color:var(--ink-soft)"':''}></td>
+      <td class="cell-plain"><input type="text" value="${escAttr(item.desc)}" data-role="desc"></td>
+      <td class="num" data-label="Valor h.e."><input type="text" inputmode="decimal" class="money" placeholder="—" data-role="valorHE"></td>
+      <td class="num" data-label="Horas"><input type="text" inputmode="decimal" class="money" placeholder="—" data-role="horas"></td>
+      <td class="num" data-label="Valor"><input type="text" inputmode="decimal" class="money" data-role="value" id="sal-value-${i}" ${isHE?'readonly style="color:var(--ink-soft)"':''}></td>
       <td><button class="icon-btn" data-role="del">✕</button></td>
     `;
     tr.querySelector('[data-role=desc]').addEventListener('input', e=>{ item.desc=e.target.value; scheduleSave(); });
@@ -1149,7 +1293,7 @@ function renderReceber(){
 
     <div class="card" style="margin-top:22px;">
       <h3>A receber de terceiros</h3>
-      <div class="table-wrap"><table>
+      <div class="table-wrap"><table class="responsive-table">
         <thead><tr><th style="width:120px">Data</th><th>Devedor</th><th>Descrição</th><th class="num" style="width:110px">Valor</th><th style="width:110px">Status</th><th style="width:50px"></th></tr></thead>
         <tbody id="recvBody"></tbody>
       </table></div>
@@ -1158,7 +1302,7 @@ function renderReceber(){
 
     <div class="card">
       <h3>Empréstimos parcelados (que você concedeu)</h3>
-      <div class="table-wrap"><table>
+      <div class="table-wrap"><table class="responsive-table">
         <thead><tr><th>Nome</th><th class="num">Valor total</th><th class="num">Parcelas</th><th class="num">Valor/parcela</th><th class="num">Pagas</th><th class="num">Restante</th><th style="width:50px"></th></tr></thead>
         <tbody id="loanBody"></tbody>
       </table></div>
@@ -1173,11 +1317,11 @@ function renderReceber(){
   state.receivables.forEach((r,i)=>{
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td><input type="date" value="${r.data||''}" data-role="data"></td>
-      <td><input type="text" value="${escAttr(r.devedor)}" data-role="devedor"></td>
-      <td><input type="text" value="${escAttr(r.descricao)}" data-role="descricao"></td>
-      <td class="num"><input type="text" inputmode="decimal" class="money" data-role="valor"></td>
-      <td>
+      <td data-label="Data"><input type="date" value="${r.data||''}" data-role="data"></td>
+      <td class="cell-plain"><input type="text" value="${escAttr(r.devedor)}" data-role="devedor" placeholder="Devedor"></td>
+      <td data-label="Descrição"><input type="text" value="${escAttr(r.descricao)}" data-role="descricao"></td>
+      <td class="num" data-label="Valor"><input type="text" inputmode="decimal" class="money" data-role="valor"></td>
+      <td data-label="Status">
         <select data-role="status">
           <option value="pendente" ${r.status==='pendente'?'selected':''}>Pendente</option>
           <option value="recebido" ${r.status==='recebido'?'selected':''}>Recebido</option>
@@ -1206,12 +1350,12 @@ function renderReceber(){
     const restante = loanRemaining(l);
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td><input type="text" value="${escAttr(l.nome)}" data-role="nome"></td>
-      <td class="num"><input type="text" inputmode="decimal" class="money" data-role="valorTotal"></td>
-      <td class="num"><input type="text" inputmode="decimal" class="money" data-role="parcelas"></td>
-      <td class="num"><input type="text" inputmode="decimal" class="money" data-role="valorParcela"></td>
-      <td class="num"><input type="text" inputmode="decimal" class="money" data-role="parcelasPagas"></td>
-      <td class="num mono" id="loan-restante-${i}" style="font-weight:600;">${fmt(restante)}</td>
+      <td class="cell-plain"><input type="text" value="${escAttr(l.nome)}" data-role="nome"></td>
+      <td class="num" data-label="Valor total"><input type="text" inputmode="decimal" class="money" data-role="valorTotal"></td>
+      <td class="num" data-label="Parcelas"><input type="text" inputmode="decimal" class="money" data-role="parcelas"></td>
+      <td class="num" data-label="Valor/parcela"><input type="text" inputmode="decimal" class="money" data-role="valorParcela"></td>
+      <td class="num" data-label="Pagas"><input type="text" inputmode="decimal" class="money" data-role="parcelasPagas"></td>
+      <td class="num mono" data-label="Restante" id="loan-restante-${i}" style="font-weight:600;">${fmt(restante)}</td>
       <td><button class="icon-btn" data-role="del">✕</button></td>
     `;
     tr.querySelector('[data-role=nome]').addEventListener('input', e=>{ l.nome=e.target.value; scheduleSave(); });
@@ -1265,7 +1409,7 @@ function renderInvestimentos(){
     </div>
     <div class="card" style="margin-top:22px;">
       <h3>Carteira</h3>
-      <div class="table-wrap"><table>
+      <div class="table-wrap"><table class="responsive-table">
         <thead><tr>
           <th>Nome</th><th style="width:110px">Tipo</th>
           <th class="num" style="width:100px">Inicial</th>
@@ -1278,7 +1422,7 @@ function renderInvestimentos(){
         </tr></thead>
         <tbody id="invBody"></tbody>
         <tfoot>
-          <tr class="total-row"><td colspan="7">TOTAL (conservador / otimista)</td><td class="num" id="inv-total-cell">${fmt(totalBaixa)}<br><span style="opacity:0.75; font-size:12px;">${fmt(totalAlta)}</span></td><td></td></tr>
+          <tr class="total-row"><td colspan="7">TOTAL (conservador / otimista)</td><td class="num" data-label="Total" id="inv-total-cell">${fmt(totalBaixa)}<br><span style="opacity:0.75; font-size:12px;">${fmt(totalAlta)}</span></td><td></td></tr>
         </tfoot>
       </table></div>
       <button class="btn secondary small" id="btnAddInv" style="margin-top:14px;">+ novo item</button>
@@ -1295,23 +1439,23 @@ function renderInvestimentos(){
     const projAlta = investmentValue(inv,true);
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td><input type="text" value="${escAttr(inv.nome)}" data-role="nome"></td>
-      <td>
+      <td class="cell-plain"><input type="text" value="${escAttr(inv.nome)}" data-role="nome"></td>
+      <td data-label="Tipo">
         <select data-role="tipo">
           <option value="rendimento" ${!isFixo?'selected':''}>Rende juros</option>
           <option value="fixo" ${isFixo?'selected':''}>Valor fixo</option>
         </select>
       </td>
       ${isFixo ? `
-        <td class="num" colspan="4"><input type="text" inputmode="decimal" class="money" data-role="valorFixo" placeholder="valor fixo"></td>
+        <td class="num" colspan="4" data-label="Valor fixo"><input type="text" inputmode="decimal" class="money" data-role="valorFixo" placeholder="valor fixo"></td>
       ` : `
-        <td class="num"><input type="text" inputmode="decimal" class="money" data-role="valorInicial"></td>
-        <td class="num"><input type="text" inputmode="decimal" class="money" data-role="aporteMensal"></td>
-        <td class="num"><input type="text" inputmode="decimal" class="money" data-role="anos"></td>
-        <td class="num"><input type="text" inputmode="decimal" class="money" data-role="taxaBaixa"></td>
-        <td class="num"><input type="text" inputmode="decimal" class="money" data-role="taxaAlta"></td>
+        <td class="num" data-label="Inicial"><input type="text" inputmode="decimal" class="money" data-role="valorInicial"></td>
+        <td class="num" data-label="Aporte/mês"><input type="text" inputmode="decimal" class="money" data-role="aporteMensal"></td>
+        <td class="num" data-label="Anos"><input type="text" inputmode="decimal" class="money" data-role="anos"></td>
+        <td class="num" data-label="Taxa baixa"><input type="text" inputmode="decimal" class="money" data-role="taxaBaixa"></td>
+        <td class="num" data-label="Taxa alta"><input type="text" inputmode="decimal" class="money" data-role="taxaAlta"></td>
       `}
-      <td class="num mono" id="inv-proj-${i}" style="font-weight:600;">${fmt(projBaixa)}${!isFixo?`<br><span style="opacity:0.6; font-size:11.5px;">${fmt(projAlta)}</span>`:''}</td>
+      <td class="num mono" data-label="Projetado" id="inv-proj-${i}" style="font-weight:600;">${fmt(projBaixa)}${!isFixo?`<br><span style="opacity:0.6; font-size:11.5px;">${fmt(projAlta)}</span>`:''}</td>
       <td><button class="icon-btn" data-role="del">✕</button></td>
     `;
     tr.querySelector('[data-role=nome]').addEventListener('input', e=>{ inv.nome=e.target.value; scheduleSave(); });
@@ -1369,10 +1513,10 @@ function renderCustomSection(sectionId){
     <div class="page-header"><div><h2>${escapeHtml(cs.label)}</h2><div class="desc">Seção personalizada — adicione o que quiser controlar aqui.</div></div></div>
     <div class="card">
       <h3>Itens</h3>
-      <div class="table-wrap"><table>
+      <div class="table-wrap"><table class="responsive-table">
         <thead><tr><th>Descrição</th><th class="num" style="width:130px">Valor</th><th style="width:60px"></th></tr></thead>
         <tbody id="csBody"></tbody>
-        <tfoot><tr class="total-row"><td>TOTAL</td><td class="num" id="cs-total-cell">${fmt(total)}</td><td></td></tr></tfoot>
+        <tfoot><tr class="total-row"><td>TOTAL</td><td class="num" data-label="Total" id="cs-total-cell">${fmt(total)}</td><td></td></tr></tfoot>
       </table></div>
       <button class="btn secondary small" id="btnAddCs" style="margin-top:14px;">+ novo item</button>
     </div>
@@ -1384,8 +1528,8 @@ function renderCustomSection(sectionId){
   cs.items.forEach((it,i)=>{
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td><input type="text" value="${escAttr(it.desc)}" data-role="desc"></td>
-      <td class="num"><input type="text" inputmode="decimal" class="money" data-role="value"></td>
+      <td data-label="Descrição"><input type="text" value="${escAttr(it.desc)}" data-role="desc"></td>
+      <td class="num" data-label="Valor"><input type="text" inputmode="decimal" class="money" data-role="value"></td>
       <td><button class="icon-btn" data-role="del">✕</button></td>
     `;
     tr.querySelector('[data-role=desc]').addEventListener('input', e=>{ it.desc=e.target.value; scheduleSave(); });
@@ -1654,6 +1798,20 @@ function wireAppButtons(){
   if(burger) burger.onclick = openDrawer;
   const overlay = document.getElementById('drawerOverlay');
   if(overlay) overlay.onclick = closeDrawer;
+
+  const bellDesktop = document.getElementById('btnBellDesktop');
+  const bellMobile = document.getElementById('btnBellMobile');
+  const closeNotif = document.getElementById('btnCloseNotif');
+  if(bellDesktop) bellDesktop.onclick = (e)=>{ e.stopPropagation(); toggleNotifPanel(); };
+  if(bellMobile) bellMobile.onclick = (e)=>{ e.stopPropagation(); toggleNotifPanel(); };
+  if(closeNotif) closeNotif.onclick = closeNotifPanel;
+  document.addEventListener('click', (e)=>{
+    const panel = document.getElementById('notifPanel');
+    if(panel && panel.classList.contains('open') && !panel.contains(e.target) && e.target.id!=='btnBellDesktop' && e.target.id!=='btnBellMobile'){
+      closeNotifPanel();
+    }
+  });
+  renderNotifications();
 }
 </script>
 </body>
