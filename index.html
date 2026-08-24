@@ -143,6 +143,80 @@ input,select{font-family:inherit;}
 .stat .value{font-family:'IBM Plex Mono',monospace; font-size:23px; font-weight:600; color:var(--forest); margin-top:4px; word-break:break-word;}
 .stat.neg .value{color:var(--rust);}
 
+/* ---------- Cartões de categoria (Gastos Mensais) ---------- */
+.month-total-bar{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  background:var(--forest); color:var(--white); border-radius:var(--radius);
+  padding:12px 16px; margin-top:2px;
+}
+.month-total-bar .mtb-label{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:rgba(251,249,241,0.75);}
+.month-total-bar .mtb-value{font-family:'IBM Plex Mono',monospace; font-size:19px; font-weight:700;}
+
+.cat-cards-wrap{display:flex; flex-direction:column; gap:16px; margin:18px 0;}
+.cat-card{background:var(--white); border:1px solid var(--paper-line); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden;}
+.cat-card-head{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:14px 18px 12px; border-bottom:1px solid var(--paper-line);
+}
+.cat-name-input{
+  flex:1; min-width:0; border:none; background:none; padding:2px 0;
+  font-family:'Fraunces',serif; font-weight:700; font-size:16px; color:var(--forest);
+}
+.cat-name-input:focus{outline:none; border-bottom:1px solid var(--gold-light);}
+.cat-card-head .icon-btn{flex-shrink:0;}
+
+.cat-list{padding:2px 18px 4px;}
+.cat-list-head{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:8px 0 7px; border-bottom:2px solid var(--forest);
+  font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase;
+  letter-spacing:0.06em; color:var(--ink-soft);
+}
+.cat-list-head span:last-child{text-align:right;}
+
+.cat-item{display:flex; align-items:center; gap:10px; padding:9px 0;}
+.cat-item + .cat-item{border-top:1px solid rgba(207,196,160,0.35);}
+.cat-item-desc{
+  flex:1; min-width:0; border:none; background:none; font-family:'Source Serif 4',Georgia,serif;
+  font-size:14.5px; color:var(--ink); padding:3px 2px;
+}
+.cat-item-desc:focus{outline:none; background:var(--forest-pale); border-radius:2px;}
+.cat-item-value{
+  width:92px; flex-shrink:0; border:none; background:none; text-align:right;
+  font-family:'IBM Plex Mono',monospace; font-size:14.5px; color:var(--ink); padding:3px 2px;
+}
+.cat-item-value:focus{outline:none; background:var(--forest-pale); border-radius:2px;}
+.cat-item-del{
+  flex-shrink:0; background:none; border:none; color:var(--ink-soft); font-size:12px;
+  padding:3px 4px; opacity:0; transition:opacity .15s, color .15s; border-radius:2px;
+}
+.cat-item:hover .cat-item-del{opacity:0.6;}
+.cat-item-del:hover{opacity:1 !important; color:var(--rust);}
+
+.cat-card-empty{padding:14px 2px; color:var(--ink-soft); font-size:13px; font-style:italic;}
+
+.cat-card-foot{display:flex; justify-content:center; padding:10px 18px 16px;}
+.cat-add-btn{
+  border:1px dashed var(--paper-line); background:none; border-radius:20px;
+  padding:7px 16px; font-family:'IBM Plex Mono',monospace; font-size:11.5px;
+  color:var(--ink-soft); text-align:center;
+}
+.cat-add-btn:hover{border-color:var(--gold); color:var(--gold);}
+
+.cat-subtotal{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  background:var(--forest); color:var(--white); padding:11px 18px;
+  font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.05em;
+}
+.cat-subtotal .cat-subtotal-value{font-size:15px; font-weight:700; text-transform:none; letter-spacing:0;}
+
+@media(max-width:880px){
+  .cat-card-head{padding:12px 14px 10px;}
+  .cat-list{padding:2px 14px 4px;}
+  .cat-subtotal{padding:10px 14px;}
+  .cat-item-value{width:78px;}
+}
+
 .table-wrap{width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch;}
 table{width:100%; border-collapse:collapse; font-size:14px;}
 th{text-align:left; font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-soft); padding:8px 8px; border-bottom:2px solid var(--forest); white-space:nowrap;}
@@ -1048,65 +1122,79 @@ function renderGastos(){
   card.className = 'card';
   card.innerHTML = `
     <h3>${escapeHtml(month.label)} <span class="hint">${month.categories.length} categorias</span></h3>
-    <div class="table-wrap"><table class="responsive-table">
-      <thead><tr><th style="width:26%">Categoria</th><th>Descrição</th><th class="num" style="width:110px">Valor</th><th style="width:70px"></th></tr></thead>
-      <tbody id="catBody"></tbody>
-      <tfoot><tr class="total-row"><td colspan="2">TOTAL DO MÊS</td><td class="num" data-label="Total" id="month-total-cell">${fmt(total)}</td><td></td></tr></tfoot>
-    </table></div>
-    <button class="btn secondary small" id="btnAddCat" style="margin-top:14px;">+ nova categoria</button>
+    <div class="month-total-bar">
+      <span class="mtb-label">Total do mês</span>
+      <span class="mtb-value mono" id="month-total-cell">${fmt(total)}</span>
+    </div>
   `;
   content.appendChild(card);
 
-  const body = card.querySelector('#catBody');
+  const wrap = document.createElement('div');
+  wrap.className = 'cat-cards-wrap';
+  wrap.id = 'catBody';
+  content.appendChild(wrap);
+
+  const addCatBtn = document.createElement('button');
+  addCatBtn.className = 'btn secondary small';
+  addCatBtn.id = 'btnAddCat';
+  addCatBtn.textContent = '+ nova categoria';
+  content.appendChild(addCatBtn);
+
   month.categories.forEach((cat, ci)=>{
     const catTotal = categoryTotal(cat);
-    cat.items.forEach((item, ii)=>{
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td${ii===0?' class="cell-plain"':''}>${ii===0 ? catInputHtml(cat.name) : ''}</td>
-        <td data-label="Descrição"><input type="text" value="${escAttr(item.desc)}" data-role="desc"></td>
-        <td class="num" data-label="Valor"><input type="text" inputmode="decimal" class="money" data-role="value"></td>
-        <td><button class="icon-btn" data-role="delItem" title="remover item">✕</button></td>
-      `;
-      tr.querySelector('[data-role=desc]').addEventListener('input', e=>{ item.desc=e.target.value; scheduleSave(); });
-      bindMoneyInput(tr.querySelector('[data-role=value]'), ()=>item.value, v=>item.value=v, ()=>recalcGastos(month, ci));
-      tr.querySelector('[data-role=delItem]').addEventListener('click', ()=>{ cat.items.splice(ii,1); scheduleSave(); renderSection(); });
-      if(ii===0){
-        const catInput = tr.querySelector('[data-role=catname]');
-        catInput.addEventListener('input', e=>{ cat.name = e.target.value; scheduleSave(); });
-      }
-      body.appendChild(tr);
-    });
-    const addRow = document.createElement('tr');
-    addRow.innerHTML = `
-      <td${cat.items.length===0?' class="cell-plain"':''}>${cat.items.length===0 ? catInputHtml(cat.name) : ''}</td>
-      <td><button class="btn secondary small" data-role="addItem">+ item em "${escAttr(cat.name)}"</button></td>
-      <td class="num mono" data-label="Subtotal da categoria" id="cat-total-${ci}" style="font-weight:600;">${fmt(catTotal)}</td>
-      <td><button class="icon-btn" data-role="delCat" title="remover categoria">🗑</button></td>
+    const catCard = document.createElement('div');
+    catCard.className = 'cat-card';
+    catCard.innerHTML = `
+      <div class="cat-card-head">
+        <input type="text" value="${escAttr(cat.name)}" data-role="catname" class="cat-name-input">
+        <button class="icon-btn" data-role="delCat" title="remover categoria">🗑</button>
+      </div>
+      <div class="cat-list">
+        ${cat.items.length ? `<div class="cat-list-head"><span>Descrição</span><span>Valor</span></div>` : `<div class="cat-card-empty">Nenhum item ainda nesta categoria.</div>`}
+        <div id="cat-items-${ci}"></div>
+      </div>
+      <div class="cat-card-foot">
+        <button class="cat-add-btn" data-role="addItem">+ item em "${escAttr(cat.name)}"</button>
+      </div>
+      <div class="cat-subtotal">
+        <span>Subtotal da categoria</span>
+        <span class="cat-subtotal-value mono" id="cat-total-${ci}">${fmt(catTotal)}</span>
+      </div>
     `;
-    addRow.querySelector('[data-role=addItem]').addEventListener('click', ()=>{
-      cat.items.push({desc:'', value:0}); scheduleSave(); renderSection();
-    });
-    addRow.querySelector('[data-role=delCat]').addEventListener('click', ()=>{
+
+    catCard.querySelector('[data-role=catname]').addEventListener('input', e=>{ cat.name = e.target.value; scheduleSave(); });
+    catCard.querySelector('[data-role=delCat]').addEventListener('click', ()=>{
       if(!confirm(`Remover categoria "${cat.name}"?`)) return;
       month.categories.splice(ci,1); scheduleSave(); renderSection();
     });
-    if(cat.items.length===0){
-      const ci2 = addRow.querySelector('[data-role=catname]');
-      if(ci2) ci2.addEventListener('input', e=>{ cat.name = e.target.value; scheduleSave(); });
-    }
-    body.appendChild(addRow);
+    catCard.querySelector('[data-role=addItem]').addEventListener('click', ()=>{
+      cat.items.push({desc:'', value:0}); scheduleSave(); renderSection();
+    });
+
+    const itemsHost = catCard.querySelector(`#cat-items-${ci}`);
+    cat.items.forEach((item, ii)=>{
+      const row = document.createElement('div');
+      row.className = 'cat-item';
+      row.innerHTML = `
+        <input type="text" value="${escAttr(item.desc)}" data-role="desc" class="cat-item-desc" placeholder="Descrição">
+        <input type="text" inputmode="decimal" class="money cat-item-value" data-role="value" placeholder="0,00">
+        <button class="cat-item-del" data-role="delItem" title="remover item">✕</button>
+      `;
+      row.querySelector('[data-role=desc]').addEventListener('input', e=>{ item.desc=e.target.value; scheduleSave(); });
+      bindMoneyInput(row.querySelector('[data-role=value]'), ()=>item.value, v=>item.value=v, ()=>recalcGastos(month, ci));
+      row.querySelector('[data-role=delItem]').addEventListener('click', ()=>{ cat.items.splice(ii,1); scheduleSave(); renderSection(); });
+      itemsHost.appendChild(row);
+    });
+
+    wrap.appendChild(catCard);
   });
 
-  card.querySelector('#btnAddCat').addEventListener('click', ()=>{
+  addCatBtn.addEventListener('click', ()=>{
     month.categories.push({name:'Nova categoria', items:[{desc:'', value:0}]});
     scheduleSave(); renderSection();
   });
 
   return el;
-}
-function catInputHtml(name){
-  return `<input type="text" value="${escAttr(name)}" data-role="catname" style="font-weight:600; color:var(--forest);">`;
 }
 function recalcGastos(month, ci){
   const catCell = document.getElementById('cat-total-'+ci);
