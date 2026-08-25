@@ -70,9 +70,13 @@ input,select{font-family:inherit;}
 .nav-hidden-toggle{padding:9px 18px; font-size:10.5px; font-family:'IBM Plex Mono',monospace; color:rgba(251,249,241,0.45); cursor:pointer; text-transform:uppercase; letter-spacing:0.05em;}
 .nav-hidden-toggle:hover{color:var(--gold-light);}
 .nav-hidden-list{padding:0 18px 8px;}
-.nav-hidden-item{font-size:12.5px; color:rgba(251,249,241,0.72); padding:6px 0; display:flex; justify-content:space-between; align-items:center; cursor:pointer; gap:8px;}
-.nav-hidden-item span{color:var(--gold-light); font-family:'IBM Plex Mono',monospace; font-size:10.5px; white-space:nowrap;}
-.nav-hidden-item:hover{color:var(--white);}
+.nav-hidden-item{font-size:12.5px; color:rgba(251,249,241,0.72); padding:6px 0; display:flex; justify-content:space-between; align-items:center; gap:8px;}
+.nav-hidden-item .nhi-label{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.nav-hidden-item .nhi-actions{display:flex; gap:9px; flex-shrink:0;}
+.nav-hidden-item .nhi-actions span{color:var(--gold-light); font-family:'IBM Plex Mono',monospace; font-size:10.5px; white-space:nowrap; cursor:pointer;}
+.nav-hidden-item .nhi-actions span:hover{color:var(--white);}
+.nav-hidden-item .nhi-danger{color:#C97A6C !important;}
+.nav-hidden-item .nhi-danger:hover{color:#E8A398 !important;}
 
 .user-badge{display:flex; align-items:center; gap:8px; padding:10px 20px; border-top:1px solid rgba(251,249,241,0.15); border-bottom:1px solid rgba(251,249,241,0.15); font-size:12px; color:rgba(251,249,241,0.85);}
 .user-badge .dot{width:7px;height:7px;border-radius:50%; background:var(--gold-light); flex-shrink:0;}
@@ -536,6 +540,8 @@ function emptyState(){
     months: [], fixedExpenses: [], salaries: [], receivables: [], loans: [], investments: [],
     customSections: [],
     realInvestments: { initialValue: 0, months: [] },
+    investmentSections: {}, // seções "Investimentos" duplicadas (id da seção -> lista de investimentos)
+    realInvestSections: {}, // seções "Investimento Real" duplicadas (id da seção -> {initialValue, months})
     navConfig: null, // preenchido por ensureNavConfig()
     lastUpdated: null, selectedMonth: null, dashboardMonth: null,
   };
@@ -609,7 +615,7 @@ function ensureNavConfig(){
   if(!Array.isArray(state.navConfig)) state.navConfig = [];
   DEFAULT_NAV.forEach(def=>{
     if(!state.navConfig.find(n=>n.id===def.id)){
-      state.navConfig.push({id:def.id, label:def.label, hidden:false, core:true});
+      state.navConfig.push({id:def.id, label:def.label, hidden:false, core:true, kind:def.id});
     }
   });
   // migração: quem já tinha o rótulo antigo "Visão Geral" (não customizado) passa a ver "Início"
@@ -618,7 +624,14 @@ function ensureNavConfig(){
   if(!Array.isArray(state.customSections)) state.customSections = [];
   state.customSections.forEach(cs=>{
     if(!state.navConfig.find(n=>n.id===cs.id)){
-      state.navConfig.push({id:cs.id, label:cs.label, hidden:false, core:false});
+      state.navConfig.push({id:cs.id, label:cs.label, hidden:false, core:false, kind:'custom'});
+    }
+  });
+  // migração: garante o campo "kind" em entradas salvas antes dessa versão (duplicação/roteamento dependem dele)
+  state.navConfig.forEach(n=>{
+    if(!n.kind){
+      const def = DEFAULT_NAV.find(d=>d.id===n.id);
+      n.kind = def ? def.id : (n.core ? n.id : 'custom');
     }
   });
 }
@@ -641,22 +654,32 @@ function renderNav(){
 function buildNavInto(containerId, visible, hidden, withManage){
   const container = document.getElementById(containerId);
   if(!container) return;
-  const itemHtml = (s,i)=>`
+  const itemHtml = (s,i)=>{
+    const dupable = s.kind==='custom' || s.kind==='investimentos' || s.kind==='realInvest';
+    return `
     <div class="nav-item ${s.id===activeSection?'active':''}" data-nav="${escAttr(s.id)}">
       <span class="num">${String(i+1).padStart(2,'0')}</span>
       <span class="nav-label">${escapeHtml(s.label)}</span>
       <span class="nav-actions">
-        ${!s.core ? `<button class="nav-icon-btn" data-dup="${escAttr(s.id)}" title="duplicar">⧉</button>` : ''}
+        ${dupable ? `<button class="nav-icon-btn" data-dup="${escAttr(s.id)}" title="duplicar">⧉</button>` : ''}
         <button class="nav-icon-btn" data-edit="${escAttr(s.id)}" title="renomear">✎</button>
         <button class="nav-icon-btn" data-delnav="${escAttr(s.id)}" title="excluir">✕</button>
       </span>
     </div>`;
+  };
   const html = visible.map(itemHtml).join('');
   const addBtn = withManage ? `<div class="nav-add-btn" data-addsection="1">+ adicionar item</div>` : '';
   const hiddenBlock = (withManage && hidden.length) ? `
     <div class="nav-hidden-toggle" data-hiddentoggle="1">seções ocultas (${hidden.length}) ▾</div>
     <div class="nav-hidden-list" data-hiddenlist="1" style="display:none;">
-      ${hidden.map(s=>`<div class="nav-hidden-item" data-restore="${escAttr(s.id)}">${escapeHtml(s.label)} <span>restaurar</span></div>`).join('')}
+      ${hidden.map(s=>`
+        <div class="nav-hidden-item">
+          <span class="nhi-label">${escapeHtml(s.label)}</span>
+          <span class="nhi-actions">
+            <span data-restore="${escAttr(s.id)}">restaurar</span>
+            <span data-permadelete="${escAttr(s.id)}" class="nhi-danger">excluir permanente</span>
+          </span>
+        </div>`).join('')}
     </div>` : '';
 
   container.innerHTML = html + addBtn + hiddenBlock;
@@ -676,6 +699,11 @@ function buildNavInto(containerId, visible, hidden, withManage){
     el.addEventListener('click', ()=>{
       const item = state.navConfig.find(n=>n.id===el.dataset.restore);
       if(item){ item.hidden = false; scheduleSave(); renderNav(); }
+    });
+  });
+  container.querySelectorAll('[data-permadelete]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      onPermanentDeleteNavItem(el.dataset.permadelete);
     });
   });
 }
@@ -795,10 +823,66 @@ function onDeleteNavItem(id){
   if(!confirm('Tem certeza que deseja excluir este item?')) return;
 
   if(cfg.core){
-    cfg.hidden = true; // seções do sistema só somem do menu; dados continuam intactos
+    cfg.hidden = true; // seções do sistema só somem do menu; dados continuam intactos (restaurável)
   } else {
     state.navConfig = state.navConfig.filter(n=>n.id!==id);
-    state.customSections = state.customSections.filter(c=>c.id!==id);
+    purgeSectionData(cfg);
+  }
+  if(activeSection===id) activeSection = null;
+  scheduleSave();
+  renderNav();
+  renderSection();
+}
+
+// Apaga os dados de uma seção não-core removida do menu (duplicatas e seções personalizadas).
+function purgeSectionData(cfg){
+  const kind = cfg.kind || cfg.id;
+  if(kind==='custom'){
+    state.customSections = state.customSections.filter(c=>c.id!==cfg.id);
+  } else if(kind==='investimentos'){
+    if(state.investmentSections) delete state.investmentSections[cfg.id];
+  } else if(kind==='realInvest'){
+    if(state.realInvestSections) delete state.realInvestSections[cfg.id];
+  }
+}
+
+// Apaga os dados de uma seção CORE (permanece no menu, oculta, porém vazia — não é recriada com dados antigos).
+function wipeSectionData(cfg){
+  switch(cfg.kind){
+    case 'gastos':
+      state.months = [];
+      if(state.dashboardMonth) state.dashboardMonth = null;
+      if(state.selectedMonth) state.selectedMonth = null;
+      break;
+    case 'fixos': state.fixedExpenses = []; break;
+    case 'salarios': state.salaries = []; break;
+    case 'receber': state.receivables = []; break;
+    case 'investimentos':
+      if(cfg.id==='investimentos') state.investments = [];
+      else if(state.investmentSections) delete state.investmentSections[cfg.id];
+      break;
+    case 'realInvest':
+      if(cfg.id==='realInvest') state.realInvestments = { initialValue:0, months:[] };
+      else if(state.realInvestSections) delete state.realInvestSections[cfg.id];
+      break;
+    case 'custom':
+      state.customSections = state.customSections.filter(c=>c.id!==cfg.id);
+      break;
+    default: break; // dashboard: nada para apagar
+  }
+}
+
+function onPermanentDeleteNavItem(id){
+  const cfg = state.navConfig.find(n=>n.id===id);
+  if(!cfg) return;
+  if(!confirm(`Excluir "${cfg.label}" PERMANENTEMENTE?\n\nTodos os dados dessa seção serão apagados e não será possível recuperar (diferente de "restaurar").`)) return;
+
+  wipeSectionData(cfg);
+
+  if(cfg.core){
+    // fica oculta no menu (para não ser recriada do zero pelo ensureNavConfig), mas sem nenhum dado
+  } else {
+    state.navConfig = state.navConfig.filter(n=>n.id!==id);
   }
   if(activeSection===id) activeSection = null;
   scheduleSave();
@@ -807,16 +891,37 @@ function onDeleteNavItem(id){
 }
 
 function onDuplicateSection(id){
-  const original = state.customSections.find(c=>c.id===id);
   const cfg = state.navConfig.find(n=>n.id===id);
-  if(!original || !cfg) return;
+  if(!cfg) return;
+  const kind = cfg.kind;
+  if(kind!=='custom' && kind!=='investimentos' && kind!=='realInvest') return; // não duplicável
+
   const suggested = `Cópia de ${cfg.label}`;
   const name = prompt(`Duplicar "${cfg.label}" — nome da nova seção:`, suggested);
   if(!name) return;
-  const newId = 'custom-' + uid();
-  const clonedItems = (original.items||[]).map(it => ({ desc: it.desc, value: it.value }));
-  state.customSections.push({ id: newId, label: name.trim(), items: clonedItems });
-  state.navConfig.push({ id: newId, label: name.trim(), hidden:false, core:false });
+  const newId = 'dup-' + uid();
+
+  if(kind==='custom'){
+    const original = state.customSections.find(c=>c.id===id);
+    if(!original) return;
+    const clonedItems = (original.items||[]).map(it => ({ desc: it.desc, value: it.value }));
+    state.customSections.push({ id: newId, label: name.trim(), items: clonedItems });
+  } else if(kind==='investimentos'){
+    const source = getInvArray(id);
+    const cloned = source.map(inv => ({ ...inv, id: uid() }));
+    if(!state.investmentSections) state.investmentSections = {};
+    state.investmentSections[newId] = cloned;
+  } else if(kind==='realInvest'){
+    const source = getRIData(id);
+    const cloned = {
+      initialValue: source.initialValue,
+      months: (source.months||[]).map(m => ({ ...m, id: uid() }))
+    };
+    if(!state.realInvestSections) state.realInvestSections = {};
+    state.realInvestSections[newId] = cloned;
+  }
+
+  state.navConfig.push({ id: newId, label: name.trim(), hidden:false, core:false, kind });
   activeSection = newId;
   scheduleSave();
   renderNav();
@@ -871,7 +976,19 @@ function investmentValue(inv, useHigh){
   const taxa = useHigh ? inv.taxaAlta : inv.taxaBaixa;
   return futureValue(Number(inv.valorInicial)||0, Number(inv.aporteMensal)||0, Number(inv.anos)||0, Number(taxa)||0);
 }
-function investmentsTotal(useHigh){ return state.investments.reduce((s,inv)=>s+investmentValue(inv,useHigh),0); }
+function investmentsTotal(sectionId, useHigh){ return getInvArray(sectionId).reduce((s,inv)=>s+investmentValue(inv,useHigh),0); }
+
+// Retorna a lista de investimentos da seção informada. 'investimentos' é a aba original (compatível com dados
+// já salvos); qualquer outro id é uma seção duplicada, guardada à parte em state.investmentSections.
+function getInvArray(sectionId){
+  if(sectionId==='investimentos'){
+    if(!Array.isArray(state.investments)) state.investments = [];
+    return state.investments;
+  }
+  if(!state.investmentSections) state.investmentSections = {};
+  if(!Array.isArray(state.investmentSections[sectionId])) state.investmentSections[sectionId] = [];
+  return state.investmentSections[sectionId];
+}
 
 /* =========================================================
    INVESTIMENTO REAL — simulador sequencial mês a mês
@@ -879,6 +996,25 @@ function investmentsTotal(useHigh){ return state.investments.reduce((s,inv)=>s+i
    O saldo final de um mês vira o saldo inicial do mês seguinte.
 ========================================================= */
 const PT_MONTH_NAMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+// Compara textos de mês ignorando maiúsculas/acentos/espaços — ex: "Novembro / 2026" ~ "novembro2026".
+function normalizeMonthLabel(str){
+  return String(str||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'');
+}
+// Ao entrar no app, se existir um mês cadastrado (em "Gastos Mensais") cujo nome corresponda ao mês/ano
+// atuais (ex: "Novembro / 2026"), seleciona ele automaticamente — isso já reflete em "Gastos Mensais" e
+// em "Salários", que usam o mesmo mês selecionado. "Gastos Fixos" não depende de mês (é um modelo único).
+function selectCurrentMonthIfFound(){
+  if(!Array.isArray(state.months) || !state.months.length) return;
+  const now = new Date();
+  const monthName = normalizeMonthLabel(PT_MONTH_NAMES[now.getMonth()]);
+  const year = String(now.getFullYear());
+  const current = state.months.find(m=>{
+    const norm = normalizeMonthLabel(m.label);
+    return norm.includes(monthName) && norm.includes(year);
+  });
+  if(current) state.selectedMonth = current.id;
+}
 
 function riMonthKeyNow(){
   const d = new Date();
@@ -911,9 +1047,23 @@ function ensureRealInvestShape(){
   }
 }
 
+// Retorna os dados de "Investimento Real" da seção informada. 'realInvest' é a aba original (compatível com
+// dados já salvos); qualquer outro id é uma seção duplicada, guardada à parte em state.realInvestSections.
+function getRIData(sectionId){
+  if(sectionId==='realInvest'){
+    ensureRealInvestShape();
+    return state.realInvestments;
+  }
+  if(!state.realInvestSections) state.realInvestSections = {};
+  const cur = state.realInvestSections[sectionId];
+  const looksNew = cur && typeof cur.initialValue !== 'undefined' && Array.isArray(cur.months);
+  if(!looksNew) state.realInvestSections[sectionId] = { initialValue: 0, months: [] };
+  return state.realInvestSections[sectionId];
+}
+
 // Roda a simulação inteira em sequência: saldo inicial do mês N = montante do mês N-1.
-function computeRealInvestSchedule(){
-  const ri = state.realInvestments;
+function computeRealInvestSchedule(sectionId){
+  const ri = getRIData(sectionId);
   const initial = Number(ri.initialValue) || 0;
   let saldo = initial;
   const rows = [];
@@ -1007,7 +1157,7 @@ function renderDashboard(){
   const receitas = sal ? salaryTotal(sal) : 0;
   const saldo = receitas - gastos;
   const pendente = receivablesPendingTotal();
-  const investTotalBaixa = investmentsTotal(false);
+  const investTotalBaixa = investmentsTotal('investimentos', false);
 
   // "tem dados de verdade" = pelo menos um mês com gasto OU salário lançado (não só meses vazios)
   const hasRealData = months.some(m=>monthTotal(m) > 0) || state.salaries.some(s=>salaryTotal(s) > 0);
@@ -1332,9 +1482,8 @@ function renderFixos(){
 ========================================================= */
 function renderSalarios(){
   const el = document.createElement('div');
-  if(!state.salaries.find(s=>s.monthId===state.selectedMonth) && state.months.length){
-    const first = state.salaries[0];
-    state.selectedMonth = first ? first.monthId : state.months[0].id;
+  if(!state.months.find(m=>m.id===state.selectedMonth) && state.months.length){
+    state.selectedMonth = state.months[0].id;
   }
   const month = state.months.find(m=>m.id===state.selectedMonth);
   let sal = state.salaries.find(s=>s.monthId===state.selectedMonth);
@@ -1559,15 +1708,19 @@ function recalcLoans(){
 /* =========================================================
    RENDER: INVESTIMENTOS
 ========================================================= */
-function renderInvestimentos(){
+function renderInvestimentos(sectionId){
+  sectionId = sectionId || 'investimentos';
   const el = document.createElement('div');
-  const totalBaixa = investmentsTotal(false);
-  const totalAlta = investmentsTotal(true);
-  const totalAporte = state.investments.reduce((s,i)=>s+(Number(i.valorInicial)||Number(i.valorFixo)||0),0);
+  const cfg = state.navConfig.find(n=>n.id===sectionId);
+  const title = cfg ? cfg.label : 'Investimentos';
+  const list = getInvArray(sectionId);
+  const totalBaixa = investmentsTotal(sectionId, false);
+  const totalAlta = investmentsTotal(sectionId, true);
+  const totalAporte = list.reduce((s,i)=>s+(Number(i.valorInicial)||Number(i.valorFixo)||0),0);
 
   el.innerHTML = `
     <div class="page-header">
-      <div><h2>Investimentos</h2><div class="desc">Informe valor inicial, aporte mensal, prazo e taxa — o valor futuro é calculado automaticamente (juros compostos), em dois cenários de taxa.</div></div>
+      <div><h2>${escapeHtml(title)}</h2><div class="desc">Informe valor inicial, aporte mensal, prazo e taxa — o valor futuro é calculado automaticamente (juros compostos), em dois cenários de taxa.</div></div>
     </div>
     <div class="grid-3">
       <div class="stat"><div class="label">Total investido/aportado hoje</div><div class="value mono" id="stat-inv-aportado">${fmt(totalAporte)}</div></div>
@@ -1597,10 +1750,11 @@ function renderInvestimentos(){
     </div>
   `;
   const body = el.querySelector('#invBody');
-  if(state.investments.length===0){
+  if(list.length===0){
     body.innerHTML = `<tr><td colspan="9"><div class="empty-state">Nenhum investimento cadastrado ainda. Clique em "+ novo item" para começar.</div></td></tr>`;
   }
-  state.investments.forEach((inv,i)=>{
+  const recalc = ()=>recalcInvestimentos(sectionId);
+  list.forEach((inv,i)=>{
     const isFixo = inv.tipo==='fixo';
     const projBaixa = investmentValue(inv,false);
     const projAlta = investmentValue(inv,true);
@@ -1632,22 +1786,23 @@ function renderInvestimentos(){
       if(inv.tipo==='rendimento' && inv.valorInicial===undefined){ inv.valorInicial=inv.valorFixo||0; inv.aporteMensal=0; inv.anos=1; inv.taxaBaixa=6; inv.taxaAlta=12.5; }
       scheduleSave(); renderSection();
     });
-    tr.querySelector('[data-role=del]').addEventListener('click', ()=>{ state.investments.splice(i,1); scheduleSave(); renderSection(); });
+    tr.querySelector('[data-role=del]').addEventListener('click', ()=>{ list.splice(i,1); scheduleSave(); renderSection(); });
     ['valorFixo','valorInicial','aporteMensal','anos','taxaBaixa','taxaAlta'].forEach(role=>{
       const input = tr.querySelector(`[data-role=${role}]`);
-      if(input) bindMoneyInput(input, ()=>inv[role], v=>inv[role]=v, recalcInvestimentos);
+      if(input) bindMoneyInput(input, ()=>inv[role], v=>inv[role]=v, recalc);
     });
     body.appendChild(tr);
   });
   el.querySelector('#btnAddInv').addEventListener('click', ()=>{
-    state.investments.push({id:uid(), nome:'', tipo:'rendimento', valorInicial:0, aporteMensal:0, anos:1, taxaBaixa:6, taxaAlta:12.5, obs:''});
+    list.push({id:uid(), nome:'', tipo:'rendimento', valorInicial:0, aporteMensal:0, anos:1, taxaBaixa:6, taxaAlta:12.5, obs:''});
     scheduleSave(); renderSection();
   });
 
   return el;
 }
-function recalcInvestimentos(){
-  state.investments.forEach((inv,i)=>{
+function recalcInvestimentos(sectionId){
+  const list = getInvArray(sectionId);
+  list.forEach((inv,i)=>{
     const cell = document.getElementById('inv-proj-'+i);
     if(cell){
       const projBaixa = investmentValue(inv,false);
@@ -1656,9 +1811,9 @@ function recalcInvestimentos(){
       cell.innerHTML = fmt(projBaixa) + (!isFixo? `<br><span style="opacity:0.6; font-size:11.5px;">${fmt(projAlta)}</span>` : '');
     }
   });
-  const totalBaixa = investmentsTotal(false);
-  const totalAlta = investmentsTotal(true);
-  const totalAporte = state.investments.reduce((s,i)=>s+(Number(i.valorInicial)||Number(i.valorFixo)||0),0);
+  const totalBaixa = investmentsTotal(sectionId, false);
+  const totalAlta = investmentsTotal(sectionId, true);
+  const totalAporte = list.reduce((s,i)=>s+(Number(i.valorInicial)||Number(i.valorFixo)||0),0);
   const a = document.getElementById('stat-inv-aportado'); if(a) a.textContent = fmt(totalAporte);
   const b = document.getElementById('stat-inv-baixa'); if(b) b.textContent = fmt(totalBaixa);
   const c = document.getElementById('stat-inv-alta'); if(c) c.textContent = fmt(totalAlta);
@@ -1727,17 +1882,19 @@ function riRateFmt2(taxa){
   return n.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
 }
 
-function renderRealInvest(){
+function renderRealInvest(sectionId){
+  sectionId = sectionId || 'realInvest';
   const el = document.createElement('div');
-  ensureRealInvestShape();
-  const ri = state.realInvestments;
-  const result = computeRealInvestSchedule();
+  const cfg = state.navConfig.find(n=>n.id===sectionId);
+  const title = cfg ? cfg.label : 'Investimento Real';
+  const ri = getRIData(sectionId);
+  const result = computeRealInvestSchedule(sectionId);
   const hasMonths = ri.months.length > 0;
 
   el.innerHTML = `
     <div class="page-header">
       <div>
-        <h2>Investimento Real</h2>
+        <h2>${escapeHtml(title)}</h2>
         <div class="desc">Simulador de juros compostos mês a mês. Edite qualquer aporte ou taxa e tudo recalcula sozinho — inclusive os meses seguintes.</div>
       </div>
     </div>
@@ -1793,8 +1950,9 @@ function renderRealInvest(){
   `;
 
   // ---- Valor inicial ----
+  const recalc = ()=>recalcRealInvest(sectionId);
   const initialInput = el.querySelector('#riInitialValue');
-  bindMoneyInput(initialInput, ()=>ri.initialValue, v=>{ ri.initialValue = v; }, recalcRealInvest);
+  bindMoneyInput(initialInput, ()=>ri.initialValue, v=>{ ri.initialValue = v; }, recalc);
 
   // ---- Linhas de meses ----
   const body = el.querySelector('#riMonthsBody');
@@ -1820,12 +1978,12 @@ function renderRealInvest(){
       <td><button class="icon-btn" data-role="delMonth" title="excluir mês">✕</button></td>
     `;
     tr.querySelector('[data-role=monthKey]').addEventListener('change', e=>{
-      m.monthKey = e.target.value; scheduleSave(); recalcRealInvest();
+      m.monthKey = e.target.value; scheduleSave(); recalc();
     });
-    bindMoneyInput(tr.querySelector('[data-role=aporte]'), ()=>m.aporte, v=>{ m.aporte=v; }, recalcRealInvest);
-    bindMoneyInput(tr.querySelector('[data-role=taxa]'), ()=>m.taxa, v=>{ m.taxa=v; }, recalcRealInvest);
+    bindMoneyInput(tr.querySelector('[data-role=aporte]'), ()=>m.aporte, v=>{ m.aporte=v; }, recalc);
+    bindMoneyInput(tr.querySelector('[data-role=taxa]'), ()=>m.taxa, v=>{ m.taxa=v; }, recalc);
     tr.querySelector('[data-role=tipoTaxa]').addEventListener('change', e=>{
-      m.tipoTaxa = e.target.value; scheduleSave(); recalcRealInvest();
+      m.tipoTaxa = e.target.value; scheduleSave(); recalc();
     });
     tr.querySelector('[data-role=delMonth]').addEventListener('click', ()=>{
       if(!confirm(`Excluir ${riFormatMonthLabel(m.monthKey)}? Os meses seguintes serão recalculados.`)) return;
@@ -1846,8 +2004,8 @@ function renderRealInvest(){
 }
 
 // Recalcula tudo (cards, cada linha, gráfico) sem reconstruir os campos — mantém o foco ao digitar.
-function recalcRealInvest(){
-  const result = computeRealInvestSchedule();
+function recalcRealInvest(sectionId){
+  const result = computeRealInvestSchedule(sectionId);
 
   const elInit = document.getElementById('ri-card-initial'); if(elInit) elInit.textContent = fmt(result.initial);
   const elAport = document.getElementById('ri-card-aportado'); if(elAport) elAport.textContent = fmt(result.totalAportado);
@@ -1863,13 +2021,13 @@ function recalcRealInvest(){
   updateRealInvestChart(result);
 }
 
-function drawRealInvestChart(){
+function drawRealInvestChart(sectionId){
   const canvas = document.getElementById('chartRealInvest');
   const skeleton = document.getElementById('riChartSkeleton');
   if(!canvas) return;
   try{
     if(typeof Chart === 'undefined') throw new Error('Chart.js indisponível');
-    const result = computeRealInvestSchedule();
+    const result = computeRealInvestSchedule(sectionId);
     const labels = result.rows.map(r=>riFormatMonthLabel(r.monthKey));
     const aportadoAcumulado = [];
     let acc = 0;
@@ -1922,18 +2080,20 @@ function renderSection(){
   const container = document.getElementById('sections');
   container.innerHTML = '';
   if(!activeSection){ container.innerHTML = `<div class="empty-state">Nenhuma seção visível. Restaure uma no menu lateral.</div>`; return; }
+  const cfg = state.navConfig.find(n=>n.id===activeSection);
+  const kind = cfg ? (cfg.kind || activeSection) : activeSection;
   let node;
-  if(activeSection==='dashboard') node = renderDashboard();
-  else if(activeSection==='gastos') node = renderGastos();
-  else if(activeSection==='fixos') node = renderFixos();
-  else if(activeSection==='salarios') node = renderSalarios();
-  else if(activeSection==='receber') node = renderReceber();
-  else if(activeSection==='investimentos') node = renderInvestimentos();
-  else if(activeSection==='realInvest') node = renderRealInvest();
+  if(kind==='dashboard') node = renderDashboard();
+  else if(kind==='gastos') node = renderGastos();
+  else if(kind==='fixos') node = renderFixos();
+  else if(kind==='salarios') node = renderSalarios();
+  else if(kind==='receber') node = renderReceber();
+  else if(kind==='investimentos') node = renderInvestimentos(activeSection);
+  else if(kind==='realInvest') node = renderRealInvest(activeSection);
   else node = renderCustomSection(activeSection);
   container.appendChild(node);
-  if(activeSection==='dashboard') requestAnimationFrame(()=>requestAnimationFrame(drawChart));
-  if(activeSection==='realInvest') requestAnimationFrame(()=>requestAnimationFrame(drawRealInvestChart));
+  if(kind==='dashboard') requestAnimationFrame(()=>requestAnimationFrame(drawChart));
+  if(kind==='realInvest'){ const sid = activeSection; requestAnimationFrame(()=>requestAnimationFrame(()=>drawRealInvestChart(sid))); }
 }
 
 /* =========================================================
@@ -2105,6 +2265,7 @@ async function enterApp(session){
   currentSession = session;
   await loadStateFromServer();
   ensureNavConfig();
+  selectCurrentMonthIfFound();
   renderNav();
   renderSection();
   renderStampAll();
