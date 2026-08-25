@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Caderneta Financeira</title>
+<title>Balance</title>
+<meta name="theme-color" content="#173A2C">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23173A2C'/%3E%3Cstop offset='1' stop-color='%232C5C46'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23g)'/%3E%3Cg transform='translate(32,33)' fill='none' stroke='%23CBA658' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M0 -13v15'/%3E%3Cpath d='M-10 -8h20'/%3E%3Cpath d='M-10 -8l-4 9.2a5.6 5.6 0 0 0 11.6 0L-10 -8'/%3E%3Cpath d='M10 -8l-4 9.2a5.6 5.6 0 0 0 11.6 0L10 -8'/%3E%3Cpath d='M-7 12h14'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23173A2C'/%3E%3Cstop offset='1' stop-color='%232C5C46'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Cg transform='translate(32,33)' fill='none' stroke='%23CBA658' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M0 -13v15'/%3E%3Cpath d='M-10 -8h20'/%3E%3Cpath d='M-10 -8l-4 9.2a5.6 5.6 0 0 0 11.6 0L-10 -8'/%3E%3Cpath d='M10 -8l-4 9.2a5.6 5.6 0 0 0 11.6 0L10 -8'/%3E%3Cpath d='M-7 12h14'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Source+Serif+4:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <!-- Cada lib carrega de um CDN; se falhar (bloqueio de rede, CDN fora do ar), o script logo abaixo
@@ -381,14 +384,14 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
 
 <div class="loading-screen" id="loadingScreen">
   <div class="mark"></div>
-  <p>abrindo a caderneta…</p>
+  <p>abrindo o Balance…</p>
 </div>
 
 <div class="auth-screen" id="authScreen" style="display:none;">
   <div class="auth-card">
     <div class="auth-brand">
-      <div class="mark">$</div>
-      <h1>Caderneta Financeira</h1>
+      <div class="mark"><svg viewBox="0 0 24 24" fill="none" style="width:60%;height:60%"><path d="M12 3v15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M4.5 7h15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M4.5 7l-3 6.8a4 4 0 0 0 8.3 0L4.5 7" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M19.5 7l-3 6.8a4 4 0 0 0 8.3 0L19.5 7" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M8 21h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div>
+      <h1>Balance</h1>
       <div class="sub">acesso pela sua conta</div>
     </div>
     <div id="configWarning" class="config-warning" style="display:none;">
@@ -436,9 +439,9 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
   <div class="sidebar">
     <div class="brand" style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px;">
       <div style="display:flex; gap:10px;">
-        <div class="mark">$</div>
+        <div class="mark"><svg viewBox="0 0 24 24" fill="none" style="width:60%;height:60%"><path d="M12 3v15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M4.5 7h15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M4.5 7l-3 6.8a4 4 0 0 0 8.3 0L4.5 7" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M19.5 7l-3 6.8a4 4 0 0 0 8.3 0L19.5 7" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M8 21h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div>
         <div>
-          <h1>Caderneta<br>Financeira</h1>
+          <h1>Balance</h1>
           <div class="sub">controle financeiro</div>
         </div>
       </div>
@@ -461,8 +464,8 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
 
   <div class="mobile-header" id="mobileHeader">
     <div class="mh-left">
-      <div class="mh-mark">$</div>
-      <div class="mh-title" id="mobileHeaderTitle">Caderneta</div>
+      <div class="mh-mark"><svg viewBox="0 0 24 24" fill="none" style="width:60%;height:60%"><path d="M12 3v15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M4.5 7h15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M4.5 7l-3 6.8a4 4 0 0 0 8.3 0L4.5 7" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M19.5 7l-3 6.8a4 4 0 0 0 8.3 0L19.5 7" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M8 21h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div>
+      <div class="mh-title" id="mobileHeaderTitle">Balance</div>
     </div>
     <div class="header-actions">
       <button class="bell-btn" id="btnBellMobile" title="Notificações" style="border-color:rgba(251,249,241,0.3); color:var(--white);">
@@ -480,9 +483,9 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
   <div class="drawer-overlay" id="drawerOverlay"></div>
   <div class="drawer" id="drawer">
     <div class="brand">
-      <div class="mark">$</div>
+      <div class="mark"><svg viewBox="0 0 24 24" fill="none" style="width:60%;height:60%"><path d="M12 3v15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M4.5 7h15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M4.5 7l-3 6.8a4 4 0 0 0 8.3 0L4.5 7" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M19.5 7l-3 6.8a4 4 0 0 0 8.3 0L19.5 7" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M8 21h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div>
       <div>
-        <h1>Caderneta<br>Financeira</h1>
+        <h1>Balance</h1>
         <div class="sub">controle financeiro</div>
       </div>
     </div>
@@ -785,7 +788,7 @@ function updateMobileHeaderTitle(visible){
   const el = document.getElementById('mobileHeaderTitle');
   if(!el) return;
   const cur = visible.find(v=>v.id===activeSection);
-  el.textContent = cur ? cur.label : 'Caderneta';
+  el.textContent = cur ? cur.label : 'Balance';
 }
 
 function openDrawer(){
@@ -1871,12 +1874,35 @@ function recalcInvestimentos(sectionId){
 ========================================================= */
 let carteiraDetailId = null;
 let chartWalletRef = null;
+let chartWalletSimRef = null;
 
 function getWallet(){
   if(!state.wallet || typeof state.wallet!=='object') state.wallet = { monthlyGoal:0, items:[] };
   if(!Array.isArray(state.wallet.items)) state.wallet.items = [];
   if(typeof state.wallet.monthlyGoal!=='number') state.wallet.monthlyGoal = Number(state.wallet.monthlyGoal)||0;
+  if(!state.wallet.simulator || typeof state.wallet.simulator!=='object'){
+    state.wallet.simulator = { saldoInicial:0, aporteMensal:0, taxaMensal:0.5, horizonteAnos:5 };
+  }
   return state.wallet;
+}
+// Simulador "cenário hipotético": juros compostos com aporte mensal fixo, taxa mensal direta (não anual).
+function walletSimResult(saldoInicial, aporteMensal, taxaMensalPct, anos){
+  const im = (Number(taxaMensalPct)||0)/100;
+  const n = Math.max(0, Math.round((Number(anos)||0)*12));
+  const growth = Math.pow(1+im, n);
+  const fromP = (Number(saldoInicial)||0)*growth;
+  const fromPMT = im===0 ? (Number(aporteMensal)||0)*n : (Number(aporteMensal)||0)*((growth-1)/im);
+  const valorFinal = fromP+fromPMT;
+  const totalAportado = (Number(saldoInicial)||0) + (Number(aporteMensal)||0)*n;
+  return { valorFinal, totalAportado, totalRendido: valorFinal-totalAportado, n };
+}
+function walletSimSeries(saldoInicial, aporteMensal, taxaMensalPct, anos){
+  const im = (Number(taxaMensalPct)||0)/100;
+  const n = Math.max(0, Math.round((Number(anos)||0)*12));
+  const out = [Number(saldoInicial)||0];
+  let v = Number(saldoInicial)||0;
+  for(let i=0;i<n;i++){ v = v*(1+im) + (Number(aporteMensal)||0); out.push(v); }
+  return out;
 }
 function walletMonthKey(d){ d = d || new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
 function walletAportadoNoMes(monthKey){
@@ -1897,6 +1923,55 @@ function walletItemCurrentRate(item, monthKey){
   const keys = Object.keys(item.rates).sort();
   return keys.length ? item.rates[keys[keys.length-1]] : 0;
 }
+function nextMonthKey(mk){
+  const [y,m] = String(mk).split('-').map(Number);
+  const d = new Date(y, (m-1)+1, 1);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+}
+// aporte/ajuste já entram com o sinal certo no histórico; retirada é guardada como valor positivo.
+function walletTxDelta(h){
+  const v = Number(h.valor)||0;
+  return h.tipo==='retirada' ? -v : v;
+}
+/* Recalcula o saldo real de um item mês a mês: a taxa registrada num mês rende sobre o que já
+   estava investido desde o mês anterior; o dinheiro que entra (ou sai) num mês só passa a render
+   a partir do mês seguinte. Assim a taxa fica "amarrada" ao aporte que a originou — em vez do
+   modelo antigo, que pegava a taxa do mês corrente e a aplicava sobre o saldo acumulado inteiro,
+   inflando a projeção com juros que o dinheiro recém-aportado nunca chegou a render.
+   Meses sem taxa registrada carregam a última taxa conhecida até então (nunca uma taxa futura). */
+function walletItemAccruedBalance(item, uptoMonthKey){
+  uptoMonthKey = uptoMonthKey || walletMonthKey();
+  const history = Array.isArray(item.history) ? item.history : [];
+  if(!history.length) return Number(item.saldo)||0;
+  const rates = item.rates || {};
+  const byMonth = {};
+  history.forEach(h=>{
+    if(!h.date) return;
+    const mk = h.date.slice(0,7);
+    byMonth[mk] = (byMonth[mk]||0) + walletTxDelta(h);
+  });
+  const months = Object.keys(byMonth).sort();
+  if(!months.length) return Number(item.saldo)||0;
+  let cursor = months[0];
+  let balance = 0;
+  let lastRate = 0;
+  let guard = 0;
+  while(cursor <= uptoMonthKey && guard < 2400){
+    if(typeof rates[cursor]==='number') lastRate = rates[cursor];
+    if(balance !== 0) balance = balance * (1 + lastRate/100);
+    balance += (byMonth[cursor]||0);
+    cursor = nextMonthKey(cursor);
+    guard++;
+  }
+  return balance;
+}
+// Atualiza o saldo de cada item da carteira para o valor realmente acumulado (histórico + juros
+// mês a mês), em vez do simples somatório de aportes. Chamar sempre antes de exibir/projetar.
+function refreshWalletBalances(){
+  const w = getWallet();
+  const mk = walletMonthKey();
+  w.items.forEach(it=>{ it.saldo = walletItemAccruedBalance(it, mk); });
+}
 function walletProjection(saldo, ratePctMonth, months){
   const r = (Number(ratePctMonth)||0)/100;
   const out = [saldo];
@@ -1911,6 +1986,7 @@ function brDate(iso){
 }
 
 function renderCarteira(){
+  refreshWalletBalances();
   return carteiraDetailId ? renderCarteiraDetail(carteiraDetailId) : renderCarteiraOverview();
 }
 
@@ -1951,6 +2027,36 @@ function renderCarteiraOverview(){
           <canvas id="chartWallet" style="display:none;"></canvas>
         </div>
       `}
+    </div>
+    <div class="card">
+      <h3>Simular cenário hipotético</h3>
+      <div class="desc" style="margin-bottom:16px;">Um teste à parte, sem mexer na sua carteira real — informe saldo, aporte e taxa mensal pra ver aonde chegam num horizonte de anos.</div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:14px; margin-bottom:18px;">
+        <div>
+          <label style="display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace; margin-bottom:5px;">Saldo inicial</label>
+          <input type="text" inputmode="decimal" class="money" id="simSaldoInicial" style="width:100%;">
+        </div>
+        <div>
+          <label style="display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace; margin-bottom:5px;">Aporte mensal</label>
+          <input type="text" inputmode="decimal" class="money" id="simAporteMensal" style="width:100%;">
+        </div>
+        <div>
+          <label style="display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace; margin-bottom:5px;">Taxa mensal (%)</label>
+          <input type="text" inputmode="decimal" class="money" id="simTaxaMensal" style="width:100%;">
+        </div>
+        <div>
+          <label style="display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace; margin-bottom:5px;">Horizonte (anos)</label>
+          <input type="text" inputmode="decimal" class="money" id="simHorizonteAnos" style="width:100%;">
+        </div>
+      </div>
+      <div class="chart-wrap" id="simChartWrap" style="height:220px;">
+        <canvas id="chartWalletSim"></canvas>
+      </div>
+      <div class="grid-3" style="margin-top:18px;">
+        <div class="stat pos"><div class="label">Valor final</div><div class="value mono" id="sim-valor-final"></div></div>
+        <div class="stat"><div class="label">Total aportado</div><div class="value mono" id="sim-total-aportado"></div></div>
+        <div class="stat pos"><div class="label">Total rendido</div><div class="value mono" id="sim-total-rendido"></div></div>
+      </div>
     </div>
   `;
 
@@ -2009,6 +2115,19 @@ function renderCarteiraOverview(){
     w.monthlyGoal = parseMoney(val);
     scheduleSave(); renderSection();
   });
+
+  const sim = w.simulator;
+  const updateSimStats = ()=>{
+    const r = walletSimResult(sim.saldoInicial, sim.aporteMensal, sim.taxaMensal, sim.horizonteAnos);
+    const vf = el.querySelector('#sim-valor-final'); if(vf) vf.textContent = fmt(r.valorFinal);
+    const ta = el.querySelector('#sim-total-aportado'); if(ta) ta.textContent = fmt(r.totalAportado);
+    const tr = el.querySelector('#sim-total-rendido'); if(tr) tr.textContent = fmt(r.totalRendido);
+  };
+  [['simSaldoInicial','saldoInicial'],['simAporteMensal','aporteMensal'],['simTaxaMensal','taxaMensal'],['simHorizonteAnos','horizonteAnos']].forEach(([id,key])=>{
+    const input = el.querySelector('#'+id);
+    bindMoneyInput(input, ()=>sim[key], v=>{ sim[key]=v; }, ()=>{ updateSimStats(); drawWalletSimChart(); });
+  });
+  updateSimStats();
 
   return el;
 }
@@ -2162,6 +2281,32 @@ function drawWalletChart(){
   }catch(err){
     console.error('Erro ao renderizar gráfico da carteira:', err);
     if(skeleton) skeleton.innerHTML = `<div class="empty-state">Não foi possível carregar o gráfico agora. Recarregue a página.</div>`;
+  }
+}
+
+function drawWalletSimChart(){
+  const canvas = document.getElementById('chartWalletSim');
+  if(!canvas) return; // só existe na visão geral da carteira
+  try{
+    if(typeof Chart === 'undefined') throw new Error('Chart.js indisponível');
+    const sim = getWallet().simulator;
+    const dataset = walletSimSeries(sim.saldoInicial, sim.aporteMensal, sim.taxaMensal, sim.horizonteAnos);
+    const n = dataset.length - 1;
+    const stepYears = sim.horizonteAnos > 6; // com horizontes longos, rotula por ano pra não poluir o eixo
+    const labels = dataset.map((_,i)=>{
+      if(i===0) return 'hoje';
+      if(stepYears) return i%12===0 ? `${i/12}a` : '';
+      return `+${i}m`;
+    });
+    if(chartWalletSimRef){ chartWalletSimRef.destroy(); chartWalletSimRef = null; }
+    const ctx = canvas.getContext('2d');
+    chartWalletSimRef = new Chart(ctx, {
+      type:'line',
+      data:{ labels, datasets:[{ label:'Cenário simulado', data:dataset, borderColor:'#A9823C', backgroundColor:'rgba(169,130,60,0.10)', borderWidth:2, borderDash:[5,4], tension:0.25, fill:true, pointRadius:0 }] },
+      options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ x:{ ticks:{ autoSkip:!stepYears, maxRotation:0 } }, y:{ ticks:{ callback:v=>fmt(v) } } } }
+    });
+  }catch(err){
+    console.error('Erro ao renderizar gráfico do simulador:', err);
   }
 }
 
@@ -2464,7 +2609,7 @@ function renderSection(){
   container.appendChild(node);
   if(kind==='dashboard') requestAnimationFrame(()=>requestAnimationFrame(drawChart));
   if(kind==='realInvest'){ const sid = activeSection; requestAnimationFrame(()=>requestAnimationFrame(()=>drawRealInvestChart(sid))); }
-  if(kind==='carteira') requestAnimationFrame(()=>requestAnimationFrame(drawWalletChart));
+  if(kind==='carteira') requestAnimationFrame(()=>requestAnimationFrame(()=>{ drawWalletChart(); drawWalletSimChart(); }));
 }
 
 /* =========================================================
@@ -2655,7 +2800,7 @@ function wireAppButtons(){
     const blob = new Blob([JSON.stringify(state,null,2)], {type:'application/json'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `caderneta-financeira-${new Date().toISOString().slice(0,10)}.json`;
+    a.download = `balance-${new Date().toISOString().slice(0,10)}.json`;
     a.click();
   };
   const doImportClick = ()=>{ importFile.click(); };
@@ -2692,7 +2837,7 @@ function wireAppButtons(){
       renderSection();
       alert('Backup importado com sucesso!');
     }catch(err){
-      alert('Não foi possível importar esse arquivo. Verifique se é um backup válido desta caderneta.');
+      alert('Não foi possível importar esse arquivo. Verifique se é um backup válido do Balance.');
     }
     e.target.value = '';
   };
