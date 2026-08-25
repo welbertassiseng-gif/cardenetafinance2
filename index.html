@@ -6,8 +6,12 @@
 <title>Caderneta Financeira</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Source+Serif+4:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- Cada lib carrega de um CDN; se falhar (bloqueio de rede, CDN fora do ar), o script logo abaixo
+     detecta a ausência e injeta um CDN alternativo antes de seguir o carregamento da página. -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script>if(typeof Chart==='undefined'){document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"><'+'/script>');}</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>if(typeof supabase==='undefined'){document.write('<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"><'+'/script>');}</script>
 <style>
 :root{
   --paper:#F3EEE0; --paper-dark:#E8E0C8; --paper-line:#CFC4A0;
@@ -51,13 +55,13 @@ input,select{font-family:inherit;}
   transition:background .15s, color .15s, border-color .15s; user-select:none; position:relative;
 }
 .nav-item .num{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--gold-light); width:16px; flex-shrink:0;}
+.nav-ico{width:17px; height:17px; flex-shrink:0; display:inline-flex; align-items:center; justify-content:center; color:var(--gold-light); opacity:0.85;}
+.nav-ico svg{width:100%; height:100%; display:block;}
+.nav-item.active .nav-ico{color:var(--white); opacity:1;}
 .nav-label{flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-.nav-item:hover{background:rgba(251,249,241,0.06); color:var(--white);}
 .nav-item.active{background:rgba(251,249,241,0.09); color:var(--white); border-left-color:var(--gold-light); font-weight:600;}
 .nav-actions{display:none; gap:2px; flex-shrink:0;}
-.nav-item:hover .nav-actions{display:flex;}
 .nav-icon-btn{background:none; border:none; color:rgba(251,249,241,0.55); font-size:12px; padding:3px 5px; border-radius:2px;}
-.nav-icon-btn:hover{color:var(--gold-light); background:rgba(251,249,241,0.08);}
 .nav-edit-input{
   flex:1; background:rgba(251,249,241,0.12); border:1px solid var(--gold-light); border-radius:2px;
   color:var(--white); font-size:13.5px; padding:3px 6px; font-family:inherit;
@@ -66,24 +70,36 @@ input,select{font-family:inherit;}
   margin:6px 18px 4px; padding:8px 10px; border:1px dashed rgba(251,249,241,0.35); border-radius:3px;
   color:rgba(251,249,241,0.65); font-size:12.5px; text-align:center; cursor:pointer; font-family:'IBM Plex Mono',monospace;
 }
-.nav-add-btn:hover{border-color:var(--gold-light); color:var(--gold-light);}
 .nav-hidden-toggle{padding:9px 18px; font-size:10.5px; font-family:'IBM Plex Mono',monospace; color:rgba(251,249,241,0.45); cursor:pointer; text-transform:uppercase; letter-spacing:0.05em;}
-.nav-hidden-toggle:hover{color:var(--gold-light);}
 .nav-hidden-list{padding:0 18px 8px;}
 .nav-hidden-item{font-size:12.5px; color:rgba(251,249,241,0.72); padding:6px 0; display:flex; justify-content:space-between; align-items:center; gap:8px;}
 .nav-hidden-item .nhi-label{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 .nav-hidden-item .nhi-actions{display:flex; gap:9px; flex-shrink:0;}
 .nav-hidden-item .nhi-actions span{color:var(--gold-light); font-family:'IBM Plex Mono',monospace; font-size:10.5px; white-space:nowrap; cursor:pointer;}
-.nav-hidden-item .nhi-actions span:hover{color:var(--white);}
 .nav-hidden-item .nhi-danger{color:#C97A6C !important;}
-.nav-hidden-item .nhi-danger:hover{color:#E8A398 !important;}
 
 .user-badge{display:flex; align-items:center; gap:8px; padding:10px 20px; border-top:1px solid rgba(251,249,241,0.15); border-bottom:1px solid rgba(251,249,241,0.15); font-size:12px; color:rgba(251,249,241,0.85);}
 .user-badge .dot{width:7px;height:7px;border-radius:50%; background:var(--gold-light); flex-shrink:0;}
 .user-badge b{font-weight:600; color:var(--white); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 .sidebar-footer{padding:14px 20px 18px; font-size:11px; color:rgba(251,249,241,0.55); font-family:'IBM Plex Mono',monospace;}
 .sidebar-footer button{background:none;border:1px solid rgba(251,249,241,0.3); color:rgba(251,249,241,0.75); font-size:10.5px; padding:6px 9px; border-radius:2px; margin-top:8px; margin-right:6px;}
-.sidebar-footer button:hover{border-color:var(--gold-light); color:var(--gold-light);}
+
+/* :hover só existe de verdade com ponteiro fino (mouse). Em telas touch, um elemento com regra :hover
+   costuma exigir dois toques (o 1º só "simula" o hover, o 2º clica de fato) — por isso isolamos aqui. */
+@media (hover:hover) and (pointer:fine){
+  .nav-item:hover{background:rgba(251,249,241,0.06); color:var(--white);}
+  .nav-item:hover .nav-actions{display:flex;}
+  .nav-icon-btn:hover{color:var(--gold-light); background:rgba(251,249,241,0.08);}
+  .nav-add-btn:hover{border-color:var(--gold-light); color:var(--gold-light);}
+  .nav-hidden-toggle:hover{color:var(--gold-light);}
+  .nav-hidden-item .nhi-actions span:hover{color:var(--white);}
+  .nav-hidden-item .nhi-danger:hover{color:#E8A398 !important;}
+  .sidebar-footer button:hover{border-color:var(--gold-light); color:var(--gold-light);}
+}
+/* em touch, os botões de ação do menu (duplicar/renomear/excluir) ficam sempre visíveis, já que não há hover */
+@media (hover:none){
+  .nav-actions{display:flex;}
+}
 
 .main{flex:1; min-width:0; padding:34px 42px 80px; max-width:1180px;}
 .page-header{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:26px; gap:20px; flex-wrap:wrap;}
@@ -104,7 +120,7 @@ input,select{font-family:inherit;}
   width:38px; height:38px; display:flex; align-items:center; justify-content:center;
   font-size:16px; color:var(--forest); flex-shrink:0;
 }
-.bell-btn:hover{background:var(--forest-pale);}
+@media (hover:hover) and (pointer:fine){ .bell-btn:hover{background:var(--forest-pale);} }
 .bell-dot{
   position:absolute; top:6px; right:7px; width:8px; height:8px; border-radius:50%;
   background:var(--rust); border:1.5px solid var(--white); display:none;
@@ -155,20 +171,22 @@ tr.total-row td{font-weight:700; background:var(--forest); color:var(--white); f
 td.num, th.num{text-align:right; font-family:'IBM Plex Mono',monospace;}
 td input[type=text], td input[type=date], td select{width:100%; min-width:90px; border:1px solid transparent; background:transparent; padding:7px 6px; border-radius:2px; font-size:13.5px; color:var(--ink);}
 td input.money{width:100%; min-width:90px; border:1px solid transparent; background:transparent; padding:7px 6px; border-radius:2px; font-size:13.5px; color:var(--ink); text-align:right; font-family:'IBM Plex Mono',monospace;}
-td input:hover, td select:hover{border-color:var(--paper-line);}
 td input:focus, td select:focus{border-color:var(--gold); outline:none; background:var(--white);}
 
 .icon-btn{background:none; border:none; color:var(--ink-soft); font-size:16px; padding:5px 7px; border-radius:2px;}
-.icon-btn:hover{color:var(--rust); background:var(--rust-pale);}
 
 .btn{background:var(--forest); color:var(--white); border:none; padding:10px 16px; border-radius:2px; font-size:13px; font-weight:600; letter-spacing:0.02em;}
-.btn:hover{background:var(--forest-light);}
 .btn.secondary{background:none; border:1.5px solid var(--forest); color:var(--forest);}
-.btn.secondary:hover{background:var(--forest-pale);}
 .btn.small{padding:7px 12px; font-size:12px;}
 .btn.gold{background:var(--gold); color:var(--white);}
-.btn.gold:hover{background:var(--gold-light);}
 .btn.link{background:none; border:none; color:var(--forest); text-decoration:underline; padding:4px 0; font-weight:400;}
+@media (hover:hover) and (pointer:fine){
+  td input:hover, td select:hover{border-color:var(--paper-line);}
+  .icon-btn:hover{color:var(--rust); background:var(--rust-pale);}
+  .btn:hover{background:var(--forest-light);}
+  .btn.secondary:hover{background:var(--forest-pale);}
+  .btn.gold:hover{background:var(--gold-light);}
+}
 .btn:disabled{opacity:0.55; cursor:default;}
 
 .toolbar{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:18px;}
@@ -255,6 +273,7 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
     width:24px;height:24px;border-radius:7px; display:flex; align-items:center; justify-content:center;
     font-family:'Fraunces',serif; font-weight:700; font-size:11px; color:var(--ink-soft); border:1.5px solid var(--paper-line);
   }
+  .bottom-tab .bt-icon svg{width:15px; height:15px;}
   .bottom-tab.active{color:var(--forest); font-weight:700;}
   .bottom-tab.active .bt-icon{color:var(--white); background:var(--forest); border-color:var(--forest);}
 
@@ -542,6 +561,8 @@ function emptyState(){
     realInvestments: { initialValue: 0, months: [] },
     investmentSections: {}, // seções "Investimentos" duplicadas (id da seção -> lista de investimentos)
     realInvestSections: {}, // seções "Investimento Real" duplicadas (id da seção -> {initialValue, months})
+    wallet: { monthlyGoal: 0, items: [] }, // "Carteira de Investimentos"
+    notes: '', // "Bloco de Notas"
     navConfig: null, // preenchido por ensureNavConfig()
     lastUpdated: null, selectedMonth: null, dashboardMonth: null,
   };
@@ -608,8 +629,28 @@ const DEFAULT_NAV = [
   {id:'receber', label:'Dinheiro a Receber'},
   {id:'investimentos', label:'Investimentos'},
   {id:'realInvest', label:'Investimento Real'},
+  {id:'carteira', label:'Carteira de Investimentos'},
+  {id:'notas', label:'Bloco de Notas'},
 ];
 let activeSection = 'dashboard';
+
+// Ícones de linha (estilo Lucide/Feather), um por tipo de seção — usam currentColor pra herdar a cor do menu.
+const NAV_ICON_PATHS = {
+  dashboard: '<path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9a1 1 0 0 0 1 1h4v-6h3v6h4a1 1 0 0 0 1-1v-9"/>',
+  gastos: '<rect x="3" y="6" width="18" height="14" rx="2"/><path d="M3 10.5h18"/><path d="M7 15h4"/>',
+  fixos: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/><path d="M8 15.5l2.2 2.2L16 12.2"/>',
+  salarios: '<rect x="2" y="7" width="20" height="12" rx="2"/><circle cx="12" cy="13" r="2.6"/><path d="M6 7v.01M18 7v.01"/>',
+  receber: '<path d="M12 3.5v13"/><path d="M6.5 11l5.5 5.5L17.5 11"/><path d="M4 20.5h16"/>',
+  investimentos: '<path d="M18.5 6c-.9 0-1.6.5-2 1-3-1.2-8.5-1-10.2 2.3C5.3 11.3 5 13 6 14.5V18a1 1 0 0 0 1 1h1.6a1 1 0 0 0 1-1v-.7h3v.7a1 1 0 0 0 1 1H15a1 1 0 0 0 1-1v-2.3c.9-.8 1.5-1.7 1.7-2.7h.8a1 1 0 0 0 1-1V10a1 1 0 0 0-1-1h-.7c-.3-1-1-2-1.8-2.6Z"/><path d="M14.5 10.2h.01"/><path d="M3.5 9.2v1.2a1.8 1.8 0 0 0 1.8 1.8"/>',
+  realInvest: '<path d="M3.5 16.5 9 11l4 4 7.5-7.5"/><path d="M15.5 7h5v5"/>',
+  carteira: '<path d="M4 8a2 2 0 0 1 2-2h11a1 1 0 0 1 1 1v2"/><path d="M4 8v9a2 2 0 0 0 2 2h13a1 1 0 0 0 1-1v-7.5a1 1 0 0 0-1-1H9a2 2 0 0 1 0-4h9"/><circle cx="17" cy="14" r="1.3"/>',
+  notas: '<path d="M6.5 3h8L19 7.5V20a1 1 0 0 1-1 1H6.5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14.5 3v4.5H19"/><path d="M8.3 12.5h7.4M8.3 16h5"/>',
+  custom: '<circle cx="12" cy="12" r="8.5"/><path d="M12 8v4.3l3 2"/>',
+};
+function navIcon(kind){
+  const p = NAV_ICON_PATHS[kind] || NAV_ICON_PATHS.custom;
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+}
 
 function ensureNavConfig(){
   if(!Array.isArray(state.navConfig)) state.navConfig = [];
@@ -658,7 +699,7 @@ function buildNavInto(containerId, visible, hidden, withManage){
     const dupable = s.kind==='custom' || s.kind==='investimentos' || s.kind==='realInvest';
     return `
     <div class="nav-item ${s.id===activeSection?'active':''}" data-nav="${escAttr(s.id)}">
-      <span class="num">${String(i+1).padStart(2,'0')}</span>
+      <span class="nav-ico">${navIcon(s.kind)}</span>
       <span class="nav-label">${escapeHtml(s.label)}</span>
       <span class="nav-actions">
         ${dupable ? `<button class="nav-icon-btn" data-dup="${escAttr(s.id)}" title="duplicar">⧉</button>` : ''}
@@ -716,7 +757,7 @@ function renderBottomTabs(visible){
   const rest = visible.slice(BOTTOM_TAB_LIMIT);
   const tabHtml = (s)=>`
     <button class="bottom-tab ${s.id===activeSection?'active':''}" data-bnav="${escAttr(s.id)}">
-      <span class="bt-icon">${escapeHtml((s.label||'?').trim().charAt(0).toUpperCase())}</span>
+      <span class="bt-icon">${navIcon(s.kind)}</span>
       <span class="bt-label">${escapeHtml(shortLabel(s.label))}</span>
     </button>`;
   const moreActive = rest.some(s=>s.id===activeSection);
@@ -729,6 +770,7 @@ function renderBottomTabs(visible){
   bar.querySelectorAll('[data-bnav]').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       activeSection = btn.dataset.bnav;
+      carteiraDetailId = null;
       renderNav(); renderSection();
     });
   });
@@ -761,6 +803,7 @@ function wireNav(container){
     el.addEventListener('click', (e)=>{
       if(e.target.closest('[data-edit]') || e.target.closest('[data-delnav]')) return;
       activeSection = el.dataset.nav;
+      carteiraDetailId = null; // clicar na aba sempre volta pra visão geral da carteira
       renderNav();
       renderSection();
       closeDrawer();
@@ -868,6 +911,8 @@ function wipeSectionData(cfg){
     case 'custom':
       state.customSections = state.customSections.filter(c=>c.id!==cfg.id);
       break;
+    case 'carteira': state.wallet = { monthlyGoal:0, items:[] }; carteiraDetailId = null; break;
+    case 'notas': state.notes = ''; break;
     default: break; // dashboard: nada para apagar
   }
 }
@@ -1821,6 +1866,329 @@ function recalcInvestimentos(sectionId){
 }
 
 /* =========================================================
+   RENDER: CARTEIRA DE INVESTIMENTOS — saldo por item, aporte/retirada com histórico,
+   taxa mensal (varia mês a mês) e projeção automática de rendimento.
+========================================================= */
+let carteiraDetailId = null;
+let chartWalletRef = null;
+
+function getWallet(){
+  if(!state.wallet || typeof state.wallet!=='object') state.wallet = { monthlyGoal:0, items:[] };
+  if(!Array.isArray(state.wallet.items)) state.wallet.items = [];
+  if(typeof state.wallet.monthlyGoal!=='number') state.wallet.monthlyGoal = Number(state.wallet.monthlyGoal)||0;
+  return state.wallet;
+}
+function walletMonthKey(d){ d = d || new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
+function walletAportadoNoMes(monthKey){
+  let total = 0;
+  getWallet().items.forEach(it=>{
+    (it.history||[]).forEach(h=>{
+      if(!h.date || h.date.slice(0,7)!==monthKey) return;
+      if(h.tipo==='aporte') total += Number(h.valor)||0;
+      else if(h.tipo==='retirada') total -= Number(h.valor)||0;
+    });
+  });
+  return total;
+}
+// Taxa do mês informada; se não houver, cai pra taxa mais recente já cadastrada (as taxas variam mês a mês).
+function walletItemCurrentRate(item, monthKey){
+  if(!item.rates) item.rates = {};
+  if(typeof item.rates[monthKey]==='number') return item.rates[monthKey];
+  const keys = Object.keys(item.rates).sort();
+  return keys.length ? item.rates[keys[keys.length-1]] : 0;
+}
+function walletProjection(saldo, ratePctMonth, months){
+  const r = (Number(ratePctMonth)||0)/100;
+  const out = [saldo];
+  let v = saldo;
+  for(let i=0;i<months;i++){ v = v*(1+r); out.push(v); }
+  return out;
+}
+function brDate(iso){
+  if(!iso) return '';
+  const parts = String(iso).slice(0,10).split('-');
+  return parts.length===3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : iso;
+}
+
+function renderCarteira(){
+  return carteiraDetailId ? renderCarteiraDetail(carteiraDetailId) : renderCarteiraOverview();
+}
+
+function renderCarteiraOverview(){
+  const el = document.createElement('div');
+  const w = getWallet();
+  const totalSaldo = w.items.reduce((s,it)=>s+(Number(it.saldo)||0),0);
+  const mk = walletMonthKey();
+  const aportadoMes = walletAportadoNoMes(mk);
+  const goal = Number(w.monthlyGoal)||0;
+  const pct = goal>0 ? Math.min(100, Math.max(0,(aportadoMes/goal)*100)) : 0;
+
+  el.innerHTML = `
+    <div class="page-header">
+      <div><h2>Carteira de Investimentos</h2><div class="desc">Saldo de cada investimento/reserva, aportes e retiradas com histórico, e projeção automática de rendimento a partir da taxa mensal de cada item.</div></div>
+      <button class="btn gold" id="btnAddWalletItem">+ novo item</button>
+    </div>
+    <div class="stat pos"><div class="label">Total investido/reservado</div><div class="value mono">${fmt(totalSaldo)}</div></div>
+    <div class="card" style="margin-top:22px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+        <h3 style="margin:0;">Meta de investimento este mês</h3>
+        <button class="icon-btn" id="btnEditGoal" title="editar meta">✎</button>
+      </div>
+      <div class="value mono" style="font-size:22px; margin-top:8px;">${fmt(aportadoMes)} <span style="font-size:13px; color:var(--ink-soft); font-weight:400;">de ${fmt(goal)}</span></div>
+      <div style="background:var(--paper-dark); border-radius:20px; height:8px; margin-top:10px; overflow:hidden;">
+        <div style="background:var(--forest); height:100%; width:${pct}%; border-radius:20px;"></div>
+      </div>
+    </div>
+    <div id="walletItemsList"></div>
+    <div class="card">
+      <h3>Rendimento e projeção</h3>
+      ${!w.items.length ? `<div class="empty-state">Adicione ao menos um item pra ver a projeção.</div>` : `
+        <div class="chart-wrap" id="walletChartWrap">
+          <div class="chart-skeleton" id="walletChartSkeleton">
+            <div class="skel-bars"><span></span><span></span><span></span><span></span><span></span></div>
+            <div class="skel-label">carregando gráfico…</div>
+          </div>
+          <canvas id="chartWallet" style="display:none;"></canvas>
+        </div>
+      `}
+    </div>
+  `;
+
+  const listEl = el.querySelector('#walletItemsList');
+  if(!w.items.length){
+    listEl.innerHTML = `<div class="card"><div class="empty-state">Nenhum item na carteira ainda. Clique em "+ novo item" para adicionar um investimento ou reserva.</div></div>`;
+  } else {
+    w.items.forEach(it=>{
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.cssText = 'margin-top:14px; cursor:pointer;';
+      card.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:14px;">
+          <div>
+            <div style="font-weight:600; font-size:15.5px;">${escapeHtml(it.nome||'(sem nome)')}</div>
+            <div style="font-size:12px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.04em; font-family:'IBM Plex Mono',monospace;">${it.tipo==='reserva'?'Reserva':'Investimento'}</div>
+          </div>
+          <div class="value mono" style="font-size:19px;">${fmt(it.saldo)}</div>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
+          <button class="btn small secondary" data-role="updbal">Atualizar saldo</button>
+          <button class="btn small link" data-role="detail">Aporte / retirada / histórico →</button>
+        </div>
+      `;
+      card.querySelector('[data-role=updbal]').addEventListener('click', (e)=>{
+        e.stopPropagation();
+        const val = prompt(`Novo saldo de "${it.nome}":`, moneyDisplay(it.saldo||0));
+        if(val===null) return;
+        const num = parseMoney(val);
+        if(!Array.isArray(it.history)) it.history=[];
+        it.history.push({id:uid(), date:new Date().toISOString().slice(0,10), tipo:'ajuste', valor:num-(Number(it.saldo)||0), nota:'Saldo atualizado manualmente'});
+        it.saldo = num;
+        scheduleSave(); renderSection();
+      });
+      card.querySelector('[data-role=detail]').addEventListener('click', (e)=>{
+        e.stopPropagation();
+        carteiraDetailId = it.id;
+        renderSection();
+      });
+      card.addEventListener('click', ()=>{ carteiraDetailId = it.id; renderSection(); });
+      listEl.appendChild(card);
+    });
+  }
+
+  el.querySelector('#btnAddWalletItem').addEventListener('click', ()=>{
+    const nome = prompt('Nome do investimento/reserva (ex: Tesouro IPCA+, Caixinha Nubank):');
+    if(!nome || !nome.trim()) return;
+    let tipo = (prompt('Tipo: digite "investimento" ou "reserva"', 'investimento')||'investimento').trim().toLowerCase();
+    tipo = tipo.startsWith('res') ? 'reserva' : 'investimento';
+    w.items.push({id:uid(), nome:nome.trim(), tipo, saldo:0, rates:{}, history:[]});
+    scheduleSave(); renderSection();
+  });
+  el.querySelector('#btnEditGoal').addEventListener('click', ()=>{
+    const val = prompt('Meta de aporte para este mês:', moneyDisplay(goal));
+    if(val===null) return;
+    w.monthlyGoal = parseMoney(val);
+    scheduleSave(); renderSection();
+  });
+
+  return el;
+}
+
+function renderCarteiraDetail(itemId){
+  const w = getWallet();
+  const it = w.items.find(i=>i.id===itemId);
+  if(!it){ carteiraDetailId = null; return renderCarteiraOverview(); }
+  if(!Array.isArray(it.history)) it.history = [];
+  if(!it.rates) it.rates = {};
+  const mk = walletMonthKey();
+  const el = document.createElement('div');
+
+  el.innerHTML = `
+    <div class="page-header">
+      <div>
+        <div class="btn link" id="btnBackWallet" style="padding:0; margin-bottom:6px;">‹ Carteira de Investimentos</div>
+        <h2>${escapeHtml(it.nome)}</h2>
+      </div>
+      <button class="icon-btn" id="btnRenameItem" title="renomear">✎</button>
+    </div>
+    <div class="stat pos"><div class="label">Investimento</div><div class="value mono">${fmt(it.saldo)}</div></div>
+    <div class="card" style="margin-top:22px;">
+      <h3>Taxa mensal (%)</h3>
+      <div class="desc" style="margin-bottom:10px;">As taxas variam de mês a mês — informe a taxa de ${PT_MONTH_NAMES[new Date().getMonth()]} e a projeção abaixo recalcula automaticamente.</div>
+      <input type="text" inputmode="decimal" class="money" id="itemRateInput" style="max-width:140px;">
+    </div>
+    <div class="card">
+      <h3>Aporte / retirada</h3>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+        <select id="txTipo" style="max-width:130px;">
+          <option value="aporte">Aporte</option>
+          <option value="retirada">Retirada</option>
+        </select>
+        <input type="text" inputmode="decimal" class="money" id="txValor" placeholder="valor do aporte" style="max-width:160px;">
+        <input type="date" id="txData">
+        <input type="text" id="txNota" placeholder="nota (opcional)" style="flex:1; min-width:140px;">
+        <button class="btn gold small" id="btnTxOk">OK</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Rendimento e projeção</h3>
+      <div class="chart-wrap" id="walletChartWrap">
+        <div class="chart-skeleton" id="walletChartSkeleton">
+          <div class="skel-bars"><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="skel-label">carregando gráfico…</div>
+        </div>
+        <canvas id="chartWallet" style="display:none;"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Histórico completo</h3>
+      <div id="walletHistList"></div>
+    </div>
+  `;
+
+  el.querySelector('#btnBackWallet').addEventListener('click', ()=>{ carteiraDetailId = null; renderSection(); });
+  el.querySelector('#btnRenameItem').addEventListener('click', ()=>{
+    const novo = prompt('Renomear item:', it.nome);
+    if(novo && novo.trim()){ it.nome = novo.trim(); scheduleSave(); renderSection(); }
+  });
+
+  const rateInput = el.querySelector('#itemRateInput');
+  bindMoneyInput(rateInput, ()=>walletItemCurrentRate(it, mk), v=>{ it.rates[mk]=v; }, ()=>{ scheduleSave(); drawWalletChart(); });
+
+  el.querySelector('#txData').value = new Date().toISOString().slice(0,10);
+  el.querySelector('#btnTxOk').addEventListener('click', ()=>{
+    const tipo = el.querySelector('#txTipo').value;
+    const valor = parseMoney(el.querySelector('#txValor').value);
+    const data = el.querySelector('#txData').value || new Date().toISOString().slice(0,10);
+    const nota = el.querySelector('#txNota').value.trim();
+    if(!valor || valor<=0){ alert('Informe um valor válido.'); return; }
+    it.history.push({id:uid(), date:data, tipo, valor, nota});
+    it.saldo = (Number(it.saldo)||0) + (tipo==='aporte' ? valor : -valor);
+    scheduleSave();
+    renderSection();
+  });
+
+  const histEl = el.querySelector('#walletHistList');
+  const sorted = [...it.history].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  if(!sorted.length){
+    histEl.innerHTML = `<div class="empty-state">Nenhuma movimentação registrada ainda.</div>`;
+  } else {
+    sorted.forEach(h=>{
+      const row = document.createElement('div');
+      row.style.cssText = 'display:flex; justify-content:space-between; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--paper-line);';
+      const negativo = h.tipo==='retirada' || (h.tipo==='ajuste' && h.valor<0);
+      const rotulo = h.tipo==='aporte' ? 'Aporte' : h.tipo==='retirada' ? 'Retirada' : 'Ajuste de saldo';
+      row.innerHTML = `
+        <div>
+          <div style="font-size:13.5px;">${brDate(h.date)} · ${rotulo}</div>
+          ${h.nota ? `<div style="font-size:12px; color:var(--ink-soft);">${escapeHtml(h.nota)}</div>` : ''}
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="mono" style="color:${negativo?'var(--rust)':'var(--forest)'}; font-weight:600;">${negativo?'-':'+'} ${fmt(Math.abs(h.valor))}</div>
+          <button class="icon-btn" data-role="delh" title="excluir">✕</button>
+        </div>
+      `;
+      row.querySelector('[data-role=delh]').addEventListener('click', ()=>{
+        let delta = 0;
+        if(h.tipo==='aporte') delta = -h.valor;
+        else if(h.tipo==='retirada') delta = h.valor;
+        else delta = -h.valor;
+        it.saldo = (Number(it.saldo)||0) + delta;
+        it.history = it.history.filter(x=>x.id!==h.id);
+        scheduleSave(); renderSection();
+      });
+      histEl.appendChild(row);
+    });
+  }
+
+  return el;
+}
+
+function drawWalletChart(){
+  const canvas = document.getElementById('chartWallet');
+  const skeleton = document.getElementById('walletChartSkeleton');
+  if(!canvas) return;
+  try{
+    if(typeof Chart === 'undefined') throw new Error('Chart.js indisponível');
+    const w = getWallet();
+    const mk = walletMonthKey();
+    const months = 12;
+    let labels, dataset, seriesLabel;
+    if(carteiraDetailId){
+      const it = w.items.find(i=>i.id===carteiraDetailId);
+      if(!it) throw new Error('item não encontrado');
+      const rate = walletItemCurrentRate(it, mk);
+      dataset = walletProjection(Number(it.saldo)||0, rate, months);
+      seriesLabel = it.nome;
+    } else {
+      const series = new Array(months+1).fill(0);
+      w.items.forEach(it=>{
+        const rate = walletItemCurrentRate(it, mk);
+        walletProjection(Number(it.saldo)||0, rate, months).forEach((v,i)=>{ series[i]+=v; });
+      });
+      dataset = series;
+      seriesLabel = 'Patrimônio projetado';
+    }
+    labels = dataset.map((_,i)=> i===0 ? 'hoje' : `+${i}m`);
+
+    if(chartWalletRef){ chartWalletRef.destroy(); chartWalletRef = null; }
+    const ctx = canvas.getContext('2d');
+    chartWalletRef = new Chart(ctx, {
+      type:'line',
+      data:{ labels, datasets:[{ label:seriesLabel, data:dataset, borderColor:'#173A2C', backgroundColor:'rgba(23,58,44,0.08)', borderWidth:2, borderDash:[5,4], tension:0.25, fill:true, pointRadius:0 }] },
+      options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ y:{ ticks:{ callback:v=>fmt(v) } } } }
+    });
+    canvas.style.display = 'block';
+    if(skeleton) skeleton.style.display = 'none';
+  }catch(err){
+    console.error('Erro ao renderizar gráfico da carteira:', err);
+    if(skeleton) skeleton.innerHTML = `<div class="empty-state">Não foi possível carregar o gráfico agora. Recarregue a página.</div>`;
+  }
+}
+
+/* =========================================================
+   RENDER: BLOCO DE NOTAS — texto livre, salva sozinho
+========================================================= */
+function renderNotas(){
+  const el = document.createElement('div');
+  if(typeof state.notes !== 'string') state.notes = '';
+  el.innerHTML = `
+    <div class="page-header">
+      <div><h2>Bloco de Notas</h2><div class="desc">Um espaço livre pra anotações — lembretes, ideias, o que quiser. Salva sozinho.</div></div>
+    </div>
+    <div class="card">
+      <textarea id="notesArea" style="width:100%; min-height:420px; border:1px solid var(--paper-line); border-radius:var(--radius); padding:16px; font-family:'Source Serif 4',serif; font-size:15px; line-height:1.6; color:var(--ink); resize:vertical; background:var(--paper);" placeholder="Escreva aqui…"></textarea>
+    </div>
+  `;
+  const ta = el.querySelector('#notesArea');
+  ta.value = state.notes;
+  ta.addEventListener('input', ()=>{
+    state.notes = ta.value;
+    scheduleSave();
+  });
+  return el;
+}
+
+/* =========================================================
    RENDER: SEÇÃO PERSONALIZADA (criada pelo usuário no menu)
 ========================================================= */
 function renderCustomSection(sectionId){
@@ -2090,10 +2458,13 @@ function renderSection(){
   else if(kind==='receber') node = renderReceber();
   else if(kind==='investimentos') node = renderInvestimentos(activeSection);
   else if(kind==='realInvest') node = renderRealInvest(activeSection);
+  else if(kind==='carteira') node = renderCarteira();
+  else if(kind==='notas') node = renderNotas();
   else node = renderCustomSection(activeSection);
   container.appendChild(node);
   if(kind==='dashboard') requestAnimationFrame(()=>requestAnimationFrame(drawChart));
   if(kind==='realInvest'){ const sid = activeSection; requestAnimationFrame(()=>requestAnimationFrame(()=>drawRealInvestChart(sid))); }
+  if(kind==='carteira') requestAnimationFrame(()=>requestAnimationFrame(drawWalletChart));
 }
 
 /* =========================================================
