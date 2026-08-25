@@ -143,80 +143,6 @@ input,select{font-family:inherit;}
 .stat .value{font-family:'IBM Plex Mono',monospace; font-size:23px; font-weight:600; color:var(--forest); margin-top:4px; word-break:break-word;}
 .stat.neg .value{color:var(--rust);}
 
-/* ---------- Cartões de categoria (Gastos Mensais) ---------- */
-.month-total-bar{
-  display:flex; align-items:center; justify-content:space-between; gap:12px;
-  background:var(--forest); color:var(--white); border-radius:var(--radius);
-  padding:12px 16px; margin-top:2px;
-}
-.month-total-bar .mtb-label{font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:rgba(251,249,241,0.75);}
-.month-total-bar .mtb-value{font-family:'IBM Plex Mono',monospace; font-size:19px; font-weight:700;}
-
-.cat-cards-wrap{display:flex; flex-direction:column; gap:16px; margin:18px 0;}
-.cat-card{background:var(--white); border:1px solid var(--paper-line); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden;}
-.cat-card-head{
-  display:flex; align-items:center; justify-content:space-between; gap:10px;
-  padding:14px 18px 12px; border-bottom:1px solid var(--paper-line);
-}
-.cat-name-input{
-  flex:1; min-width:0; border:none; background:none; padding:2px 0;
-  font-family:'Fraunces',serif; font-weight:700; font-size:16px; color:var(--forest);
-}
-.cat-name-input:focus{outline:none; border-bottom:1px solid var(--gold-light);}
-.cat-card-head .icon-btn{flex-shrink:0;}
-
-.cat-list{padding:2px 18px 4px;}
-.cat-list-head{
-  display:flex; align-items:center; justify-content:space-between; gap:10px;
-  padding:8px 0 7px; border-bottom:2px solid var(--forest);
-  font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase;
-  letter-spacing:0.06em; color:var(--ink-soft);
-}
-.cat-list-head span:last-child{text-align:right;}
-
-.cat-item{display:flex; align-items:center; gap:10px; padding:9px 0;}
-.cat-item + .cat-item{border-top:1px solid rgba(207,196,160,0.35);}
-.cat-item-desc{
-  flex:1; min-width:0; border:none; background:none; font-family:'Source Serif 4',Georgia,serif;
-  font-size:14.5px; color:var(--ink); padding:3px 2px;
-}
-.cat-item-desc:focus{outline:none; background:var(--forest-pale); border-radius:2px;}
-.cat-item-value{
-  width:92px; flex-shrink:0; border:none; background:none; text-align:right;
-  font-family:'IBM Plex Mono',monospace; font-size:14.5px; color:var(--ink); padding:3px 2px;
-}
-.cat-item-value:focus{outline:none; background:var(--forest-pale); border-radius:2px;}
-.cat-item-del{
-  flex-shrink:0; background:none; border:none; color:var(--ink-soft); font-size:12px;
-  padding:3px 4px; opacity:0; transition:opacity .15s, color .15s; border-radius:2px;
-}
-.cat-item:hover .cat-item-del{opacity:0.6;}
-.cat-item-del:hover{opacity:1 !important; color:var(--rust);}
-
-.cat-card-empty{padding:14px 2px; color:var(--ink-soft); font-size:13px; font-style:italic;}
-
-.cat-card-foot{display:flex; justify-content:center; padding:10px 18px 16px;}
-.cat-add-btn{
-  border:1px dashed var(--paper-line); background:none; border-radius:20px;
-  padding:7px 16px; font-family:'IBM Plex Mono',monospace; font-size:11.5px;
-  color:var(--ink-soft); text-align:center;
-}
-.cat-add-btn:hover{border-color:var(--gold); color:var(--gold);}
-
-.cat-subtotal{
-  display:flex; align-items:center; justify-content:space-between; gap:10px;
-  background:var(--forest); color:var(--white); padding:11px 18px;
-  font-family:'IBM Plex Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.05em;
-}
-.cat-subtotal .cat-subtotal-value{font-size:15px; font-weight:700; text-transform:none; letter-spacing:0;}
-
-@media(max-width:880px){
-  .cat-card-head{padding:12px 14px 10px;}
-  .cat-list{padding:2px 14px 4px;}
-  .cat-subtotal{padding:10px 14px;}
-  .cat-item-value{width:78px;}
-}
-
 .table-wrap{width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch;}
 table{width:100%; border-collapse:collapse; font-size:14px;}
 th{text-align:left; font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-soft); padding:8px 8px; border-bottom:2px solid var(--forest); white-space:nowrap;}
@@ -255,6 +181,19 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
 .save-toast.error{background:var(--rust);}
 
 .chart-wrap{position:relative; height:250px;}
+.chart-skeleton{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;}
+.skel-bars{display:flex; align-items:flex-end; gap:10px; height:120px;}
+.skel-bars span{
+  width:16px; background:var(--paper-dark); border-radius:3px 3px 0 0;
+  animation:skelPulse 1.1s ease-in-out infinite;
+}
+.skel-bars span:nth-child(1){height:40%; animation-delay:0s;}
+.skel-bars span:nth-child(2){height:70%; animation-delay:0.1s;}
+.skel-bars span:nth-child(3){height:50%; animation-delay:0.2s;}
+.skel-bars span:nth-child(4){height:85%; animation-delay:0.3s;}
+.skel-bars span:nth-child(5){height:60%; animation-delay:0.4s;}
+@keyframes skelPulse{0%,100%{opacity:0.45;} 50%{opacity:0.9;}}
+.skel-label{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.05em;}
 .small-note{font-size:12px; color:var(--ink-soft); margin-top:8px; font-family:'IBM Plex Mono',monospace; line-height:1.6;}
 
 /* ===== APP MOBILE (cabeçalho fixo + gaveta + barra inferior) ===== */
@@ -391,6 +330,28 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
 .auth-form{display:none;}
 .auth-form.active{display:block;}
 .config-warning{background:var(--rust-pale); color:var(--rust); font-size:12px; padding:12px 14px; border-radius:3px; margin-bottom:16px; font-family:'IBM Plex Mono',monospace; line-height:1.6;}
+
+/* ===== MODAL (novo aporte, etc.) ===== */
+.modal-overlay{
+  position:fixed; inset:0; background:rgba(15,25,20,0.55); z-index:85;
+  display:none; align-items:center; justify-content:center; padding:18px;
+}
+.modal-overlay.open{display:flex;}
+.modal-card{
+  background:var(--white); width:100%; max-width:420px; border-radius:5px;
+  padding:26px 26px 24px; box-shadow:0 20px 50px rgba(0,0,0,0.3); border:1px solid var(--paper-line);
+  max-height:90vh; overflow-y:auto;
+}
+.modal-card h3{font-family:'Fraunces',serif; color:var(--forest);}
+.modal-money{
+  width:100%; padding:10px 11px; border:1px solid var(--paper-line); border-radius:2px;
+  font-size:14.5px; background:var(--paper); font-family:'IBM Plex Mono',monospace; text-align:left;
+}
+.modal-money:focus{outline:none; border-color:var(--gold); background:var(--white);}
+#investCategorySelect, #investRatePeriod, #investDate{
+  width:100%; padding:10px 11px; border:1px solid var(--paper-line); border-radius:2px;
+  font-size:14px; background:var(--paper); font-family:'Source Serif 4',serif;
+}
 </style>
 </head>
 <body>
@@ -574,6 +535,7 @@ function emptyState(){
   return {
     months: [], fixedExpenses: [], salaries: [], receivables: [], loans: [], investments: [],
     customSections: [],
+    realInvestments: { initialValue: 0, months: [] },
     navConfig: null, // preenchido por ensureNavConfig()
     lastUpdated: null, selectedMonth: null, dashboardMonth: null,
   };
@@ -639,6 +601,7 @@ const DEFAULT_NAV = [
   {id:'salarios', label:'Salários'},
   {id:'receber', label:'Dinheiro a Receber'},
   {id:'investimentos', label:'Investimentos'},
+  {id:'realInvest', label:'Investimento Real'},
 ];
 let activeSection = 'dashboard';
 
@@ -683,6 +646,7 @@ function buildNavInto(containerId, visible, hidden, withManage){
       <span class="num">${String(i+1).padStart(2,'0')}</span>
       <span class="nav-label">${escapeHtml(s.label)}</span>
       <span class="nav-actions">
+        ${!s.core ? `<button class="nav-icon-btn" data-dup="${escAttr(s.id)}" title="duplicar">⧉</button>` : ''}
         <button class="nav-icon-btn" data-edit="${escAttr(s.id)}" title="renomear">✎</button>
         <button class="nav-icon-btn" data-delnav="${escAttr(s.id)}" title="excluir">✕</button>
       </span>
@@ -780,6 +744,12 @@ function wireNav(container){
       startInlineRename(btn.dataset.edit, btn.closest('.nav-item'));
     });
   });
+  container.querySelectorAll('[data-dup]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      onDuplicateSection(btn.dataset.dup);
+    });
+  });
   container.querySelectorAll('[data-delnav]').forEach(btn=>{
     btn.addEventListener('click', (e)=>{
       e.stopPropagation();
@@ -836,7 +806,38 @@ function onDeleteNavItem(id){
   renderSection();
 }
 
+function onDuplicateSection(id){
+  const original = state.customSections.find(c=>c.id===id);
+  const cfg = state.navConfig.find(n=>n.id===id);
+  if(!original || !cfg) return;
+  const suggested = `Cópia de ${cfg.label}`;
+  const name = prompt(`Duplicar "${cfg.label}" — nome da nova seção:`, suggested);
+  if(!name) return;
+  const newId = 'custom-' + uid();
+  const clonedItems = (original.items||[]).map(it => ({ desc: it.desc, value: it.value }));
+  state.customSections.push({ id: newId, label: name.trim(), items: clonedItems });
+  state.navConfig.push({ id: newId, label: name.trim(), hidden:false, core:false });
+  activeSection = newId;
+  scheduleSave();
+  renderNav();
+  renderSection();
+}
+
 function onAddCustomSection(){
+  const customs = state.navConfig.filter(n=>!n.core);
+  if(customs.length){
+    const list = customs.map((c,i)=>`${i+1}. ${c.label}`).join('\n');
+    const choice = prompt(
+      `Criar nova seção em branco, ou duplicar uma já existente?\n\nPara duplicar, digite o número da seção abaixo:\n${list}\n\nOu deixe em branco e clique OK para criar uma nova seção do zero.`,
+      ''
+    );
+    if(choice === null) return; // cancelou
+    const idx = parseInt(choice, 10);
+    if(!isNaN(idx) && idx>=1 && idx<=customs.length){
+      onDuplicateSection(customs[idx-1].id);
+      return;
+    }
+  }
   const label = prompt('Nome da nova seção (ex: Contas da Casa):');
   if(!label) return;
   const id = 'custom-' + uid();
@@ -871,6 +872,66 @@ function investmentValue(inv, useHigh){
   return futureValue(Number(inv.valorInicial)||0, Number(inv.aporteMensal)||0, Number(inv.anos)||0, Number(taxa)||0);
 }
 function investmentsTotal(useHigh){ return state.investments.reduce((s,inv)=>s+investmentValue(inv,useHigh),0); }
+
+/* =========================================================
+   INVESTIMENTO REAL — simulador sequencial mês a mês
+   Modelo: valor inicial + lista de meses (aporte, taxa, tipo de taxa).
+   O saldo final de um mês vira o saldo inicial do mês seguinte.
+========================================================= */
+const PT_MONTH_NAMES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+function riMonthKeyNow(){
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+}
+function riNextMonthKey(key){
+  const [y,m] = key.split('-').map(Number);
+  const d = new Date(y, m, 1); // m já é (mês-1)+1 = próximo mês
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+}
+function riFormatMonthLabel(key){
+  if(!key) return '—';
+  const [y,m] = key.split('-').map(Number);
+  const name = PT_MONTH_NAMES[(m||1)-1] || '';
+  return `${name}/${y}`;
+}
+// taxa anual -> equivalente mensal, matematicamente correta: (1+i_a)^(1/12) - 1
+function riMonthlyRateFrom(taxa, tipoTaxa){
+  const r = Number(taxa)||0;
+  if(tipoTaxa==='mensal') return r/100;
+  return Math.pow(1 + r/100, 1/12) - 1;
+}
+
+function ensureRealInvestShape(){
+  const ri = state.realInvestments;
+  const looksNew = ri && typeof ri.initialValue !== 'undefined' && Array.isArray(ri.months);
+  if(!looksNew){
+    // formato antigo (categorias/aportes) ou inexistente: recomeça limpo, sem inventar dados do usuário
+    state.realInvestments = { initialValue: 0, months: [] };
+  }
+}
+
+// Roda a simulação inteira em sequência: saldo inicial do mês N = montante do mês N-1.
+function computeRealInvestSchedule(){
+  const ri = state.realInvestments;
+  const initial = Number(ri.initialValue) || 0;
+  let saldo = initial;
+  const rows = [];
+  (ri.months||[]).forEach(m=>{
+    const saldoInicial = saldo;
+    const aporte = Number(m.aporte) || 0;
+    const taxaMensal = riMonthlyRateFrom(m.taxa, m.tipoTaxa);
+    const rendimento = saldoInicial * taxaMensal;
+    const montante = saldoInicial + aporte + rendimento;
+    rows.push({ id:m.id, monthKey:m.monthKey, aporte, taxa:m.taxa, tipoTaxa:m.tipoTaxa, saldoInicial, rendimento, montante });
+    saldo = montante;
+  });
+  const totalAportado = (ri.months||[]).reduce((s,m)=>s+(Number(m.aporte)||0), 0);
+  const montanteAtual = rows.length ? rows[rows.length-1].montante : initial;
+  const rendimentoTotal = montanteAtual - initial - totalAportado;
+  return { rows, initial, totalAportado, montanteAtual, rendimentoTotal };
+}
+
 function fmtStampDate(iso){
   if(!iso) return '—';
   const d = new Date(iso);
@@ -947,7 +1008,9 @@ function renderDashboard(){
   const saldo = receitas - gastos;
   const pendente = receivablesPendingTotal();
   const investTotalBaixa = investmentsTotal(false);
-  const hasChartData = months.length > 0;
+
+  // "tem dados de verdade" = pelo menos um mês com gasto OU salário lançado (não só meses vazios)
+  const hasRealData = months.some(m=>monthTotal(m) > 0) || state.salaries.some(s=>salaryTotal(s) > 0);
 
   const el = document.createElement('div');
   el.innerHTML = `
@@ -972,10 +1035,21 @@ function renderDashboard(){
     <div class="grid-2" style="margin-top:22px;">
       <div class="card" id="chartCard">
         <h3>Receita × Gastos por mês</h3>
-        ${hasChartData
-          ? `<div class="chart-wrap"><canvas id="chartMain"></canvas></div>`
-          : `<div class="empty-state">Assim que você cadastrar um mês em "Gastos Mensais" (com o salário lançado), esse gráfico aparece aqui sozinho.<br><br><button class="btn secondary small" id="btnGoToGastos">Ir para Gastos Mensais</button></div>`
-        }
+        <div id="chartCardBody">
+          ${!months.length ? `
+            <div class="empty-state">Assim que você cadastrar um mês em "Gastos Mensais", esse gráfico aparece aqui sozinho.<br><br><button class="btn secondary small" id="btnGoToGastos">Ir para Gastos Mensais</button></div>
+          ` : !hasRealData ? `
+            <div class="empty-state">Seus meses ainda estão sem gastos ou salário lançado. Preencha algum valor para o gráfico ganhar vida.<br><br><button class="btn secondary small" id="btnGoToGastos">Ir para Gastos Mensais</button></div>
+          ` : `
+            <div class="chart-wrap" id="chartWrap">
+              <div class="chart-skeleton" id="chartSkeleton">
+                <div class="skel-bars"><span></span><span></span><span></span><span></span><span></span></div>
+                <div class="skel-label">carregando gráfico…</div>
+              </div>
+              <canvas id="chartMain" style="display:none;"></canvas>
+            </div>
+          `}
+        </div>
       </div>
       <div class="card">
         <h3>Resumo geral</h3>
@@ -1006,39 +1080,58 @@ function renderDashboard(){
   const sel = el.querySelector('#dashMonthSelect');
   sel.innerHTML = months.length ? months.map(m=>`<option value="${m.id}" ${m.id===state.dashboardMonth?'selected':''}>${escapeHtml(m.label)}</option>`).join('') : `<option>Nenhum mês cadastrado</option>`;
   sel.addEventListener('change', ()=>{ state.dashboardMonth = sel.value; renderSection(); });
-  const goBtn = el.querySelector('#btnGoToGastos');
-  if(goBtn) goBtn.addEventListener('click', ()=>{ activeSection='gastos'; renderNav(); renderSection(); });
+  el.querySelectorAll('#btnGoToGastos').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ activeSection='gastos'; renderNav(); renderSection(); });
+  });
   return el;
 }
 
 function drawChart(){
   const canvas = document.getElementById('chartMain');
-  if(!canvas) return;
-  if(typeof Chart==='undefined'){
-    const card = document.getElementById('chartCard');
-    if(card) card.innerHTML = `<h3>Receita × Gastos por mês</h3><div class="empty-state">Não foi possível carregar o gráfico agora. Recarregue a página.</div>`;
-    return;
-  }
-  if(chartRef) chartRef.destroy();
-  const months = state.months;
-  const labels = months.map(m=>m.label.split(' / ')[0]);
-  const gastosData = months.map(m=>monthTotal(m));
-  const salData = months.map(m=>{ const s = state.salaries.find(x=>x.monthId===m.id); return s? salaryTotal(s):0; });
-  chartRef = new Chart(canvas.getContext('2d'), {
-    type:'bar',
-    data:{ labels, datasets:[
-      {label:'Receita', data:salData, backgroundColor:'#A9823C', borderRadius:2},
-      {label:'Gastos', data:gastosData, backgroundColor:'#8C3B32', borderRadius:2},
-    ]},
-    options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{legend:{labels:{font:{family:'IBM Plex Mono', size:11}}}},
-      scales:{
-        y:{ticks:{font:{family:'IBM Plex Mono', size:10}}, grid:{color:'#E8E0C8'}},
-        x:{ticks:{font:{family:'IBM Plex Mono', size:11}}, grid:{display:false}}
-      }
+  const skeleton = document.getElementById('chartSkeleton');
+  if(!canvas) return; // sem dados: já mostramos o empty state, nada a desenhar
+
+  try{
+    if(typeof Chart === 'undefined'){
+      throw new Error('Biblioteca de gráficos não carregou (Chart.js indisponível).');
     }
-  });
+    const months = state.months;
+    // valida e normaliza os dados para número antes de entregar ao Chart.js
+    const labels = months.map(m => String(m.label).split(' / ')[0]);
+    const gastosData = months.map(m => Number(monthTotal(m)) || 0);
+    const salData = months.map(m => {
+      const s = state.salaries.find(x => x.monthId === m.id);
+      return Number(s ? salaryTotal(s) : 0) || 0;
+    });
+
+    if(chartRef){ chartRef.destroy(); chartRef = null; }
+
+    chartRef = new Chart(canvas.getContext('2d'), {
+      type:'bar',
+      data:{ labels, datasets:[
+        {label:'Receita', data:salData, backgroundColor:'#A9823C', borderRadius:2},
+        {label:'Gastos', data:gastosData, backgroundColor:'#8C3B32', borderRadius:2},
+      ]},
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{labels:{font:{family:'IBM Plex Mono', size:11}}}},
+        scales:{
+          y:{ticks:{font:{family:'IBM Plex Mono', size:10}}, grid:{color:'#E8E0C8'}, beginAtZero:true},
+          x:{ticks:{font:{family:'IBM Plex Mono', size:11}}, grid:{display:false}}
+        }
+      }
+    });
+
+    // sucesso: troca o esqueleto pelo gráfico de verdade
+    if(skeleton) skeleton.style.display = 'none';
+    canvas.style.display = 'block';
+  }catch(err){
+    console.error('Erro ao renderizar gráfico Receita × Gastos:', err);
+    const body = document.getElementById('chartCardBody');
+    if(body){
+      body.innerHTML = `<div class="empty-state">Não foi possível carregar o gráfico agora.<br>Recarregue a página — se persistir, verifique sua conexão.</div>`;
+    }
+  }
 }
 
 /* =========================================================
@@ -1122,79 +1215,65 @@ function renderGastos(){
   card.className = 'card';
   card.innerHTML = `
     <h3>${escapeHtml(month.label)} <span class="hint">${month.categories.length} categorias</span></h3>
-    <div class="month-total-bar">
-      <span class="mtb-label">Total do mês</span>
-      <span class="mtb-value mono" id="month-total-cell">${fmt(total)}</span>
-    </div>
+    <div class="table-wrap"><table class="responsive-table">
+      <thead><tr><th style="width:26%">Categoria</th><th>Descrição</th><th class="num" style="width:110px">Valor</th><th style="width:70px"></th></tr></thead>
+      <tbody id="catBody"></tbody>
+      <tfoot><tr class="total-row"><td colspan="2">TOTAL DO MÊS</td><td class="num" data-label="Total" id="month-total-cell">${fmt(total)}</td><td></td></tr></tfoot>
+    </table></div>
+    <button class="btn secondary small" id="btnAddCat" style="margin-top:14px;">+ nova categoria</button>
   `;
   content.appendChild(card);
 
-  const wrap = document.createElement('div');
-  wrap.className = 'cat-cards-wrap';
-  wrap.id = 'catBody';
-  content.appendChild(wrap);
-
-  const addCatBtn = document.createElement('button');
-  addCatBtn.className = 'btn secondary small';
-  addCatBtn.id = 'btnAddCat';
-  addCatBtn.textContent = '+ nova categoria';
-  content.appendChild(addCatBtn);
-
+  const body = card.querySelector('#catBody');
   month.categories.forEach((cat, ci)=>{
     const catTotal = categoryTotal(cat);
-    const catCard = document.createElement('div');
-    catCard.className = 'cat-card';
-    catCard.innerHTML = `
-      <div class="cat-card-head">
-        <input type="text" value="${escAttr(cat.name)}" data-role="catname" class="cat-name-input">
-        <button class="icon-btn" data-role="delCat" title="remover categoria">🗑</button>
-      </div>
-      <div class="cat-list">
-        ${cat.items.length ? `<div class="cat-list-head"><span>Descrição</span><span>Valor</span></div>` : `<div class="cat-card-empty">Nenhum item ainda nesta categoria.</div>`}
-        <div id="cat-items-${ci}"></div>
-      </div>
-      <div class="cat-card-foot">
-        <button class="cat-add-btn" data-role="addItem">+ item em "${escAttr(cat.name)}"</button>
-      </div>
-      <div class="cat-subtotal">
-        <span>Subtotal da categoria</span>
-        <span class="cat-subtotal-value mono" id="cat-total-${ci}">${fmt(catTotal)}</span>
-      </div>
+    cat.items.forEach((item, ii)=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td${ii===0?' class="cell-plain"':''}>${ii===0 ? catInputHtml(cat.name) : ''}</td>
+        <td data-label="Descrição"><input type="text" value="${escAttr(item.desc)}" data-role="desc"></td>
+        <td class="num" data-label="Valor"><input type="text" inputmode="decimal" class="money" data-role="value"></td>
+        <td><button class="icon-btn" data-role="delItem" title="remover item">✕</button></td>
+      `;
+      tr.querySelector('[data-role=desc]').addEventListener('input', e=>{ item.desc=e.target.value; scheduleSave(); });
+      bindMoneyInput(tr.querySelector('[data-role=value]'), ()=>item.value, v=>item.value=v, ()=>recalcGastos(month, ci));
+      tr.querySelector('[data-role=delItem]').addEventListener('click', ()=>{ cat.items.splice(ii,1); scheduleSave(); renderSection(); });
+      if(ii===0){
+        const catInput = tr.querySelector('[data-role=catname]');
+        catInput.addEventListener('input', e=>{ cat.name = e.target.value; scheduleSave(); });
+      }
+      body.appendChild(tr);
+    });
+    const addRow = document.createElement('tr');
+    addRow.innerHTML = `
+      <td${cat.items.length===0?' class="cell-plain"':''}>${cat.items.length===0 ? catInputHtml(cat.name) : ''}</td>
+      <td><button class="btn secondary small" data-role="addItem">+ item em "${escAttr(cat.name)}"</button></td>
+      <td class="num mono" data-label="Subtotal da categoria" id="cat-total-${ci}" style="font-weight:600;">${fmt(catTotal)}</td>
+      <td><button class="icon-btn" data-role="delCat" title="remover categoria">🗑</button></td>
     `;
-
-    catCard.querySelector('[data-role=catname]').addEventListener('input', e=>{ cat.name = e.target.value; scheduleSave(); });
-    catCard.querySelector('[data-role=delCat]').addEventListener('click', ()=>{
+    addRow.querySelector('[data-role=addItem]').addEventListener('click', ()=>{
+      cat.items.push({desc:'', value:0}); scheduleSave(); renderSection();
+    });
+    addRow.querySelector('[data-role=delCat]').addEventListener('click', ()=>{
       if(!confirm(`Remover categoria "${cat.name}"?`)) return;
       month.categories.splice(ci,1); scheduleSave(); renderSection();
     });
-    catCard.querySelector('[data-role=addItem]').addEventListener('click', ()=>{
-      cat.items.push({desc:'', value:0}); scheduleSave(); renderSection();
-    });
-
-    const itemsHost = catCard.querySelector(`#cat-items-${ci}`);
-    cat.items.forEach((item, ii)=>{
-      const row = document.createElement('div');
-      row.className = 'cat-item';
-      row.innerHTML = `
-        <input type="text" value="${escAttr(item.desc)}" data-role="desc" class="cat-item-desc" placeholder="Descrição">
-        <input type="text" inputmode="decimal" class="money cat-item-value" data-role="value" placeholder="0,00">
-        <button class="cat-item-del" data-role="delItem" title="remover item">✕</button>
-      `;
-      row.querySelector('[data-role=desc]').addEventListener('input', e=>{ item.desc=e.target.value; scheduleSave(); });
-      bindMoneyInput(row.querySelector('[data-role=value]'), ()=>item.value, v=>item.value=v, ()=>recalcGastos(month, ci));
-      row.querySelector('[data-role=delItem]').addEventListener('click', ()=>{ cat.items.splice(ii,1); scheduleSave(); renderSection(); });
-      itemsHost.appendChild(row);
-    });
-
-    wrap.appendChild(catCard);
+    if(cat.items.length===0){
+      const ci2 = addRow.querySelector('[data-role=catname]');
+      if(ci2) ci2.addEventListener('input', e=>{ cat.name = e.target.value; scheduleSave(); });
+    }
+    body.appendChild(addRow);
   });
 
-  addCatBtn.addEventListener('click', ()=>{
+  card.querySelector('#btnAddCat').addEventListener('click', ()=>{
     month.categories.push({name:'Nova categoria', items:[{desc:'', value:0}]});
     scheduleSave(); renderSection();
   });
 
   return el;
+}
+function catInputHtml(name){
+  return `<input type="text" value="${escAttr(name)}" data-role="catname" style="font-weight:600; color:var(--forest);">`;
 }
 function recalcGastos(month, ci){
   const catCell = document.getElementById('cat-total-'+ci);
@@ -1635,6 +1714,208 @@ function renderCustomSection(sectionId){
 }
 
 /* =========================================================
+   RENDER: INVESTIMENTO REAL — simulador mês a mês, editável em linha
+========================================================= */
+let chartRealInvestRef = null;
+
+function riMoneyFmt2(n){
+  // sempre "R$ 1.234,56" com 2 casas — usa o fmt() padrão do app (já é pt-BR/BRL)
+  return fmt(n);
+}
+function riRateFmt2(taxa){
+  const n = Number(taxa) || 0;
+  return n.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function renderRealInvest(){
+  const el = document.createElement('div');
+  ensureRealInvestShape();
+  const ri = state.realInvestments;
+  const result = computeRealInvestSchedule();
+  const hasMonths = ri.months.length > 0;
+
+  el.innerHTML = `
+    <div class="page-header">
+      <div>
+        <h2>Investimento Real</h2>
+        <div class="desc">Simulador de juros compostos mês a mês. Edite qualquer aporte ou taxa e tudo recalcula sozinho — inclusive os meses seguintes.</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Valor inicial <span class="hint">o que você já tem, antes dos aportes mensais</span></h3>
+      <input type="text" inputmode="decimal" class="modal-money" id="riInitialValue" style="max-width:260px; font-size:17px; padding:12px 13px;">
+    </div>
+
+    <div class="grid-3" style="margin-top:4px;">
+      <div class="stat"><div class="label">Valor inicial</div><div class="value mono" id="ri-card-initial">${fmt(result.initial)}</div></div>
+      <div class="stat"><div class="label">Total aportado</div><div class="value mono" id="ri-card-aportado">${fmt(result.totalAportado)}</div></div>
+      <div class="stat pos"><div class="label">Rendimento total</div><div class="value mono" id="ri-card-rendimento">${fmt(result.rendimentoTotal)}</div></div>
+    </div>
+    <div class="grid-3" style="margin-top:14px;">
+      <div class="stat pos" style="grid-column:1/-1;"><div class="label">Montante atual</div><div class="value mono" id="ri-card-montante" style="font-size:26px;">${fmt(result.montanteAtual)}</div></div>
+    </div>
+
+    <div class="card" style="margin-top:22px;">
+      <h3>Evolução do patrimônio</h3>
+      <div id="riChartCardBody">
+        ${!hasMonths ? `
+          <div class="empty-state">Adicione ao menos um mês para ver a curva de crescimento do patrimônio.</div>
+        ` : `
+          <div class="chart-wrap" id="riChartWrap">
+            <div class="chart-skeleton" id="riChartSkeleton">
+              <div class="skel-bars"><span></span><span></span><span></span><span></span><span></span></div>
+              <div class="skel-label">carregando gráfico…</div>
+            </div>
+            <canvas id="chartRealInvest" style="display:none;"></canvas>
+          </div>
+        `}
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Simulação mês a mês <span class="hint">${ri.months.length} mês${ri.months.length===1?'':'es'}</span></h3>
+      <div class="table-wrap"><table class="responsive-table">
+        <thead><tr>
+          <th style="width:150px">Mês</th>
+          <th class="num">Saldo inicial</th>
+          <th class="num" style="width:120px">Aporte</th>
+          <th class="num" style="width:150px">Taxa</th>
+          <th class="num">Rendimento</th>
+          <th class="num">Montante</th>
+          <th style="width:50px"></th>
+        </tr></thead>
+        <tbody id="riMonthsBody"></tbody>
+      </table></div>
+      <button class="btn secondary small" id="btnAddMonth" style="margin-top:14px;">+ Adicionar mês</button>
+      <div class="small-note">Taxa anual é convertida matematicamente para o mês: (1 + taxa anual)^(1/12) − 1. O saldo inicial de cada mês é sempre o montante do mês anterior — não é editável, porque é resultado do cálculo.</div>
+    </div>
+  `;
+
+  // ---- Valor inicial ----
+  const initialInput = el.querySelector('#riInitialValue');
+  bindMoneyInput(initialInput, ()=>ri.initialValue, v=>{ ri.initialValue = v; }, recalcRealInvest);
+
+  // ---- Linhas de meses ----
+  const body = el.querySelector('#riMonthsBody');
+  if(!hasMonths){
+    body.innerHTML = `<tr><td colspan="7"><div class="empty-state">Nenhum mês cadastrado ainda. Clique em "+ Adicionar mês" para começar.</div></td></tr>`;
+  }
+  result.rows.forEach((row, i)=>{
+    const m = ri.months[i];
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="cell-plain"><input type="month" value="${escAttr(m.monthKey)}" data-role="monthKey"></td>
+      <td class="num" data-label="Saldo inicial" id="ri-saldoinicial-${i}" style="color:var(--ink-soft);">${fmt(row.saldoInicial)}</td>
+      <td class="num" data-label="Aporte"><input type="text" inputmode="decimal" class="money" data-role="aporte"></td>
+      <td data-label="Taxa" style="display:flex; gap:6px; align-items:center; justify-content:flex-end;">
+        <input type="text" inputmode="decimal" class="money" data-role="taxa" style="max-width:70px;">
+        <select data-role="tipoTaxa" style="width:auto; min-width:76px;">
+          <option value="anual" ${m.tipoTaxa!=='mensal'?'selected':''}>a.a.</option>
+          <option value="mensal" ${m.tipoTaxa==='mensal'?'selected':''}>a.m.</option>
+        </select>
+      </td>
+      <td class="num mono" data-label="Rendimento" id="ri-rendimento-${i}" style="color:var(--forest);">${fmt(row.rendimento)}</td>
+      <td class="num mono" data-label="Montante" id="ri-montante-${i}" style="font-weight:600;">${fmt(row.montante)}</td>
+      <td><button class="icon-btn" data-role="delMonth" title="excluir mês">✕</button></td>
+    `;
+    tr.querySelector('[data-role=monthKey]').addEventListener('change', e=>{
+      m.monthKey = e.target.value; scheduleSave(); recalcRealInvest();
+    });
+    bindMoneyInput(tr.querySelector('[data-role=aporte]'), ()=>m.aporte, v=>{ m.aporte=v; }, recalcRealInvest);
+    bindMoneyInput(tr.querySelector('[data-role=taxa]'), ()=>m.taxa, v=>{ m.taxa=v; }, recalcRealInvest);
+    tr.querySelector('[data-role=tipoTaxa]').addEventListener('change', e=>{
+      m.tipoTaxa = e.target.value; scheduleSave(); recalcRealInvest();
+    });
+    tr.querySelector('[data-role=delMonth]').addEventListener('click', ()=>{
+      if(!confirm(`Excluir ${riFormatMonthLabel(m.monthKey)}? Os meses seguintes serão recalculados.`)) return;
+      ri.months.splice(i,1);
+      scheduleSave(); renderSection();
+    });
+    body.appendChild(tr);
+  });
+
+  el.querySelector('#btnAddMonth').addEventListener('click', ()=>{
+    const last = ri.months[ri.months.length-1];
+    const nextKey = last ? riNextMonthKey(last.monthKey) : riMonthKeyNow();
+    ri.months.push({ id: uid(), monthKey: nextKey, aporte: 0, taxa: 0, tipoTaxa: 'anual' });
+    scheduleSave(); renderSection();
+  });
+
+  return el;
+}
+
+// Recalcula tudo (cards, cada linha, gráfico) sem reconstruir os campos — mantém o foco ao digitar.
+function recalcRealInvest(){
+  const result = computeRealInvestSchedule();
+
+  const elInit = document.getElementById('ri-card-initial'); if(elInit) elInit.textContent = fmt(result.initial);
+  const elAport = document.getElementById('ri-card-aportado'); if(elAport) elAport.textContent = fmt(result.totalAportado);
+  const elRend = document.getElementById('ri-card-rendimento'); if(elRend) elRend.textContent = fmt(result.rendimentoTotal);
+  const elMont = document.getElementById('ri-card-montante'); if(elMont) elMont.textContent = fmt(result.montanteAtual);
+
+  result.rows.forEach((row,i)=>{
+    const si = document.getElementById('ri-saldoinicial-'+i); if(si) si.textContent = fmt(row.saldoInicial);
+    const rend = document.getElementById('ri-rendimento-'+i); if(rend) rend.textContent = fmt(row.rendimento);
+    const mont = document.getElementById('ri-montante-'+i); if(mont) mont.textContent = fmt(row.montante);
+  });
+
+  updateRealInvestChart(result);
+}
+
+function drawRealInvestChart(){
+  const canvas = document.getElementById('chartRealInvest');
+  const skeleton = document.getElementById('riChartSkeleton');
+  if(!canvas) return;
+  try{
+    if(typeof Chart === 'undefined') throw new Error('Chart.js indisponível');
+    const result = computeRealInvestSchedule();
+    const labels = result.rows.map(r=>riFormatMonthLabel(r.monthKey));
+    const aportadoAcumulado = [];
+    let acc = 0;
+    result.rows.forEach(r=>{ acc += r.aporte; aportadoAcumulado.push(acc); });
+    const montanteData = result.rows.map(r=>r.montante);
+
+    if(chartRealInvestRef){ chartRealInvestRef.destroy(); chartRealInvestRef=null; }
+    chartRealInvestRef = new Chart(canvas.getContext('2d'), {
+      type:'line',
+      data:{ labels, datasets:[
+        {label:'Aportado (acumulado)', data:aportadoAcumulado, borderColor:'#4B5A50', backgroundColor:'rgba(75,90,80,0.08)', borderDash:[4,3], tension:0.15, pointRadius:3, borderWidth:2},
+        {label:'Patrimônio (com juros)', data:montanteData, borderColor:'#173A2C', backgroundColor:'rgba(23,58,44,0.12)', fill:true, tension:0.25, pointRadius:3, borderWidth:2.5},
+      ]},
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{labels:{font:{family:'IBM Plex Mono', size:11}}}},
+        scales:{
+          y:{ticks:{font:{family:'IBM Plex Mono', size:10}}, grid:{color:'#E8E0C8'}, beginAtZero:true},
+          x:{ticks:{font:{family:'IBM Plex Mono', size:10}, maxRotation:0, autoSkip:true, maxTicksLimit:8}, grid:{display:false}}
+        }
+      }
+    });
+    if(skeleton) skeleton.style.display='none';
+    canvas.style.display='block';
+  }catch(err){
+    console.error('Erro ao renderizar gráfico de Investimento Real:', err);
+    const body = document.getElementById('riChartCardBody');
+    if(body) body.innerHTML = `<div class="empty-state">Não foi possível carregar o gráfico agora. Recarregue a página.</div>`;
+  }
+}
+
+// Atualiza o gráfico já existente em tempo real (sem destruir/recriar) enquanto o usuário digita.
+function updateRealInvestChart(result){
+  if(!chartRealInvestRef) return;
+  const labels = result.rows.map(r=>riFormatMonthLabel(r.monthKey));
+  const aportadoAcumulado = [];
+  let acc = 0;
+  result.rows.forEach(r=>{ acc += r.aporte; aportadoAcumulado.push(acc); });
+  const montanteData = result.rows.map(r=>r.montante);
+  chartRealInvestRef.data.labels = labels;
+  chartRealInvestRef.data.datasets[0].data = aportadoAcumulado;
+  chartRealInvestRef.data.datasets[1].data = montanteData;
+  chartRealInvestRef.update('none');
+}
+
+/* =========================================================
    ROTEADOR DE SEÇÕES
 ========================================================= */
 function renderSection(){
@@ -1648,9 +1929,11 @@ function renderSection(){
   else if(activeSection==='salarios') node = renderSalarios();
   else if(activeSection==='receber') node = renderReceber();
   else if(activeSection==='investimentos') node = renderInvestimentos();
+  else if(activeSection==='realInvest') node = renderRealInvest();
   else node = renderCustomSection(activeSection);
   container.appendChild(node);
-  if(activeSection==='dashboard') requestAnimationFrame(drawChart);
+  if(activeSection==='dashboard') requestAnimationFrame(()=>requestAnimationFrame(drawChart));
+  if(activeSection==='realInvest') requestAnimationFrame(()=>requestAnimationFrame(drawRealInvestChart));
 }
 
 /* =========================================================
