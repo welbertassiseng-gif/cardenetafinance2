@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Balance</title>
-<meta name="theme-color" content="#173A2C">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23173A2C'/%3E%3Cstop offset='1' stop-color='%232C5C46'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23g)'/%3E%3Cg transform='translate(32,33)' fill='none' stroke='%23CBA658' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M0 -13v15'/%3E%3Cpath d='M-10 -8h20'/%3E%3Cpath d='M-10 -8l-4 9.2a5.6 5.6 0 0 0 11.6 0L-10 -8'/%3E%3Cpath d='M10 -8l-4 9.2a5.6 5.6 0 0 0 11.6 0L10 -8'/%3E%3Cpath d='M-7 12h14'/%3E%3C/g%3E%3C/svg%3E">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23173A2C'/%3E%3Cstop offset='1' stop-color='%232C5C46'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Cg transform='translate(32,33)' fill='none' stroke='%23CBA658' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M0 -13v15'/%3E%3Cpath d='M-10 -8h20'/%3E%3Cpath d='M-10 -8l-4 9.2a5.6 5.6 0 0 0 11.6 0L-10 -8'/%3E%3Cpath d='M10 -8l-4 9.2a5.6 5.6 0 0 0 11.6 0L10 -8'/%3E%3Cpath d='M-7 12h14'/%3E%3C/g%3E%3C/svg%3E">
+<meta name="theme-color" content="#34343A">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%2334343A'/%3E%3Cstop offset='1' stop-color='%2357575F'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='32' fill='url(%23g)'/%3E%3Ctext x='32' y='34' font-family='Georgia, Times, serif' font-weight='700' font-size='34' fill='%23CFC4AE' text-anchor='middle' dominant-baseline='central'%3EB%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%2334343A'/%3E%3Cstop offset='1' stop-color='%2357575F'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3Ctext x='32' y='34' font-family='Georgia, Times, serif' font-weight='700' font-size='34' fill='%23CFC4AE' text-anchor='middle' dominant-baseline='central'%3EB%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Source+Serif+4:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <!-- Cada lib carrega de um CDN; se falhar (bloqueio de rede, CDN fora do ar), o script logo abaixo
@@ -17,13 +17,24 @@
 <script>if(typeof supabase==='undefined'){document.write('<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"><'+'/script>');}</script>
 <style>
 :root{
-  --paper:#F3EEE0; --paper-dark:#E8E0C8; --paper-line:#CFC4A0;
-  --ink:#1F2B23; --ink-soft:#4B5A50;
-  --forest:#173A2C; --forest-light:#2C5C46; --forest-pale:#DDE6DE;
-  --gold:#A9823C; --gold-light:#CBA658;
+  --paper:#F1F0EC; --paper-dark:#E5E3DC; --paper-line:#D6D4CB;
+  --ink:#26262A; --ink-soft:#5B5B60;
+  --forest:#34343A; --forest-light:#57575F; --forest-pale:#E7E6E2;
+  --gold:#8C8172; --gold-light:#B7AC98;
   --rust:#8C3B32; --rust-pale:#F2DCD6; --green-pale:#DCE9DC;
-  --white:#FBF9F1; --shadow:0 6px 18px rgba(23,58,44,0.12); --radius:3px;
+  --white:#FAF9F6; --on-dark:#FBF9F1; --shadow:0 6px 18px rgba(30,30,32,0.12); --radius:3px;
+  --icon-blue:#3E6FD9;
 }
+body.theme-dark{
+  --paper:#1B1B1D; --paper-dark:#222224; --paper-line:#3A3A3E;
+  --ink:#ECECEA; --ink-soft:#ABABB0;
+  --forest:#82828A; --forest-light:#9C9CA2; --forest-pale:#333338;
+  --gold:#C4B9A4; --gold-light:#D8CDB8;
+  --rust:#C06456; --rust-pale:#3B2A27; --green-pale:#24312A;
+  --white:#242426; --shadow:0 6px 18px rgba(0,0,0,0.45);
+  --icon-blue:#6EA0FF;
+}
+body.theme-dark{ background-image: repeating-linear-gradient(180deg, transparent, transparent 27px, rgba(255,255,255,0.035) 28px); }
 *{box-sizing:border-box;}
 html,body{margin:0;padding:0;}
 body{
@@ -39,7 +50,7 @@ input,select{font-family:inherit;}
 
 #app{display:flex; min-height:100vh;}
 .sidebar{
-  width:250px; flex-shrink:0; background:var(--forest); color:var(--white);
+  width:250px; flex-shrink:0; background:var(--forest); color:var(--on-dark);
   display:flex; flex-direction:column; position:sticky; top:0; height:100vh; overflow-y:auto;
 }
 .brand{padding:26px 20px 16px; border-bottom:1px solid rgba(251,249,241,0.15);}
@@ -48,7 +59,7 @@ input,select{font-family:inherit;}
   display:flex;align-items:center;justify-content:center;
   font-family:'Fraunces',serif; font-weight:700; font-size:16px; color:var(--gold-light); margin-bottom:10px;
 }
-.brand h1{color:var(--white); font-size:18px; line-height:1.25;}
+.brand h1{color:var(--on-dark); font-size:18px; line-height:1.25;}
 .brand .sub{font-size:11px; letter-spacing:0.08em; text-transform:uppercase; color:var(--gold-light); margin-top:5px; font-family:'IBM Plex Mono',monospace;}
 
 .nav{padding:10px 0; flex:1;}
@@ -60,14 +71,14 @@ input,select{font-family:inherit;}
 .nav-item .num{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--gold-light); width:16px; flex-shrink:0;}
 .nav-ico{width:17px; height:17px; flex-shrink:0; display:inline-flex; align-items:center; justify-content:center; color:var(--gold-light); opacity:0.85;}
 .nav-ico svg{width:100%; height:100%; display:block;}
-.nav-item.active .nav-ico{color:var(--white); opacity:1;}
+.nav-item.active .nav-ico{color:var(--on-dark); opacity:1;}
 .nav-label{flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-.nav-item.active{background:rgba(251,249,241,0.09); color:var(--white); border-left-color:var(--gold-light); font-weight:600;}
+.nav-item.active{background:rgba(251,249,241,0.09); color:var(--on-dark); border-left-color:var(--gold-light); font-weight:600;}
 .nav-actions{display:none; gap:2px; flex-shrink:0;}
 .nav-icon-btn{background:none; border:none; color:rgba(251,249,241,0.55); font-size:12px; padding:3px 5px; border-radius:2px;}
 .nav-edit-input{
   flex:1; background:rgba(251,249,241,0.12); border:1px solid var(--gold-light); border-radius:2px;
-  color:var(--white); font-size:13.5px; padding:3px 6px; font-family:inherit;
+  color:var(--on-dark); font-size:13.5px; padding:3px 6px; font-family:inherit;
 }
 .nav-add-btn{
   margin:6px 18px 4px; padding:8px 10px; border:1px dashed rgba(251,249,241,0.35); border-radius:3px;
@@ -79,24 +90,24 @@ input,select{font-family:inherit;}
 .nav-hidden-item .nhi-label{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 .nav-hidden-item .nhi-actions{display:flex; gap:9px; flex-shrink:0;}
 .nav-hidden-item .nhi-actions span{color:var(--gold-light); font-family:'IBM Plex Mono',monospace; font-size:10.5px; white-space:nowrap; cursor:pointer;}
-.nav-hidden-item .nhi-danger{color:#C97A6C !important;}
+.nhi-trash-btn{background:none; border:none; color:#C97A6C; font-size:12.5px; padding:2px 3px; line-height:1; flex-shrink:0;}
 
 .user-badge{display:flex; align-items:center; gap:8px; padding:10px 20px; border-top:1px solid rgba(251,249,241,0.15); border-bottom:1px solid rgba(251,249,241,0.15); font-size:12px; color:rgba(251,249,241,0.85);}
 .user-badge .dot{width:7px;height:7px;border-radius:50%; background:var(--gold-light); flex-shrink:0;}
-.user-badge b{font-weight:600; color:var(--white); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.user-badge b{font-weight:600; color:var(--on-dark); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 .sidebar-footer{padding:14px 20px 18px; font-size:11px; color:rgba(251,249,241,0.55); font-family:'IBM Plex Mono',monospace;}
 .sidebar-footer button{background:none;border:1px solid rgba(251,249,241,0.3); color:rgba(251,249,241,0.75); font-size:10.5px; padding:6px 9px; border-radius:2px; margin-top:8px; margin-right:6px;}
 
 /* :hover só existe de verdade com ponteiro fino (mouse). Em telas touch, um elemento com regra :hover
    costuma exigir dois toques (o 1º só "simula" o hover, o 2º clica de fato) — por isso isolamos aqui. */
 @media (hover:hover) and (pointer:fine){
-  .nav-item:hover{background:rgba(251,249,241,0.06); color:var(--white);}
+  .nav-item:hover{background:rgba(251,249,241,0.06); color:var(--on-dark);}
   .nav-item:hover .nav-actions{display:flex;}
   .nav-icon-btn:hover{color:var(--gold-light); background:rgba(251,249,241,0.08);}
   .nav-add-btn:hover{border-color:var(--gold-light); color:var(--gold-light);}
   .nav-hidden-toggle:hover{color:var(--gold-light);}
-  .nav-hidden-item .nhi-actions span:hover{color:var(--white);}
-  .nav-hidden-item .nhi-danger:hover{color:#E8A398 !important;}
+  .nav-hidden-item .nhi-actions span:hover{color:var(--on-dark);}
+  .nhi-trash-btn:hover{color:#E8A398;}
   .sidebar-footer button:hover{border-color:var(--gold-light); color:var(--gold-light);}
 }
 /* em touch, os botões de ação do menu (duplicar/renomear/excluir) ficam sempre visíveis, já que não há hover */
@@ -130,6 +141,82 @@ input,select{font-family:inherit;}
 }
 .bell-dot.show{display:block;}
 .header-actions{display:flex; align-items:center; gap:10px; flex-shrink:0;}
+
+/* botão de salvar (manual) e configurações — sidebar/drawer */
+.quick-actions{display:flex; gap:8px; padding:12px 20px 2px;}
+.quick-actions-footer{padding:0 0 14px; margin:0;}
+.qa-btn{
+  flex:1; display:flex; align-items:center; justify-content:center; gap:6px;
+  padding:9px 8px; border-radius:5px; font-size:12px; font-family:'IBM Plex Mono',monospace;
+  border:1px solid rgba(251,249,241,0.25); background:rgba(251,249,241,0.06); color:rgba(251,249,241,0.85);
+  transition:background .15s, border-color .15s, color .15s;
+}
+.qa-btn .ico{font-size:13px; line-height:1;}
+.icon-blue{color:var(--icon-blue); display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;}
+.icon-blue svg{width:16px; height:16px; display:block;}
+.bell-btn .icon-blue svg{width:18px; height:18px;}
+.hdr-icon-btn .icon-blue svg{width:17px; height:17px;}
+.qa-btn.js-save-btn.is-dirty{background:var(--gold-light); border-color:var(--gold-light); color:var(--forest); font-weight:600;}
+.qa-btn.js-save-btn.is-saving{opacity:0.65;}
+@media (hover:hover) and (pointer:fine){
+  .qa-btn:hover{background:rgba(251,249,241,0.14); border-color:rgba(251,249,241,0.4);}
+  .qa-btn.js-save-btn.is-dirty:hover{filter:brightness(1.05);}
+}
+
+/* botões compactos de salvar/configurações no cabeçalho mobile */
+.hdr-icon-btn{
+  position:relative; background:none; border:1px solid var(--paper-line); border-radius:6px;
+  height:38px; padding:0 12px; display:flex; align-items:center; justify-content:center; gap:6px;
+  font-size:14px; color:var(--forest); flex-shrink:0;
+}
+.hdr-icon-btn .js-save-label{display:inline; font-size:11.5px; font-family:'IBM Plex Mono',monospace; text-transform:lowercase;}
+@media (hover:hover) and (pointer:fine){ .hdr-icon-btn:hover{background:var(--forest-pale);} }
+.hdr-icon-btn.js-save-btn.is-dirty{background:var(--gold-light); border-color:var(--gold-light); color:var(--forest);}
+.hdr-icon-btn .save-dot{
+  position:absolute; top:4px; right:4px; width:8px; height:8px; border-radius:50%;
+  background:var(--rust); border:1.5px solid var(--white); display:none;
+}
+.hdr-icon-btn.js-save-btn.is-dirty .save-dot{display:block;}
+
+/* modal de configurações */
+.modal-overlay{
+  position:fixed; inset:0; background:rgba(20,20,22,0.45); z-index:90; display:none;
+}
+.modal-overlay.open{display:block;}
+.settings-modal{
+  position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:460px; max-width:calc(100vw - 32px); max-height:calc(100vh - 60px);
+  background:var(--white); border:1px solid var(--paper-line); border-radius:8px;
+  box-shadow:0 24px 60px rgba(0,0,0,0.28); z-index:95; display:none; flex-direction:column; overflow:hidden;
+}
+.settings-modal.open{display:flex;}
+.settings-head{
+  display:flex; align-items:center; justify-content:space-between; padding:16px 20px;
+  border-bottom:1px solid var(--paper-line); flex-shrink:0;
+}
+.settings-head h3{font-size:19px;}
+.settings-head button{background:none; border:none; color:var(--ink-soft); font-size:19px; line-height:1; padding:2px 4px;}
+.settings-body{overflow-y:auto; padding:6px 20px 20px;}
+.settings-section{padding:16px 0; border-bottom:1px solid var(--paper-line);}
+.settings-section:last-child{border-bottom:none;}
+.settings-section h4{font-size:13px; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace; font-weight:600; margin-bottom:12px;}
+.settings-desc{font-size:13px; color:var(--ink-soft); margin:0 0 12px;}
+.settings-field{margin-bottom:12px;}
+.settings-field label{display:block; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-soft); font-family:'IBM Plex Mono',monospace; margin-bottom:5px;}
+.settings-field input{width:100%; padding:10px 11px; border:1px solid var(--paper-line); border-radius:2px; font-size:14px; background:var(--paper); font-family:'Source Serif 4',serif; color:var(--ink);}
+.settings-field input:focus{outline:none; border-color:var(--gold); background:var(--white);}
+.settings-field input:disabled{opacity:0.6; cursor:not-allowed;}
+.theme-toggle{display:flex; gap:8px;}
+.theme-opt{
+  flex:1; padding:12px; border:1.5px solid var(--paper-line); border-radius:5px; background:var(--paper);
+  color:var(--ink); font-size:13.5px; font-weight:600; display:flex; align-items:center; justify-content:center; gap:7px;
+}
+.theme-opt.active{border-color:var(--gold); background:var(--forest-pale); color:var(--forest);}
+@media (hover:hover) and (pointer:fine){ .theme-opt:hover{border-color:var(--gold-light);} }
+.settings-msg{font-size:12.5px; margin-top:8px; min-height:1em;}
+.settings-msg.ok{color:#3E7A54;}
+.settings-msg.err{color:var(--rust);}
+@media (max-width:640px){ .settings-modal{width:calc(100vw - 24px);} }
 
 .notif-panel{
   position:fixed; top:76px; right:34px; width:330px; max-width:calc(100vw - 32px);
@@ -170,7 +257,51 @@ input,select{font-family:inherit;}
 table{width:100%; border-collapse:collapse; font-size:14px;}
 th{text-align:left; font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-soft); padding:8px 8px; border-bottom:2px solid var(--forest); white-space:nowrap;}
 td{padding:7px 8px; border-bottom:1px solid var(--paper-line); vertical-align:middle;}
-tr.total-row td{font-weight:700; background:var(--forest); color:var(--white); font-family:'IBM Plex Mono',monospace; font-size:15px;}
+tr.total-row td{font-weight:700; background:var(--forest); color:var(--on-dark); font-family:'IBM Plex Mono',monospace; font-size:15px;}
+
+/* Gastos Mensais — cartão-resumo do mês + um cartão por categoria */
+.month-summary-card{padding-bottom:20px;}
+.month-summary-head{display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap;}
+.month-summary-head h3{font-size:19px;}
+.month-summary-head .hint{font-size:11px; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-soft);}
+.total-row-bar{
+  display:flex; justify-content:space-between; align-items:center; margin-top:16px;
+  background:var(--forest); color:var(--on-dark); border-radius:4px; padding:14px 18px;
+}
+.total-row-bar span:first-child{font-size:11px; font-family:'IBM Plex Mono',monospace; text-transform:uppercase; letter-spacing:0.05em; opacity:0.85;}
+.total-row-bar .mono{font-family:'IBM Plex Mono',monospace; font-size:18px; font-weight:700;}
+
+.cat-card{padding:18px 22px 0; overflow:hidden;}
+.cat-card .subtotal-bar{margin:14px -22px 0; border-radius:0 0 3px 3px; padding:14px 22px;}
+.cat-card-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;}
+.cat-name-input{
+  border:none; background:none; font-family:'Fraunces',serif; font-weight:700; font-size:16.5px;
+  color:var(--forest); padding:3px 0; width:auto; max-width:75%;
+}
+.cat-name-input:focus{outline:none; border-bottom:1px dashed var(--gold);}
+.cat-remove-btn{background:none; border:none; color:var(--ink-soft); opacity:0.4; font-size:13px; padding:5px 6px; border-radius:3px; flex-shrink:0;}
+@media (hover:hover) and (pointer:fine){ .cat-remove-btn:hover{opacity:1; background:var(--rust-pale); color:var(--rust);} }
+@media (hover:none){ .cat-remove-btn{opacity:0.7;} }
+table.cat-items-table tfoot tr.total-row td{font-size:12.5px; text-transform:uppercase; letter-spacing:0.04em;}
+table.cat-items-table tfoot tr.total-row td.num{font-size:15px; text-transform:none; letter-spacing:0;}
+.cat-add-row{text-align:center; padding:10px 0 4px;}
+
+/* Bloco de Notas — lista de notas estilo iPhone */
+.note-card{display:flex; justify-content:space-between; align-items:flex-start; gap:14px; padding:16px 20px; cursor:pointer;}
+.note-title{font-size:15.5px; margin-bottom:4px;}
+.note-meta{font-size:12px; color:var(--ink-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.note-trash{font-size:14px; flex-shrink:0; padding:4px 6px; opacity:0.55;}
+#noteBody:focus{outline:none;}
+@media (hover:hover) and (pointer:fine){
+  .note-card:hover{border-color:var(--gold-light);}
+  .note-trash:hover{opacity:1;}
+}
+@media (hover:none){ .note-trash{opacity:0.8;} }
+.pill-add-btn{
+  background:none; border:1px dashed var(--paper-line); color:var(--ink-soft); border-radius:20px;
+  padding:8px 16px; font-family:'IBM Plex Mono',monospace; font-size:12px;
+}
+@media (hover:hover) and (pointer:fine){ .pill-add-btn:hover{border-color:var(--gold); color:var(--forest);} }
 td.num, th.num{text-align:right; font-family:'IBM Plex Mono',monospace;}
 td input[type=text], td input[type=date], td select{width:100%; min-width:90px; border:1px solid transparent; background:transparent; padding:7px 6px; border-radius:2px; font-size:13.5px; color:var(--ink);}
 td input.money{width:100%; min-width:90px; border:1px solid transparent; background:transparent; padding:7px 6px; border-radius:2px; font-size:13.5px; color:var(--ink); text-align:right; font-family:'IBM Plex Mono',monospace;}
@@ -178,10 +309,10 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
 
 .icon-btn{background:none; border:none; color:var(--ink-soft); font-size:16px; padding:5px 7px; border-radius:2px;}
 
-.btn{background:var(--forest); color:var(--white); border:none; padding:10px 16px; border-radius:2px; font-size:13px; font-weight:600; letter-spacing:0.02em;}
+.btn{background:var(--forest); color:var(--on-dark); border:none; padding:10px 16px; border-radius:2px; font-size:13px; font-weight:600; letter-spacing:0.02em;}
 .btn.secondary{background:none; border:1.5px solid var(--forest); color:var(--forest);}
 .btn.small{padding:7px 12px; font-size:12px;}
-.btn.gold{background:var(--gold); color:var(--white);}
+.btn.gold{background:var(--gold); color:var(--on-dark);}
 .btn.link{background:none; border:none; color:var(--forest); text-decoration:underline; padding:4px 0; font-weight:400;}
 @media (hover:hover) and (pointer:fine){
   td input:hover, td select:hover{border-color:var(--paper-line);}
@@ -201,7 +332,7 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
 
 .empty-state{text-align:center; padding:34px 20px; color:var(--ink-soft); font-size:14px;}
 
-.save-toast{position:fixed; bottom:22px; right:26px; background:var(--forest); color:var(--white); padding:10px 18px; border-radius:3px; font-size:12.5px; font-family:'IBM Plex Mono',monospace; opacity:0; transform:translateY(8px); transition:opacity .25s, transform .25s; pointer-events:none; box-shadow:var(--shadow); z-index:50; max-width:80vw;}
+.save-toast{position:fixed; bottom:22px; right:26px; background:var(--forest); color:var(--on-dark); padding:10px 18px; border-radius:3px; font-size:12.5px; font-family:'IBM Plex Mono',monospace; opacity:0; transform:translateY(8px); transition:opacity .25s, transform .25s; pointer-events:none; box-shadow:var(--shadow); z-index:50; max-width:80vw;}
 .save-toast.show{opacity:1; transform:translateY(0);}
 .save-toast.error{background:var(--rust);}
 
@@ -233,7 +364,7 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
 
   .mobile-header{
     display:flex; align-items:center; justify-content:space-between;
-    position:sticky; top:0; z-index:40; background:var(--forest); color:var(--white);
+    position:sticky; top:0; z-index:40; background:var(--forest); color:var(--on-dark);
     padding:12px 16px; gap:10px; box-shadow:0 2px 10px rgba(0,0,0,0.15);
   }
   .mobile-header .mh-left{display:flex; align-items:center; gap:10px; min-width:0;}
@@ -243,7 +374,7 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
     font-family:'Fraunces',serif; font-weight:700; font-size:14px; color:var(--gold-light);
   }
   .mobile-header .mh-title{font-family:'Fraunces',serif; font-weight:700; font-size:16px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
-  .mh-burger{background:none; border:none; color:var(--white); font-size:22px; padding:6px 8px; line-height:1;}
+  .mh-burger{background:none; border:none; color:var(--on-dark); font-size:22px; padding:6px 8px; line-height:1;}
 
   .drawer-overlay{
     display:block; position:fixed; inset:0; background:rgba(15,25,20,0.5); z-index:60;
@@ -252,7 +383,7 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
   .drawer-overlay.open{opacity:1; pointer-events:auto;}
   .drawer{
     display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; width:84%; max-width:310px;
-    background:var(--forest); color:var(--white); z-index:70; overflow-y:auto;
+    background:var(--forest); color:var(--on-dark); z-index:70; overflow-y:auto;
     transform:translateX(-105%); transition:transform .25s ease;
   }
   .drawer.open{transform:translateX(0);}
@@ -278,7 +409,7 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
   }
   .bottom-tab .bt-icon svg{width:15px; height:15px;}
   .bottom-tab.active{color:var(--forest); font-weight:700;}
-  .bottom-tab.active .bt-icon{color:var(--white); background:var(--forest); border-color:var(--forest);}
+  .bottom-tab.active .bt-icon{color:var(--on-dark); background:var(--forest); border-color:var(--forest);}
 
   .main{padding:14px 12px 88px;}
   .page-header{flex-direction:column; margin-bottom:18px;}
@@ -296,7 +427,7 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
   /* Tabelas viram cartões empilhados — acaba o arrastar horizontal */
   table.responsive-table{width:100%;}
   table.responsive-table thead{display:none;}
-  table.responsive-table, table.responsive-table tbody, table.responsive-table tr, table.responsive-table td{
+  table.responsive-table, table.responsive-table tbody, table.responsive-table tfoot, table.responsive-table tr, table.responsive-table td{
     display:block; width:100%;
   }
   table.responsive-table tr{
@@ -390,7 +521,7 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
 <div class="auth-screen" id="authScreen" style="display:none;">
   <div class="auth-card">
     <div class="auth-brand">
-      <div class="mark"><svg viewBox="0 0 24 24" fill="none" style="width:60%;height:60%"><path d="M12 3v15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M4.5 7h15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M4.5 7l-3 6.8a4 4 0 0 0 8.3 0L4.5 7" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M19.5 7l-3 6.8a4 4 0 0 0 8.3 0L19.5 7" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M8 21h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div>
+      <div class="mark"><svg viewBox="0 0 24 24" style="width:62%;height:62%"><text x="12" y="12.5" text-anchor="middle" dominant-baseline="central" font-family="Fraunces, Georgia, serif" font-weight="700" font-size="15.5" fill="currentColor">B</text></svg></div>
       <h1>Balance</h1>
       <div class="sub">acesso pela sua conta</div>
     </div>
@@ -439,19 +570,23 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
   <div class="sidebar">
     <div class="brand" style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px;">
       <div style="display:flex; gap:10px;">
-        <div class="mark"><svg viewBox="0 0 24 24" fill="none" style="width:60%;height:60%"><path d="M12 3v15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M4.5 7h15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M4.5 7l-3 6.8a4 4 0 0 0 8.3 0L4.5 7" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M19.5 7l-3 6.8a4 4 0 0 0 8.3 0L19.5 7" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M8 21h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div>
+        <div class="mark"><svg viewBox="0 0 24 24" style="width:62%;height:62%"><text x="12" y="12.5" text-anchor="middle" dominant-baseline="central" font-family="Fraunces, Georgia, serif" font-weight="700" font-size="15.5" fill="currentColor">B</text></svg></div>
         <div>
           <h1>Balance</h1>
           <div class="sub">controle financeiro</div>
         </div>
       </div>
-      <button class="bell-btn" id="btnBellDesktop" title="Notificações" style="border-color:rgba(251,249,241,0.3); color:var(--white);">
-        🔔<span class="bell-dot" id="bellDotDesktop"></span>
+      <button class="bell-btn" id="btnBellDesktop" title="Notificações" style="border-color:rgba(251,249,241,0.3); color:var(--on-dark);">
+        <span class="icon-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 3.5 1 5 2 6H4c1-1 2-2.5 2-6Z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg></span><span class="bell-dot" id="bellDotDesktop"></span>
       </button>
     </div>
     <div class="nav" id="navList"></div>
     <div class="user-badge"><span class="dot"></span> <b id="currentUserLabel"></b></div>
     <div class="sidebar-footer">
+      <div class="quick-actions quick-actions-footer">
+        <button class="qa-btn js-save-btn" id="btnSaveDesktop" title="Salvar alterações"><span class="ico icon-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l3 3v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"/><path d="M8 4v5h7V4"/><path d="M8 14h8v6H8z"/></svg></span><span class="js-save-label">salvar</span></button>
+        <button class="qa-btn" id="btnSettingsDesktop" title="Configurações"><span class="ico icon-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.97 7.97 0 0 0 0-2l2-1.5-2-3.4-2.4 1a8 8 0 0 0-1.7-1L15 3h-4l-.3 2.6a8 8 0 0 0-1.7 1l-2.4-1-2 3.4L6.6 11a7.97 7.97 0 0 0 0 2l-2 1.5 2 3.4 2.4-1a8 8 0 0 0 1.7 1L11 21h4l.3-2.6a8 8 0 0 0 1.7-1l2.4 1 2-3.4Z"/></svg></span><span>ajustes</span></button>
+      </div>
       Dados salvos na sua conta
       <div>
         <button id="btnExport">Exportar backup</button>
@@ -464,12 +599,15 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
 
   <div class="mobile-header" id="mobileHeader">
     <div class="mh-left">
-      <div class="mh-mark"><svg viewBox="0 0 24 24" fill="none" style="width:60%;height:60%"><path d="M12 3v15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M4.5 7h15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M4.5 7l-3 6.8a4 4 0 0 0 8.3 0L4.5 7" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M19.5 7l-3 6.8a4 4 0 0 0 8.3 0L19.5 7" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M8 21h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div>
+      <div class="mh-mark"><svg viewBox="0 0 24 24" style="width:62%;height:62%"><text x="12" y="12.5" text-anchor="middle" dominant-baseline="central" font-family="Fraunces, Georgia, serif" font-weight="700" font-size="15.5" fill="currentColor">B</text></svg></div>
       <div class="mh-title" id="mobileHeaderTitle">Balance</div>
     </div>
     <div class="header-actions">
-      <button class="bell-btn" id="btnBellMobile" title="Notificações" style="border-color:rgba(251,249,241,0.3); color:var(--white);">
-        🔔<span class="bell-dot" id="bellDotMobile"></span>
+      <button class="hdr-icon-btn js-save-btn" id="btnSaveMobile" title="Salvar alterações" style="border-color:rgba(251,249,241,0.3); color:var(--on-dark);">
+        <span class="icon-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l3 3v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"/><path d="M8 4v5h7V4"/><path d="M8 14h8v6H8z"/></svg></span><span class="js-save-label">salvar</span><span class="save-dot"></span>
+      </button>
+      <button class="bell-btn" id="btnBellMobile" title="Notificações" style="border-color:rgba(251,249,241,0.3); color:var(--on-dark);">
+        <span class="icon-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 3.5 1 5 2 6H4c1-1 2-2.5 2-6Z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg></span><span class="bell-dot" id="bellDotMobile"></span>
       </button>
       <button class="mh-burger" id="btnOpenDrawer" aria-label="Menu">☰</button>
     </div>
@@ -483,7 +621,7 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
   <div class="drawer-overlay" id="drawerOverlay"></div>
   <div class="drawer" id="drawer">
     <div class="brand">
-      <div class="mark"><svg viewBox="0 0 24 24" fill="none" style="width:60%;height:60%"><path d="M12 3v15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M4.5 7h15" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M4.5 7l-3 6.8a4 4 0 0 0 8.3 0L4.5 7" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M19.5 7l-3 6.8a4 4 0 0 0 8.3 0L19.5 7" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M8 21h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div>
+      <div class="mark"><svg viewBox="0 0 24 24" style="width:62%;height:62%"><text x="12" y="12.5" text-anchor="middle" dominant-baseline="central" font-family="Fraunces, Georgia, serif" font-weight="700" font-size="15.5" fill="currentColor">B</text></svg></div>
       <div>
         <h1>Balance</h1>
         <div class="sub">controle financeiro</div>
@@ -492,6 +630,10 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
     <div class="nav" id="navListDrawer"></div>
     <div class="user-badge"><span class="dot"></span> <b id="currentUserLabelDrawer"></b></div>
     <div class="sidebar-footer">
+      <div class="quick-actions quick-actions-footer">
+        <button class="qa-btn js-save-btn" id="btnSaveDrawer" title="Salvar alterações"><span class="ico icon-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l3 3v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z"/><path d="M8 4v5h7V4"/><path d="M8 14h8v6H8z"/></svg></span><span class="js-save-label">salvar</span></button>
+        <button class="qa-btn" id="btnSettingsDrawer" title="Configurações"><span class="ico icon-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 13a7.97 7.97 0 0 0 0-2l2-1.5-2-3.4-2.4 1a8 8 0 0 0-1.7-1L15 3h-4l-.3 2.6a8 8 0 0 0-1.7 1l-2.4-1-2 3.4L6.6 11a7.97 7.97 0 0 0 0 2l-2 1.5 2 3.4 2.4-1a8 8 0 0 0 1.7 1L11 21h4l.3-2.6a8 8 0 0 0 1.7-1l2.4 1 2-3.4Z"/></svg></span><span>ajustes</span></button>
+      </div>
       Dados salvos na sua conta
       <div>
         <button id="btnExportDrawer">Exportar backup</button>
@@ -504,6 +646,48 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
   <div class="bottom-tabbar" id="bottomTabbar"></div>
 
   <div class="main"><div id="sections"></div></div>
+</div>
+
+<div class="modal-overlay" id="settingsOverlay"></div>
+<div class="settings-modal" id="settingsModal">
+  <div class="settings-head">
+    <h3>Configurações</h3>
+    <button id="btnCloseSettings" aria-label="Fechar">✕</button>
+  </div>
+  <div class="settings-body">
+    <section class="settings-section">
+      <h4>Aparência</h4>
+      <div class="theme-toggle">
+        <button class="theme-opt" id="themeLightBtn" type="button">☀️ Claro</button>
+        <button class="theme-opt" id="themeDarkBtn" type="button">🌙 Escuro</button>
+      </div>
+    </section>
+
+    <section class="settings-section">
+      <h4>Dados pessoais</h4>
+      <div class="settings-field"><label>Nome</label><input type="text" id="settingsName"></div>
+      <div class="settings-field"><label>E-mail</label><input type="email" id="settingsEmail" disabled></div>
+      <button class="btn secondary small" id="btnSaveProfile" type="button">Salvar dados pessoais</button>
+      <div class="settings-msg" id="profileMsg"></div>
+    </section>
+
+    <section class="settings-section">
+      <h4>Segurança</h4>
+      <div class="settings-field"><label>Nova senha</label><input type="password" id="settingsNewPass" autocomplete="new-password"></div>
+      <div class="settings-field"><label>Confirme a nova senha</label><input type="password" id="settingsNewPass2" autocomplete="new-password"></div>
+      <button class="btn secondary small" id="btnChangePass" type="button">Trocar senha</button>
+      <div class="settings-msg" id="passMsg"></div>
+    </section>
+
+    <section class="settings-section">
+      <h4>Dados do app</h4>
+      <p class="settings-desc">Exporte um backup completo dos seus dados ou importe um arquivo salvo antes.</p>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn secondary small" id="btnExportSettings" type="button">Exportar backup</button>
+        <button class="btn secondary small" id="btnImportSettings" type="button">Importar backup</button>
+      </div>
+    </section>
+  </div>
 </div>
 
 <div class="save-toast" id="saveToast">✓ salvo</div>
@@ -538,7 +722,10 @@ function parseMoney(v){
 }
 function moneyDisplay(v){
   if(v===null||v===undefined||v==='') return '';
-  return String(v).replace('.', ',');
+  const n = Number(v);
+  if(isNaN(n)) return String(v).replace('.', ',');
+  // formata com separador de milhar "." e 2 casas decimais, ex: 20000 -> 20.000,00
+  return n.toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
 }
 function bindMoneyInput(inputEl, getVal, setVal, onChange){
   inputEl.value = moneyDisplay(getVal());
@@ -565,8 +752,9 @@ function emptyState(){
     investmentSections: {}, // seções "Investimentos" duplicadas (id da seção -> lista de investimentos)
     realInvestSections: {}, // seções "Investimento Real" duplicadas (id da seção -> {initialValue, months})
     wallet: { monthlyGoal: 0, items: [] }, // "Carteira de Investimentos"
-    notes: '', // "Bloco de Notas"
+    notesList: [], // "Bloco de Notas" — lista de notas (estilo iPhone)
     navConfig: null, // preenchido por ensureNavConfig()
+    deletedCoreSections: [], // ids de seções padrão excluídas permanentemente (não devem ser recriadas)
     lastUpdated: null, selectedMonth: null, dashboardMonth: null,
   };
 }
@@ -575,6 +763,7 @@ let state = null;
 let currentSession = null; // sessão do Supabase (user + token)
 let saveTimer = null;
 let saving = false;
+let dirty = false; // true quando há alterações ainda não salvas manualmente
 
 async function loadStateFromServer(){
   const userId = currentSession.user.id;
@@ -588,29 +777,58 @@ async function loadStateFromServer(){
   }
 }
 
+// O app não salva mais sozinho a cada alteração — só marca que existe algo
+// pendente e atualiza os indicadores. O salvamento de fato só acontece
+// quando o usuário aperta o botão "Salvar" (ver manualSave()).
 function scheduleSave(){
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(persistState, 700);
+  dirty = true;
+  updateSaveIndicators();
 }
 
 async function persistState(){
-  if(!currentSession) return;
+  if(!currentSession) return false;
   state.lastUpdated = new Date().toISOString();
   saving = true;
+  updateSaveIndicators();
   try{
     const { error } = await sb.from('financial_data')
       .upsert({ user_id: currentSession.user.id, data: state, updated_at: new Date().toISOString() });
     if(error) throw error;
+    dirty = false;
     showToast('✓ salvo', false);
     renderStampAll();
     renderNotifications();
+    return true;
   }catch(e){
     console.error('Falha ao salvar', e);
     showToast('Não foi possível salvar. Verifique sua conexão e tente novamente.', true);
+    return false;
   }finally{
     saving = false;
+    updateSaveIndicators();
   }
 }
+
+// chamado pelo clique nos botões "Salvar" espalhados pela interface
+async function manualSave(){
+  if(saving) return;
+  await persistState();
+}
+
+function updateSaveIndicators(){
+  document.querySelectorAll('.js-save-btn').forEach(btn=>{
+    btn.classList.toggle('is-dirty', dirty && !saving);
+    btn.classList.toggle('is-saving', saving);
+    btn.disabled = saving;
+    const label = btn.querySelector('.js-save-label');
+    if(label) label.textContent = saving ? 'salvando…' : (dirty ? 'salvar' : 'salvo');
+  });
+}
+
+// avisa antes de fechar/recarregar a aba se houver alterações não salvas
+window.addEventListener('beforeunload', (e)=>{
+  if(dirty){ e.preventDefault(); e.returnValue = ''; }
+});
 
 function showToast(msg, isError){
   const t = document.getElementById('saveToast');
@@ -657,7 +875,9 @@ function navIcon(kind){
 
 function ensureNavConfig(){
   if(!Array.isArray(state.navConfig)) state.navConfig = [];
+  if(!Array.isArray(state.deletedCoreSections)) state.deletedCoreSections = [];
   DEFAULT_NAV.forEach(def=>{
+    if(state.deletedCoreSections.includes(def.id)) return; // excluída permanentemente: não recriar
     if(!state.navConfig.find(n=>n.id===def.id)){
       state.navConfig.push({id:def.id, label:def.label, hidden:false, core:true, kind:def.id});
     }
@@ -721,7 +941,7 @@ function buildNavInto(containerId, visible, hidden, withManage){
           <span class="nhi-label">${escapeHtml(s.label)}</span>
           <span class="nhi-actions">
             <span data-restore="${escAttr(s.id)}">restaurar</span>
-            <span data-permadelete="${escAttr(s.id)}" class="nhi-danger">excluir permanente</span>
+            <button class="nhi-trash-btn" data-permadelete="${escAttr(s.id)}" title="excluir permanentemente">🗑</button>
           </span>
         </div>`).join('')}
     </div>` : '';
@@ -915,12 +1135,12 @@ function wipeSectionData(cfg){
       state.customSections = state.customSections.filter(c=>c.id!==cfg.id);
       break;
     case 'carteira': state.wallet = { monthlyGoal:0, items:[] }; carteiraDetailId = null; break;
-    case 'notas': state.notes = ''; break;
+    case 'notas': state.notes = ''; state.notesList = []; notesOpenId = null; break;
     default: break; // dashboard: nada para apagar
   }
 }
 
-function onPermanentDeleteNavItem(id){
+async function onPermanentDeleteNavItem(id){
   const cfg = state.navConfig.find(n=>n.id===id);
   if(!cfg) return;
   if(!confirm(`Excluir "${cfg.label}" PERMANENTEMENTE?\n\nTodos os dados dessa seção serão apagados e não será possível recuperar (diferente de "restaurar").`)) return;
@@ -928,14 +1148,17 @@ function onPermanentDeleteNavItem(id){
   wipeSectionData(cfg);
 
   if(cfg.core){
-    // fica oculta no menu (para não ser recriada do zero pelo ensureNavConfig), mas sem nenhum dado
-  } else {
-    state.navConfig = state.navConfig.filter(n=>n.id!==id);
+    // registra a exclusão pra ensureNavConfig não recriar essa seção padrão do zero,
+    // e remove o item da lista de fato (some da lista de "seções ocultas")
+    if(!Array.isArray(state.deletedCoreSections)) state.deletedCoreSections = [];
+    if(!state.deletedCoreSections.includes(id)) state.deletedCoreSections.push(id);
   }
+  state.navConfig = state.navConfig.filter(n=>n.id!==id);
   if(activeSection===id) activeSection = null;
-  scheduleSave();
   renderNav();
   renderSection();
+  // exclusão permanente é destrutiva e irreversível: salva na hora, não espera o botão "Salvar"
+  await persistState();
 }
 
 function onDuplicateSection(id){
@@ -1205,7 +1428,8 @@ function renderDashboard(){
   const receitas = sal ? salaryTotal(sal) : 0;
   const saldo = receitas - gastos;
   const pendente = receivablesPendingTotal();
-  const investTotalBaixa = investmentsTotal('investimentos', false);
+  refreshWalletBalances();
+  const walletTotal = getWallet().items.reduce((s,it)=>s+(Number(it.saldo)||0),0);
 
   // "tem dados de verdade" = pelo menos um mês com gasto OU salário lançado (não só meses vazios)
   const hasRealData = months.some(m=>monthTotal(m) > 0) || state.salaries.some(s=>salaryTotal(s) > 0);
@@ -1253,7 +1477,7 @@ function renderDashboard(){
         <h3>Resumo geral</h3>
         <div class="table-wrap"><table>
           <tr><td>A receber (pendente)</td><td class="num mono">${fmt(pendente)}</td></tr>
-          <tr><td>Investimentos (cenário conservador)</td><td class="num mono">${fmt(investTotalBaixa)}</td></tr>
+          <tr><td>Carteira de Investimentos</td><td class="num mono">${fmt(walletTotal)}</td></tr>
           <tr><td>Gastos fixos mensais</td><td class="num mono">${fmt(state.fixedExpenses.reduce((s,f)=>s+(Number(f.value)||0),0))}</td></tr>
           <tr><td>Empréstimos em aberto</td><td class="num mono">${fmt(state.loans.reduce((s,l)=>s+loanRemaining(l),0))}</td></tr>
         </table></div>
@@ -1307,14 +1531,14 @@ function drawChart(){
     chartRef = new Chart(canvas.getContext('2d'), {
       type:'bar',
       data:{ labels, datasets:[
-        {label:'Receita', data:salData, backgroundColor:'#A9823C', borderRadius:2},
+        {label:'Receita', data:salData, backgroundColor:'#8C8172', borderRadius:2},
         {label:'Gastos', data:gastosData, backgroundColor:'#8C3B32', borderRadius:2},
       ]},
       options:{
         responsive:true, maintainAspectRatio:false,
         plugins:{legend:{labels:{font:{family:'IBM Plex Mono', size:11}}}},
         scales:{
-          y:{ticks:{font:{family:'IBM Plex Mono', size:10}}, grid:{color:'#E8E0C8'}, beginAtZero:true},
+          y:{ticks:{font:{family:'IBM Plex Mono', size:10}}, grid:{color:'#E5E3DC'}, beginAtZero:true},
           x:{ticks:{font:{family:'IBM Plex Mono', size:11}}, grid:{display:false}}
         }
       }
@@ -1409,26 +1633,49 @@ function renderGastos(){
   }
 
   const total = monthTotal(month);
-  const card = document.createElement('div');
-  card.className = 'card';
-  card.innerHTML = `
-    <h3>${escapeHtml(month.label)} <span class="hint">${month.categories.length} categorias</span></h3>
-    <div class="table-wrap"><table class="responsive-table">
-      <thead><tr><th style="width:26%">Categoria</th><th>Descrição</th><th class="num" style="width:110px">Valor</th><th style="width:70px"></th></tr></thead>
-      <tbody id="catBody"></tbody>
-      <tfoot><tr class="total-row"><td colspan="2">TOTAL DO MÊS</td><td class="num" data-label="Total" id="month-total-cell">${fmt(total)}</td><td></td></tr></tfoot>
-    </table></div>
-    <button class="btn secondary small" id="btnAddCat" style="margin-top:14px;">+ nova categoria</button>
-  `;
-  content.appendChild(card);
 
-  const body = card.querySelector('#catBody');
+  const summaryCard = document.createElement('div');
+  summaryCard.className = 'card month-summary-card';
+  summaryCard.innerHTML = `
+    <div class="month-summary-head">
+      <h3>${escapeHtml(month.label)}</h3>
+      <span class="hint">${month.categories.length} categoria${month.categories.length===1?'':'s'}</span>
+    </div>
+    <div class="total-row-bar">
+      <span>Total do mês</span>
+      <span class="mono" id="month-total-cell">${fmt(total)}</span>
+    </div>
+  `;
+  content.appendChild(summaryCard);
+
   month.categories.forEach((cat, ci)=>{
     const catTotal = categoryTotal(cat);
+    const catCard = document.createElement('div');
+    catCard.className = 'card cat-card';
+    catCard.innerHTML = `
+      <div class="cat-card-head">
+        ${catInputHtml(cat.name)}
+        <button class="cat-remove-btn" data-role="delCat" title="remover categoria">🗑</button>
+      </div>
+      <div class="table-wrap"><table class="responsive-table cat-items-table">
+        <thead><tr><th>Descrição</th><th class="num" style="width:120px">Valor</th><th style="width:34px"></th></tr></thead>
+        <tbody id="catItemsBody-${ci}"></tbody>
+      </table></div>
+      <div class="cat-add-row"><button class="pill-add-btn" data-role="addItem">+ item em "${escAttr(cat.name)}"</button></div>
+      <div class="total-row-bar subtotal-bar">
+        <span>Subtotal da categoria</span>
+        <span class="mono" id="cat-total-${ci}">${fmt(catTotal)}</span>
+      </div>
+    `;
+    content.appendChild(catCard);
+
+    const catNameInput = catCard.querySelector('[data-role=catname]');
+    catNameInput.addEventListener('input', e=>{ cat.name = e.target.value; scheduleSave(); });
+
+    const body = catCard.querySelector('#catItemsBody-'+ci);
     cat.items.forEach((item, ii)=>{
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td${ii===0?' class="cell-plain"':''}>${ii===0 ? catInputHtml(cat.name) : ''}</td>
         <td data-label="Descrição"><input type="text" value="${escAttr(item.desc)}" data-role="desc"></td>
         <td class="num" data-label="Valor"><input type="text" inputmode="decimal" class="money" data-role="value"></td>
         <td><button class="icon-btn" data-role="delItem" title="remover item">✕</button></td>
@@ -1436,42 +1683,33 @@ function renderGastos(){
       tr.querySelector('[data-role=desc]').addEventListener('input', e=>{ item.desc=e.target.value; scheduleSave(); });
       bindMoneyInput(tr.querySelector('[data-role=value]'), ()=>item.value, v=>item.value=v, ()=>recalcGastos(month, ci));
       tr.querySelector('[data-role=delItem]').addEventListener('click', ()=>{ cat.items.splice(ii,1); scheduleSave(); renderSection(); });
-      if(ii===0){
-        const catInput = tr.querySelector('[data-role=catname]');
-        catInput.addEventListener('input', e=>{ cat.name = e.target.value; scheduleSave(); });
-      }
       body.appendChild(tr);
     });
-    const addRow = document.createElement('tr');
-    addRow.innerHTML = `
-      <td${cat.items.length===0?' class="cell-plain"':''}>${cat.items.length===0 ? catInputHtml(cat.name) : ''}</td>
-      <td><button class="btn secondary small" data-role="addItem">+ item em "${escAttr(cat.name)}"</button></td>
-      <td class="num mono" data-label="Subtotal da categoria" id="cat-total-${ci}" style="font-weight:600;">${fmt(catTotal)}</td>
-      <td><button class="icon-btn" data-role="delCat" title="remover categoria">🗑</button></td>
-    `;
-    addRow.querySelector('[data-role=addItem]').addEventListener('click', ()=>{
+
+    catCard.querySelector('[data-role=addItem]').addEventListener('click', ()=>{
       cat.items.push({desc:'', value:0}); scheduleSave(); renderSection();
     });
-    addRow.querySelector('[data-role=delCat]').addEventListener('click', ()=>{
+
+    catCard.querySelector('[data-role=delCat]').addEventListener('click', ()=>{
       if(!confirm(`Remover categoria "${cat.name}"?`)) return;
       month.categories.splice(ci,1); scheduleSave(); renderSection();
     });
-    if(cat.items.length===0){
-      const ci2 = addRow.querySelector('[data-role=catname]');
-      if(ci2) ci2.addEventListener('input', e=>{ cat.name = e.target.value; scheduleSave(); });
-    }
-    body.appendChild(addRow);
   });
 
-  card.querySelector('#btnAddCat').addEventListener('click', ()=>{
+  const addCatBtn = document.createElement('button');
+  addCatBtn.className = 'btn secondary small';
+  addCatBtn.style.marginTop = '2px';
+  addCatBtn.textContent = '+ nova categoria';
+  addCatBtn.addEventListener('click', ()=>{
     month.categories.push({name:'Nova categoria', items:[{desc:'', value:0}]});
     scheduleSave(); renderSection();
   });
+  content.appendChild(addCatBtn);
 
   return el;
 }
 function catInputHtml(name){
-  return `<input type="text" value="${escAttr(name)}" data-role="catname" style="font-weight:600; color:var(--forest);">`;
+  return `<input type="text" value="${escAttr(name)}" data-role="catname" class="cat-name-input">`;
 }
 function recalcGastos(month, ci){
   const catCell = document.getElementById('cat-total-'+ci);
@@ -2273,7 +2511,7 @@ function drawWalletChart(){
     const ctx = canvas.getContext('2d');
     chartWalletRef = new Chart(ctx, {
       type:'line',
-      data:{ labels, datasets:[{ label:seriesLabel, data:dataset, borderColor:'#173A2C', backgroundColor:'rgba(23,58,44,0.08)', borderWidth:2, borderDash:[5,4], tension:0.25, fill:true, pointRadius:0 }] },
+      data:{ labels, datasets:[{ label:seriesLabel, data:dataset, borderColor:'#34343A', backgroundColor:'rgba(52,52,58,0.08)', borderWidth:2, borderDash:[5,4], tension:0.25, fill:true, pointRadius:0 }] },
       options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ y:{ ticks:{ callback:v=>fmt(v) } } } }
     });
     canvas.style.display = 'block';
@@ -2302,7 +2540,7 @@ function drawWalletSimChart(){
     const ctx = canvas.getContext('2d');
     chartWalletSimRef = new Chart(ctx, {
       type:'line',
-      data:{ labels, datasets:[{ label:'Cenário simulado', data:dataset, borderColor:'#A9823C', backgroundColor:'rgba(169,130,60,0.10)', borderWidth:2, borderDash:[5,4], tension:0.25, fill:true, pointRadius:0 }] },
+      data:{ labels, datasets:[{ label:'Cenário simulado', data:dataset, borderColor:'#8C8172', backgroundColor:'rgba(140,129,114,0.12)', borderWidth:2, borderDash:[5,4], tension:0.25, fill:true, pointRadius:0 }] },
       options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ x:{ ticks:{ autoSkip:!stepYears, maxRotation:0 } }, y:{ ticks:{ callback:v=>fmt(v) } } } }
     });
   }catch(err){
@@ -2311,26 +2549,133 @@ function drawWalletSimChart(){
 }
 
 /* =========================================================
-   RENDER: BLOCO DE NOTAS — texto livre, salva sozinho
+   RENDER: BLOCO DE NOTAS — várias notas, estilo "Notas" do iPhone
 ========================================================= */
+let notesOpenId = null; // id da nota aberta pra edição (null = lista)
+
+function migrateNotes(){
+  if(!Array.isArray(state.notesList)){
+    state.notesList = [];
+    if(typeof state.notes === 'string' && state.notes.trim()){
+      state.notesList.push({ id: uid(), body: state.notes, updatedAt: new Date().toISOString() });
+    }
+    delete state.notes;
+    scheduleSave();
+  }
+}
+
+function formatNoteDate(iso){
+  try{
+    const d = new Date(iso);
+    const data = d.toLocaleDateString('pt-BR', {day:'2-digit', month:'short', year:'numeric'});
+    const hora = d.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+    return `${data} · ${hora}`;
+  }catch(e){ return ''; }
+}
+
 function renderNotas(){
+  migrateNotes();
   const el = document.createElement('div');
-  if(typeof state.notes !== 'string') state.notes = '';
+  if(notesOpenId && state.notesList.find(n=>n.id===notesOpenId)){
+    renderNoteEditor(el);
+  } else {
+    notesOpenId = null;
+    renderNotesList(el);
+  }
+  return el;
+}
+
+function renderNotesList(el){
+  const notes = [...state.notesList].sort((a,b)=> new Date(b.updatedAt) - new Date(a.updatedAt));
   el.innerHTML = `
     <div class="page-header">
-      <div><h2>Bloco de Notas</h2><div class="desc">Um espaço livre pra anotações — lembretes, ideias, o que quiser. Salva sozinho.</div></div>
+      <div><h2>Bloco de Notas</h2><div class="desc">Um espaço livre pra anotações — lembretes, ideias, o que quiser.</div></div>
+    </div>
+    <button class="btn secondary small" id="btnNewNote" style="margin-bottom:16px;">+ nova nota</button>
+    <div id="notesListWrap"></div>
+  `;
+  const wrap = el.querySelector('#notesListWrap');
+  if(notes.length===0){
+    wrap.innerHTML = `<div class="card" style="text-align:center; color:var(--ink-soft);">Nenhuma nota ainda. Toque em "+ nova nota" pra começar.</div>`;
+  } else {
+    notes.forEach(n=>{
+      const lines = String(n.body||'').split('\n');
+      const title = (n.title && n.title.trim()) || lines[0].trim() || 'Nova nota';
+      const snippet = (n.title && n.title.trim()) ? lines.join(' ').trim() : lines.slice(1).join(' ').trim();
+      const card = document.createElement('div');
+      card.className = 'card note-card';
+      card.innerHTML = `
+        <div class="note-card-body">
+          <h4 class="note-title">${escapeHtml(title)}</h4>
+          <div class="note-meta">${formatNoteDate(n.updatedAt)}${snippet ? ' — ' + escapeHtml(snippet.slice(0,90)) : ''}</div>
+        </div>
+        <button class="nhi-trash-btn note-trash" data-delnote="${escAttr(n.id)}" title="excluir nota">🗑</button>
+      `;
+      card.querySelector('.note-card-body').addEventListener('click', ()=>{ notesOpenId = n.id; renderSection(); });
+      card.querySelector('[data-delnote]').addEventListener('click', async (e)=>{
+        e.stopPropagation();
+        if(!confirm(`Excluir a nota "${title}"?`)) return;
+        state.notesList = state.notesList.filter(x=>x.id!==n.id);
+        renderSection();
+        await persistState();
+      });
+      wrap.appendChild(card);
+    });
+  }
+  el.querySelector('#btnNewNote').addEventListener('click', ()=>{
+    const note = { id: uid(), title:'', body:'', updatedAt: new Date().toISOString() };
+    state.notesList.unshift(note);
+    notesOpenId = note.id;
+    scheduleSave();
+    renderSection();
+  });
+}
+
+function renderNoteEditor(el){
+  const note = state.notesList.find(n=>n.id===notesOpenId);
+  const lines = String(note.body||'').split('\n');
+  const fallbackTitle = lines[0].trim();
+  el.innerHTML = `
+    <div class="page-header">
+      <div>
+        <button class="btn secondary small" id="btnBackNotes">← todas as notas</button>
+        <div class="desc" id="noteUpdatedLabel" style="margin-top:10px;">${formatNoteDate(note.updatedAt)}</div>
+      </div>
+      <button class="nhi-trash-btn" id="btnDeleteNote" title="excluir nota" style="font-size:17px;">🗑</button>
     </div>
     <div class="card">
-      <textarea id="notesArea" style="width:100%; min-height:420px; border:1px solid var(--paper-line); border-radius:var(--radius); padding:16px; font-family:'Source Serif 4',serif; font-size:15px; line-height:1.6; color:var(--ink); resize:vertical; background:var(--paper);" placeholder="Escreva aqui…"></textarea>
+      <input id="noteTitle" type="text" maxlength="120" placeholder="Título da nota" style="width:100%; border:none; padding:0 0 10px; margin-bottom:10px; border-bottom:1px solid var(--paper-line); background:none; font-family:'Fraunces',serif; font-weight:700; font-size:19px; color:var(--forest);">
+      <textarea id="noteBody" style="width:100%; min-height:400px; border:none; padding:0; font-family:'Source Serif 4',serif; font-size:15px; line-height:1.6; color:var(--ink); resize:vertical; background:none;" placeholder="Escreva aqui…"></textarea>
     </div>
   `;
-  const ta = el.querySelector('#notesArea');
-  ta.value = state.notes;
-  ta.addEventListener('input', ()=>{
-    state.notes = ta.value;
+  const titleInput = el.querySelector('#noteTitle');
+  titleInput.value = (note.title && note.title.trim()) ? note.title : '';
+  titleInput.placeholder = fallbackTitle ? fallbackTitle : 'Título da nota';
+  titleInput.addEventListener('input', ()=>{
+    note.title = titleInput.value;
+    note.updatedAt = new Date().toISOString();
+    const lbl = el.querySelector('#noteUpdatedLabel');
+    if(lbl) lbl.textContent = formatNoteDate(note.updatedAt);
     scheduleSave();
   });
-  return el;
+  const ta = el.querySelector('#noteBody');
+  ta.value = note.body;
+  ta.addEventListener('input', ()=>{
+    note.body = ta.value;
+    note.updatedAt = new Date().toISOString();
+    const lbl = el.querySelector('#noteUpdatedLabel');
+    if(lbl) lbl.textContent = formatNoteDate(note.updatedAt);
+    scheduleSave();
+  });
+  el.querySelector('#btnBackNotes').addEventListener('click', ()=>{ notesOpenId = null; renderSection(); });
+  el.querySelector('#btnDeleteNote').addEventListener('click', async ()=>{
+    if(!confirm('Excluir esta nota?')) return;
+    state.notesList = state.notesList.filter(n=>n.id!==note.id);
+    notesOpenId = null;
+    renderSection();
+    await persistState();
+  });
+  setTimeout(()=>ta.focus(), 0);
 }
 
 /* =========================================================
@@ -2551,14 +2896,14 @@ function drawRealInvestChart(sectionId){
     chartRealInvestRef = new Chart(canvas.getContext('2d'), {
       type:'line',
       data:{ labels, datasets:[
-        {label:'Aportado (acumulado)', data:aportadoAcumulado, borderColor:'#4B5A50', backgroundColor:'rgba(75,90,80,0.08)', borderDash:[4,3], tension:0.15, pointRadius:3, borderWidth:2},
-        {label:'Patrimônio (com juros)', data:montanteData, borderColor:'#173A2C', backgroundColor:'rgba(23,58,44,0.12)', fill:true, tension:0.25, pointRadius:3, borderWidth:2.5},
+        {label:'Aportado (acumulado)', data:aportadoAcumulado, borderColor:'#8A8A90', backgroundColor:'rgba(138,138,144,0.08)', borderDash:[4,3], tension:0.15, pointRadius:3, borderWidth:2},
+        {label:'Patrimônio (com juros)', data:montanteData, borderColor:'#34343A', backgroundColor:'rgba(52,52,58,0.12)', fill:true, tension:0.25, pointRadius:3, borderWidth:2.5},
       ]},
       options:{
         responsive:true, maintainAspectRatio:false,
         plugins:{legend:{labels:{font:{family:'IBM Plex Mono', size:11}}}},
         scales:{
-          y:{ticks:{font:{family:'IBM Plex Mono', size:10}}, grid:{color:'#E8E0C8'}, beginAtZero:true},
+          y:{ticks:{font:{family:'IBM Plex Mono', size:10}}, grid:{color:'#E5E3DC'}, beginAtZero:true},
           x:{ticks:{font:{family:'IBM Plex Mono', size:10}, maxRotation:0, autoSkip:true, maxTicksLimit:8}, grid:{display:false}}
         }
       }
@@ -2739,7 +3084,91 @@ function traduzErro(error){
 ========================================================= */
 document.addEventListener('DOMContentLoaded', boot);
 
+/* =========================================================
+   TEMA (claro / escuro)
+========================================================= */
+function applySavedTheme(){
+  const saved = localStorage.getItem('balance_theme') || 'light';
+  setTheme(saved, false);
+}
+function setTheme(mode, persist){
+  document.body.classList.toggle('theme-dark', mode === 'dark');
+  if(persist !== false) localStorage.setItem('balance_theme', mode);
+  const lightBtn = document.getElementById('themeLightBtn');
+  const darkBtn = document.getElementById('themeDarkBtn');
+  if(lightBtn && darkBtn){
+    lightBtn.classList.toggle('active', mode !== 'dark');
+    darkBtn.classList.toggle('active', mode === 'dark');
+  }
+}
+
+/* =========================================================
+   MODAL DE CONFIGURAÇÕES
+========================================================= */
+function openSettings(){
+  if(currentSession){
+    const u = currentSession.user;
+    document.getElementById('settingsEmail').value = u.email || '';
+    document.getElementById('settingsName').value = (u.user_metadata && u.user_metadata.full_name) || '';
+  }
+  document.getElementById('profileMsg').textContent = '';
+  document.getElementById('passMsg').textContent = '';
+  document.getElementById('settingsNewPass').value = '';
+  document.getElementById('settingsNewPass2').value = '';
+  document.getElementById('settingsOverlay').classList.add('open');
+  document.getElementById('settingsModal').classList.add('open');
+}
+function closeSettings(){
+  document.getElementById('settingsOverlay').classList.remove('open');
+  document.getElementById('settingsModal').classList.remove('open');
+}
+
+function wireSettingsModal(){
+  document.getElementById('btnCloseSettings').onclick = closeSettings;
+  document.getElementById('settingsOverlay').onclick = closeSettings;
+  document.getElementById('themeLightBtn').onclick = ()=> setTheme('light');
+  document.getElementById('themeDarkBtn').onclick = ()=> setTheme('dark');
+
+  document.getElementById('btnSaveProfile').onclick = async ()=>{
+    const msg = document.getElementById('profileMsg');
+    const name = document.getElementById('settingsName').value.trim();
+    msg.textContent = 'salvando…'; msg.className = 'settings-msg';
+    try{
+      const { error } = await sb.auth.updateUser({ data:{ full_name: name } });
+      if(error) throw error;
+      const { data:{ session } } = await sb.auth.getSession();
+      currentSession = session;
+      const label = name || session.user.email;
+      document.getElementById('currentUserLabel').textContent = label;
+      document.getElementById('currentUserLabelDrawer').textContent = label;
+      msg.textContent = 'Dados salvos.'; msg.className = 'settings-msg ok';
+    }catch(e){
+      msg.textContent = traduzErro(e); msg.className = 'settings-msg err';
+    }
+  };
+
+  document.getElementById('btnChangePass').onclick = async ()=>{
+    const msg = document.getElementById('passMsg');
+    const p1 = document.getElementById('settingsNewPass').value;
+    const p2 = document.getElementById('settingsNewPass2').value;
+    if(p1.length < 6){ msg.textContent = 'A senha precisa ter pelo menos 6 caracteres.'; msg.className = 'settings-msg err'; return; }
+    if(p1 !== p2){ msg.textContent = 'As senhas não conferem.'; msg.className = 'settings-msg err'; return; }
+    msg.textContent = 'salvando…'; msg.className = 'settings-msg';
+    try{
+      const { error } = await sb.auth.updateUser({ password: p1 });
+      if(error) throw error;
+      document.getElementById('settingsNewPass').value = '';
+      document.getElementById('settingsNewPass2').value = '';
+      msg.textContent = 'Senha alterada com sucesso.'; msg.className = 'settings-msg ok';
+    }catch(e){
+      msg.textContent = traduzErro(e); msg.className = 'settings-msg err';
+    }
+  };
+}
+
 async function boot(){
+  applySavedTheme();
+  wireSettingsModal();
   document.getElementById('loadingScreen').style.display = 'none';
 
   if(!supabaseReady){
@@ -2805,6 +3234,10 @@ function wireAppButtons(){
   };
   const doImportClick = ()=>{ importFile.click(); };
   const doLogout = async ()=>{
+    if(dirty){
+      const ok = confirm('Você tem alterações não salvas. Sair mesmo assim e perder essas alterações?');
+      if(!ok) return;
+    }
     await sb.auth.signOut();
     currentSession = null;
     state = null;
@@ -2818,10 +3251,19 @@ function wireAppButtons(){
 
   document.getElementById('btnExport').onclick = doExport;
   document.getElementById('btnExportDrawer').onclick = doExport;
+  document.getElementById('btnExportSettings').onclick = doExport;
   document.getElementById('btnImport').onclick = doImportClick;
   document.getElementById('btnImportDrawer').onclick = doImportClick;
+  document.getElementById('btnImportSettings').onclick = doImportClick;
   document.getElementById('btnLogout').onclick = doLogout;
   document.getElementById('btnLogoutDrawer').onclick = doLogout;
+
+  document.getElementById('btnSaveDesktop').onclick = manualSave;
+  document.getElementById('btnSaveMobile').onclick = manualSave;
+  document.getElementById('btnSaveDrawer').onclick = manualSave;
+  document.getElementById('btnSettingsDesktop').onclick = ()=>{ openSettings(); };
+  document.getElementById('btnSettingsDrawer').onclick = ()=>{ closeDrawer(); openSettings(); };
+  updateSaveIndicators();
 
   importFile.onchange = async (e)=>{
     const file = e.target.files[0];
