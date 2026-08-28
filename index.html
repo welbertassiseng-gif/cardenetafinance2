@@ -252,7 +252,7 @@ input,select{font-family:inherit;}
 .stat.neg{border-left-color:var(--rust); background:var(--rust-pale);}
 .stat.pos{border-left-color:var(--gold); background:#F3EAD2;}
 .stat .label{font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-soft); font-family:'JetBrains Mono',monospace;}
-.stat .value{font-family:'JetBrains Mono',monospace; font-size:23px; font-weight:600; color:var(--forest); margin-top:4px; word-break:break-word;}
+.stat .value{font-family:'JetBrains Mono',monospace; font-size:clamp(16px,5vw,23px); font-weight:600; color:var(--forest); margin-top:4px; white-space:nowrap; overflow:hidden;}
 .stat.neg .value{color:var(--rust);}
 
 .table-wrap{width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch;}
@@ -261,31 +261,45 @@ th{text-align:left; font-family:'JetBrains Mono',monospace; font-size:10.5px; te
 td{padding:7px 8px; border-bottom:1px solid var(--paper-line); vertical-align:middle;}
 tr.total-row td{font-weight:700; background:var(--forest); color:var(--on-dark); font-family:'JetBrains Mono',monospace; font-size:15px;}
 
-/* Gastos Mensais — cartão-resumo do mês + um cartão por categoria */
-.month-summary-card{padding-bottom:20px;}
-.month-summary-head{display:flex; justify-content:space-between; align-items:baseline; gap:12px; flex-wrap:wrap;}
-.month-summary-head h3{font-size:19px;}
-.month-summary-head .hint{font-size:11px; font-family:'JetBrains Mono',monospace; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-soft);}
-.total-row-bar{
-  display:flex; justify-content:space-between; align-items:center; margin-top:16px;
-  background:var(--forest); color:var(--on-dark); border-radius:4px; padding:14px 18px;
-}
-.total-row-bar span:first-child{font-size:11px; font-family:'JetBrains Mono',monospace; text-transform:uppercase; letter-spacing:0.05em; opacity:0.85;}
-.total-row-bar .mono{font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:700;}
+/* Gastos Mensais — navegação por mês, resumo com anel e categorias colapsáveis */
+.month-nav{display:flex; align-items:center; justify-content:center; gap:18px; padding:10px 0; border-bottom:1px solid var(--paper-line);}
+.month-nav-arrow{background:none; border:1px solid var(--paper-line); border-radius:50%; width:34px; height:34px; font-size:17px; color:var(--forest); display:flex; align-items:center; justify-content:center; line-height:1; flex-shrink:0;}
+.month-nav-arrow:disabled{opacity:0.3;}
+@media (hover:hover) and (pointer:fine){ .month-nav-arrow:not(:disabled):hover{border-color:var(--gold); color:var(--gold);} }
+.month-nav-label{font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:17px; min-width:150px; text-align:center;}
 
-.cat-card{padding:18px 22px 0; overflow:hidden;}
-.cat-card .subtotal-bar{margin:14px -22px 0; border-radius:0 0 3px 3px; padding:14px 22px;}
-.cat-card-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;}
+.month-summary-card{padding-bottom:22px;}
+.summary-total-row{display:flex; align-items:center; justify-content:space-between; gap:18px;}
+.summary-total-value{font-size:clamp(22px,7vw,32px); font-weight:700; color:var(--forest); white-space:nowrap; overflow:hidden;}
+.summary-total-label{font-size:13px; color:var(--ink-soft); margin-top:2px;}
+.summary-ring{width:88px; height:88px; flex-shrink:0;}
+
+.cats-card-label{font-family:'JetBrains Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-soft); margin-bottom:6px;}
+.cat-block{border-top:1px solid var(--paper-line); padding:14px 0;}
+.cat-block:first-of-type{border-top:none; padding-top:6px;}
+.cat-row{display:flex; align-items:center; gap:10px;}
+.cat-chevron{background:none; border:none; color:var(--ink-soft); font-size:14px; width:20px; height:20px; flex-shrink:0; transition:transform .15s ease; display:flex; align-items:center; justify-content:center;}
+.cat-chevron.is-open{transform:rotate(90deg);}
+.cat-badge{
+  width:30px; height:30px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+  color:#fff; font-family:'JetBrains Mono',monospace; font-weight:700; font-size:12.5px;
+}
 .cat-name-input{
-  border:none; background:none; font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:16.5px;
-  color:var(--forest); padding:3px 0; width:auto; max-width:75%;
+  border:none; background:none; font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:15.5px;
+  color:var(--ink); padding:3px 0; flex:1; min-width:0;
 }
 .cat-name-input:focus{outline:none; border-bottom:1px dashed var(--gold);}
-.cat-remove-btn{background:none; border:none; color:var(--ink-soft); opacity:0.4; font-size:13px; padding:5px 6px; border-radius:3px; flex-shrink:0;}
+.cat-row-total{font-size:14.5px; font-weight:600; color:var(--ink); white-space:nowrap; flex-shrink:0;}
+.cat-remove-btn{background:none; border:none; color:var(--ink-soft); opacity:0.4; font-size:13px; padding:5px 4px; border-radius:3px; flex-shrink:0;}
 @media (hover:hover) and (pointer:fine){ .cat-remove-btn:hover{opacity:1; background:var(--rust-pale); color:var(--rust);} }
 @media (hover:none){ .cat-remove-btn{opacity:0.7;} }
-table.cat-items-table tfoot tr.total-row td{font-size:12.5px; text-transform:uppercase; letter-spacing:0.04em;}
-table.cat-items-table tfoot tr.total-row td.num{font-size:15px; text-transform:none; letter-spacing:0;}
+.cat-items{margin-top:10px; padding-left:40px;}
+.item-row{display:flex; align-items:center; gap:10px; padding:8px 0; border-top:1px dashed var(--paper-line);}
+.item-row:first-child{border-top:none;}
+.item-dot{width:6px; height:6px; border-radius:50%; background:var(--paper-line); flex-shrink:0;}
+.item-desc-input{border:none; background:none; font-size:14px; color:var(--ink); padding:4px 0; flex:1; min-width:0;}
+.item-desc-input:focus{outline:none; border-bottom:1px dashed var(--gold);}
+.item-value-input{border:none !important; background:none !important; text-align:right; font-size:14px; width:110px; flex-shrink:0; padding:4px 2px !important;}
 .cat-add-row{text-align:center; padding:10px 0 4px;}
 
 /* Bloco de Notas — lista de notas estilo iPhone */
@@ -419,9 +433,9 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
   .card{padding:16px 15px;}
   th, td{padding:9px 7px;}
   .btn.small{padding:9px 12px; font-size:12.5px;}
-  .grid-3{grid-template-columns:1fr 1fr; gap:10px;}
+  .grid-3{grid-template-columns:1fr; gap:10px;}
   .stat{padding:12px 13px;}
-  .stat .value{font-size:18px;}
+  .stat .value{font-size:20px;}
   .stat .label{font-size:9px;}
   .toolbar{gap:8px;}
   .tag-select{padding:9px 12px; font-size:12.5px;}
@@ -454,6 +468,12 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
   table.responsive-table td input, table.responsive-table td select{text-align:right; max-width:62%;}
   table.responsive-table td.cell-plain{display:block; text-align:left; font-weight:600; color:var(--forest); border-bottom:none; padding-bottom:4px;}
   table.responsive-table td.cell-plain::before{content:none;}
+
+  /* Gastos Mensais no mobile: menos recuo e anel um pouco menor */
+  .cat-items{padding-left:22px;}
+  .summary-ring{width:72px; height:72px;}
+  .cat-badge{width:26px; height:26px; font-size:11px;}
+  .item-value-input{width:92px;}
 }
 @media(min-width:881px){
   .mobile-header, .drawer-overlay, .drawer, .bottom-tabbar{display:none !important;}
@@ -517,7 +537,8 @@ h1,h2,h3,h4{letter-spacing:-0.02em;}
 body.theme-dark h1, body.theme-dark h2, body.theme-dark h3, body.theme-dark h4,
 body.theme-dark .stat .value, body.theme-dark .cat-name-input,
 body.theme-dark .status-pill.recebido, body.theme-dark .notif-panel-head,
-body.theme-dark .modal-card h3, body.theme-dark .auth-brand h1{color:var(--ink);}
+body.theme-dark .modal-card h3, body.theme-dark .auth-brand h1,
+body.theme-dark .summary-total-value, body.theme-dark .month-nav-arrow{color:var(--ink);}
 body.theme-dark .btn{background:var(--gold); color:#08111F;}
 body.theme-dark .btn.secondary{background:none; color:var(--gold); border-color:var(--gold);}
 body.theme-dark .btn.link{color:var(--gold);}
@@ -1080,20 +1101,19 @@ const BOTTOM_TAB_LIMIT = 4;
 function renderBottomTabs(visible){
   const bar = document.getElementById('bottomTabbar');
   if(!bar) return;
-  const primary = visible.slice(0, BOTTOM_TAB_LIMIT);
-  const rest = visible.slice(BOTTOM_TAB_LIMIT);
+  // o botão "mais" foi removido: tocar no cabeçalho/☰ já abre o menu lateral com tudo.
+  // então usamos essa vaga da barra inferior pra um atalho direto pra Carteira de Investimentos.
+  const carteira = visible.find(v=>v.kind==='carteira');
+  let primary = visible.slice(0, BOTTOM_TAB_LIMIT);
+  if(carteira && !primary.find(p=>p.id===carteira.id)){
+    primary = primary.slice(0, BOTTOM_TAB_LIMIT-1).concat([carteira]);
+  }
   const tabHtml = (s)=>`
     <button class="bottom-tab ${s.id===activeSection?'active':''}" data-bnav="${escAttr(s.id)}">
       <span class="bt-icon">${navIcon(s.kind)}</span>
       <span class="bt-label">${escapeHtml(shortLabel(s.label))}</span>
     </button>`;
-  const moreActive = rest.some(s=>s.id===activeSection);
-  const moreHtml = rest.length ? `
-    <button class="bottom-tab more ${moreActive?'active':''}" data-bmore="1">
-      <span class="bt-icon">⋯</span>
-      <span class="bt-label">Mais</span>
-    </button>` : '';
-  bar.innerHTML = primary.map(tabHtml).join('') + moreHtml;
+  bar.innerHTML = primary.map(tabHtml).join('');
   bar.querySelectorAll('[data-bnav]').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       activeSection = btn.dataset.bnav;
@@ -1101,8 +1121,6 @@ function renderBottomTabs(visible){
       renderNav(); renderSection();
     });
   });
-  const moreBtn = bar.querySelector('[data-bmore]');
-  if(moreBtn) moreBtn.addEventListener('click', openDrawer);
 }
 function shortLabel(label){
   const l = String(label||'');
@@ -1833,18 +1851,49 @@ function drawChart(){
 /* =========================================================
    RENDER: GASTOS MENSAIS
 ========================================================= */
+const CAT_COLORS = ['#E11D48','#F97316','#EAB308','#22C55E','#0EA5E9','#6366F1','#D946EF','#F43F5E','#14B8A6','#A855F7'];
+let gastosCollapsedCats = new Set(); // nomes de categorias colapsadas (fica só na memória, não salva)
+
+function buildCategoryRing(categories, total){
+  const r = 50, cx = 60, cy = 60, circumference = 2*Math.PI*r;
+  if(!total || categories.length===0){
+    return `<svg viewBox="0 0 120 120" class="summary-ring"><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--paper-line)" stroke-width="12"/></svg>`;
+  }
+  const gapDeg = categories.length>1 ? 3 : 0;
+  let cursor = 0;
+  const arcs = categories.map((cat,i)=>{
+    const val = categoryTotal(cat);
+    const frac = total>0 ? val/total : 0;
+    const sweep = frac*360;
+    const startDeg = cursor;
+    cursor += sweep;
+    const color = CAT_COLORS[i % CAT_COLORS.length];
+    const segLen = Math.max((sweep-gapDeg)/360*circumference, 0);
+    const restLen = circumference-segLen;
+    const rotate = (startDeg-90).toFixed(2);
+    return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${segLen.toFixed(2)} ${restLen.toFixed(2)}" transform="rotate(${rotate} ${cx} ${cy})"/>`;
+  }).join('');
+  return `<svg viewBox="0 0 120 120" class="summary-ring">${arcs}</svg>`;
+}
+
 function renderGastos(){
   const el = document.createElement('div');
   if(!state.months.find(m=>m.id===state.selectedMonth) && state.months.length){
     state.selectedMonth = state.months[0].id;
   }
   const month = state.months.find(m=>m.id===state.selectedMonth);
+  const idx = month ? state.months.findIndex(m=>m.id===month.id) : -1;
 
   el.innerHTML = `
     <div class="page-header">
       <div><h2>Gastos Mensais</h2><div class="desc">Adicione categorias e itens à vontade. O subtotal de cada categoria e o total do mês somam sozinhos.</div></div>
     </div>
-    <div class="toolbar">
+    <div class="month-nav">
+      <button class="month-nav-arrow" id="btnPrevMonth" title="mês anterior" ${idx<=0?'disabled':''}>‹</button>
+      <div class="month-nav-label">${month ? escapeHtml(month.label) : '—'}</div>
+      <button class="month-nav-arrow" id="btnNextMonth" title="próximo mês" ${(idx<0||idx>=state.months.length-1)?'disabled':''}>›</button>
+    </div>
+    <div class="toolbar" style="margin-top:12px;">
       <select class="tag-select" id="monthSelect"></select>
       <button class="btn secondary small" id="btnNewMonth">+ novo mês</button>
       <button class="btn secondary small" id="btnDupMonth">duplicar mês atual</button>
@@ -1857,6 +1906,15 @@ function renderGastos(){
   const sel = el.querySelector('#monthSelect');
   sel.innerHTML = state.months.map(m=>`<option value="${m.id}" ${m.id===state.selectedMonth?'selected':''}>${escapeHtml(m.label)}</option>`).join('');
   sel.addEventListener('change', ()=>{ state.selectedMonth = sel.value; renderSection(); });
+
+  const prevBtn = el.querySelector('#btnPrevMonth');
+  const nextBtn = el.querySelector('#btnNextMonth');
+  if(prevBtn) prevBtn.addEventListener('click', ()=>{
+    if(idx>0){ state.selectedMonth = state.months[idx-1].id; renderSection(); }
+  });
+  if(nextBtn) nextBtn.addEventListener('click', ()=>{
+    if(idx>=0 && idx<state.months.length-1){ state.selectedMonth = state.months[idx+1].id; renderSection(); }
+  });
 
   el.querySelector('#btnNewMonth').addEventListener('click', ()=>{
     const label = prompt('Nome do novo mês (ex: Novembro / 2026):');
@@ -1911,62 +1969,86 @@ function renderGastos(){
   const summaryCard = document.createElement('div');
   summaryCard.className = 'card month-summary-card';
   summaryCard.innerHTML = `
-    <div class="month-summary-head">
-      <h3>${escapeHtml(month.label)}</h3>
-      <span class="hint">${month.categories.length} categoria${month.categories.length===1?'':'s'}</span>
-    </div>
-    <div class="total-row-bar">
-      <span>Total do mês</span>
-      <span class="mono" id="month-total-cell">${fmt(total)}</span>
+    <div class="summary-total-row">
+      <div>
+        <div class="summary-total-value mono">${fmt(total)}</div>
+        <div class="summary-total-label">total gasto</div>
+      </div>
+      ${buildCategoryRing(month.categories, total)}
     </div>
   `;
   content.appendChild(summaryCard);
 
+  const catsCard = document.createElement('div');
+  catsCard.className = 'card cats-card';
+  catsCard.innerHTML = `<div class="cats-card-label">Categorias</div><div id="catsListWrap"></div>`;
+  content.appendChild(catsCard);
+  const catsWrap = catsCard.querySelector('#catsListWrap');
+
   month.categories.forEach((cat, ci)=>{
     const catTotal = categoryTotal(cat);
-    const catCard = document.createElement('div');
-    catCard.className = 'card cat-card';
-    catCard.innerHTML = `
-      <div class="cat-card-head">
-        ${catInputHtml(cat.name)}
+    const color = CAT_COLORS[ci % CAT_COLORS.length];
+    const collapsed = gastosCollapsedCats.has(cat.name);
+    const block = document.createElement('div');
+    block.className = 'cat-block';
+    block.innerHTML = `
+      <div class="cat-row">
+        <button class="cat-chevron ${collapsed?'':'is-open'}" data-role="toggle" title="expandir/recolher">›</button>
+        <span class="cat-badge" style="background:${color};">${ci+1}</span>
+        <input type="text" value="${escAttr(cat.name)}" data-role="catname" class="cat-name-input" placeholder="nome da categoria">
+        <span class="cat-row-total mono" id="cat-total-${ci}">${fmt(catTotal)}</span>
         <button class="cat-remove-btn" data-role="delCat" title="remover categoria">🗑</button>
       </div>
-      <div class="table-wrap"><table class="responsive-table cat-items-table">
-        <thead><tr><th>Descrição</th><th class="num" style="width:120px">Valor</th><th style="width:34px"></th></tr></thead>
-        <tbody id="catItemsBody-${ci}"></tbody>
-      </table></div>
-      <div class="cat-add-row"><button class="pill-add-btn" data-role="addItem">+ item em "${escAttr(cat.name)}"</button></div>
-      <div class="total-row-bar subtotal-bar">
-        <span>Subtotal da categoria</span>
-        <span class="mono" id="cat-total-${ci}">${fmt(catTotal)}</span>
+      <div class="cat-items" data-role="items" style="display:${collapsed?'none':'block'};">
+        <div data-role="itemsList"></div>
+        <div class="cat-add-row"><button class="pill-add-btn" data-role="addItem">+ item em "${escAttr(cat.name)}"</button></div>
       </div>
     `;
-    content.appendChild(catCard);
+    catsWrap.appendChild(block);
 
-    const catNameInput = catCard.querySelector('[data-role=catname]');
-    catNameInput.addEventListener('input', e=>{ cat.name = e.target.value; scheduleSave(); });
-
-    const body = catCard.querySelector('#catItemsBody-'+ci);
-    cat.items.forEach((item, ii)=>{
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td data-label="Descrição"><input type="text" value="${escAttr(item.desc)}" data-role="desc"></td>
-        <td class="num" data-label="Valor"><input type="text" inputmode="decimal" class="money" data-role="value"></td>
-        <td><button class="icon-btn" data-role="delItem" title="remover item">✕</button></td>
-      `;
-      tr.querySelector('[data-role=desc]').addEventListener('input', e=>{ item.desc=e.target.value; scheduleSave(); });
-      bindMoneyInput(tr.querySelector('[data-role=value]'), ()=>item.value, v=>item.value=v, ()=>recalcGastos(month, ci));
-      tr.querySelector('[data-role=delItem]').addEventListener('click', ()=>{ cat.items.splice(ii,1); scheduleSave(); renderSection(); });
-      body.appendChild(tr);
+    const catNameInput = block.querySelector('[data-role=catname]');
+    catNameInput.addEventListener('input', e=>{
+      const oldName = cat.name;
+      cat.name = e.target.value;
+      if(gastosCollapsedCats.has(oldName)){ gastosCollapsedCats.delete(oldName); gastosCollapsedCats.add(cat.name); }
+      const addBtn = block.querySelector('[data-role=addItem]');
+      if(addBtn) addBtn.textContent = `+ item em "${cat.name}"`;
+      scheduleSave();
     });
 
-    catCard.querySelector('[data-role=addItem]').addEventListener('click', ()=>{
+    const itemsList = block.querySelector('[data-role=itemsList]');
+    cat.items.forEach((item, ii)=>{
+      const row = document.createElement('div');
+      row.className = 'item-row';
+      row.innerHTML = `
+        <span class="item-dot"></span>
+        <input type="text" value="${escAttr(item.desc)}" data-role="desc" class="item-desc-input" placeholder="descrição">
+        <input type="text" inputmode="decimal" class="money item-value-input" data-role="value">
+        <button class="icon-btn" data-role="delItem" title="remover item">✕</button>
+      `;
+      row.querySelector('[data-role=desc]').addEventListener('input', e=>{ item.desc=e.target.value; scheduleSave(); });
+      bindMoneyInput(row.querySelector('[data-role=value]'), ()=>item.value, v=>item.value=v, ()=>recalcGastos(month, ci));
+      row.querySelector('[data-role=delItem]').addEventListener('click', ()=>{ cat.items.splice(ii,1); scheduleSave(); renderSection(); });
+      itemsList.appendChild(row);
+    });
+
+    block.querySelector('[data-role=addItem]').addEventListener('click', ()=>{
       cat.items.push({desc:'', value:0}); scheduleSave(); renderSection();
     });
 
-    catCard.querySelector('[data-role=delCat]').addEventListener('click', ()=>{
+    block.querySelector('[data-role=delCat]').addEventListener('click', ()=>{
       if(!confirm(`Remover categoria "${cat.name}"?`)) return;
+      gastosCollapsedCats.delete(cat.name);
       month.categories.splice(ci,1); scheduleSave(); renderSection();
+    });
+
+    block.querySelector('[data-role=toggle]').addEventListener('click', ()=>{
+      const itemsEl = block.querySelector('[data-role=items]');
+      const chevron = block.querySelector('[data-role=toggle]');
+      const willCollapse = itemsEl.style.display !== 'none';
+      itemsEl.style.display = willCollapse ? 'none' : 'block';
+      chevron.classList.toggle('is-open', !willCollapse);
+      if(willCollapse) gastosCollapsedCats.add(cat.name); else gastosCollapsedCats.delete(cat.name);
     });
   });
 
@@ -1982,14 +2064,12 @@ function renderGastos(){
 
   return el;
 }
-function catInputHtml(name){
-  return `<input type="text" value="${escAttr(name)}" data-role="catname" class="cat-name-input">`;
-}
 function recalcGastos(month, ci){
   const catCell = document.getElementById('cat-total-'+ci);
   if(catCell) catCell.textContent = fmt(categoryTotal(month.categories[ci]));
-  const totalCell = document.getElementById('month-total-cell');
+  const totalCell = document.querySelector('.summary-total-value');
   if(totalCell) totalCell.textContent = fmt(monthTotal(month));
+  // o anel de proporção por categoria só recalcula num novo render (evita SVG piscando a cada tecla)
 }
 
 /* =========================================================
