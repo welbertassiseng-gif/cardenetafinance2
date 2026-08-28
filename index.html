@@ -230,6 +230,11 @@ input,select{font-family:inherit;}
 .notif-item.warn .ni-dot{background:var(--rust);}
 .notif-item.info .ni-dot{background:var(--gold);}
 .notif-empty{padding:24px 16px; text-align:center; color:var(--ink-soft); font-size:13px;}
+.notif-push-bar{padding:11px 16px; border-bottom:1px solid var(--paper-line); display:flex; align-items:center; gap:10px; justify-content:space-between;}
+.notif-push-bar .npb-txt{font-size:12px; line-height:1.4; color:var(--ink-soft);}
+.notif-push-bar.is-on .npb-txt{color:var(--forest); font-weight:600;}
+.notif-push-bar button{white-space:nowrap;}
+.notif-push-bar.hide-btn button{display:none;}
 @media(max-width:880px){
   .notif-panel{top:66px; right:12px; left:12px; width:auto;}
 }
@@ -709,8 +714,13 @@ tr.total-row td:last-child{border-radius:0 10px 10px 0;}
 
   <div class="notif-panel" id="notifPanel">
     <div class="notif-panel-head">Notificações <button id="btnCloseNotif">✕</button></div>
+    <div class="notif-push-bar" id="notifPushBar">
+      <div class="npb-txt" id="notifPushTxt">Receba esses alertas direto no celular.</div>
+      <button class="btn secondary small" id="btnEnablePush">ativar avisos</button>
+    </div>
     <div class="notif-list" id="notifList"></div>
   </div>
+
 
   <div class="drawer-overlay" id="drawerOverlay"></div>
   <div class="drawer" id="drawer">
@@ -1462,27 +1472,122 @@ function renderStampAll(){
 function computeNotifications(){
   const list = [];
   if(!state) return list;
+  const push = (id, type, title, text)=>list.push({id, type, title, text});
   const months = state.months || [];
   const lastMonth = months[months.length-1];
+  const receitasDe = (m)=>{ const s = state.salaries.find(x=>x.monthId===m.id); return s ? salaryTotal(s) : 0; };
+
   if(lastMonth){
     const sal = state.salaries.find(s=>s.monthId===lastMonth.id);
     const gastos = monthTotal(lastMonth);
     const receitas = sal ? salaryTotal(sal) : 0;
-    if(sal && (receitas - gastos) < 0){
-      list.push({type:'warn', text:`O saldo de ${lastMonth.label} está negativo: ${fmt(receitas-gastos)}.`});
+
+    // 1) média dos meses anteriores com gasto lançado
+    const anteriores = months.slice(0,-1).map(monthTotal).filter(v=>v>0);
+    if(anteriores.length >= 2 && gastos > 0){
+      const media = anteriores.reduce((a,b)=>a+b,0)/anteriores.length;
+      const diff = (gastos - media) / media;
+      if(diff >= 0.15){
+        push('gasto-acima', 'warn', 'Fique de olho nos gastos',
+          `Seus gastos em ${lastMonth.label} estão ${Math.round(diff*100)}% acima do normal (${fmt(gastos)} contra uma média de ${fmt(media)}).`);
+      } else if(diff <= -0.15){
+        push('gasto-abaixo', 'info', 'Mês redondo',
+          `Você gastou ${Math.round(Math.abs(diff)*100)}% menos que a sua média em ${lastMonth.label}. Bom momento pra reforçar a carteira.`);
+      }
     }
+
+    // 2) proporção gasto/receita
+    if(receitas > 0 && gastos > 0){
+      const pct = gastos / receitas;
+      if(pct >= 1){
+        push('saldo-neg', 'warn', 'Saldo negativo',
+          `Em ${lastMonth.label} você já gastou mais do que recebeu: ${fmt(receitas-gastos)} no vermelho.`);
+      } else if(pct >= 0.8){
+        push('gasto-80', 'warn', 'Já foram 80% da renda',
+          `Os gastos de ${lastMonth.label} consumiram ${Math.round(pct*100)}% da sua receita. Sobra hoje: ${fmt(receitas-gastos)}.`);
+      } else if(pct <= 0.6){
+        push('sobra-boa', 'info', 'Boa sobra no mês',
+          `Você fechou ${lastMonth.label} usando só ${Math.round(pct*100)}% da renda — sobraram ${fmt(receitas-gastos)}.`);
+      }
+    }
+
+    // 3) categoria que mais pesou
+    if(gastos > 0 && Array.isArray(lastMonth.categories)){
+      const cats = lastMonth.categories.map(c=>({
+        name: c.label || c.name || 'categoria',
+        total: (c.items||[]).reduce((s,i)=>s+(Number(i.value)||0),0)
+      })).sort((a,b)=>b.total-a.total);
+      const top = cats[0];
+      if(top && top.total / gastos >= 0.4){
+        push('cat-top', 'warn', 'Uma categoria puxou o mês',
+          `"${top.name}" sozinha representa ${Math.round(top.total/gastos*100)}% dos gastos de ${lastMonth.label} (${fmt(top.total)}).`);
+      }
+    }
+
     if(!sal){
-      list.push({type:'info', text:`Ainda não há salário lançado para ${lastMonth.label}.`});
+      push('sem-salario', 'info', 'Falta lançar o salário',
+        `Ainda não há salário lançado para ${lastMonth.label}. Sem isso o resumo fica incompleto.`);
+    }
+    if(gastos === 0){
+      push('sem-gasto', 'info', 'Nenhum gasto lançado',
+        `${lastMonth.label} ainda está sem gastos registrados. Que tal atualizar agora?`);
     }
   }
-  const pendCount = (state.receivables||[]).filter(r=>r.status!=='recebido').length;
-  if(pendCount>0){
-    list.push({type:'info', text:`Você tem ${pendCount} valor${pendCount>1?'es':''} pendente${pendCount>1?'s':''} a receber (${fmt(receivablesPendingTotal())}).`});
+
+  // 4) gastos fixos pesando na renda
+  const fixos = (state.fixedExpenses||[]).reduce((s,f)=>s+(Number(f.value)||0),0);
+  const receitaRef = lastMonth ? receitasDe(lastMonth) : 0;
+  if(fixos > 0 && receitaRef > 0 && fixos/receitaRef >= 0.5){
+    push('fixos-altos', 'warn', 'Gastos fixos pesados',
+      `Seus gastos fixos (${fmt(fixos)}) já comprometem ${Math.round(fixos/receitaRef*100)}% da sua renda antes de qualquer despesa nova.`);
   }
+
+  // 5) a receber
+  const pend = (state.receivables||[]).filter(r=>r.status!=='recebido');
+  if(pend.length>0){
+    push('a-receber', 'info', 'Dinheiro a receber',
+      `Você tem ${pend.length} valor${pend.length>1?'es':''} pendente${pend.length>1?'s':''} a receber, somando ${fmt(receivablesPendingTotal())}.`);
+  }
+
+  // 6) empréstimos
   const loansOpen = (state.loans||[]).filter(l=>loanRemaining(l)>0);
   if(loansOpen.length>0){
-    list.push({type:'info', text:`${loansOpen.length} empréstimo${loansOpen.length>1?'s':''} ainda em aberto (${fmt(loansOpen.reduce((s,l)=>s+loanRemaining(l),0))}).`});
+    push('emprestimos', 'info', 'Empréstimos em aberto',
+      `${loansOpen.length} empréstimo${loansOpen.length>1?'s':''} ainda em aberto, total de ${fmt(loansOpen.reduce((s,l)=>s+loanRemaining(l),0))}.`);
   }
+
+  // 7) carteira de investimentos — meta de aporte do mês
+  try{
+    const w = getWallet();
+    const mk = walletMonthKey();
+    const aportado = walletAportadoNoMes(mk);
+    const meta = Number(w.monthlyGoal)||0;
+    const totalCarteira = (w.items||[]).reduce((s,i)=>s+(Number(i.saldo)||0),0);
+    if(meta > 0 && aportado <= 0){
+      push('aporte-zero', 'warn', 'Aporte do mês parado',
+        `Sua meta é aportar ${fmt(meta)} por mês e este mês ainda está zerado.`);
+    } else if(meta > 0 && aportado < meta){
+      push('aporte-parcial', 'info', 'Quase lá no aporte',
+        `Você já aportou ${fmt(aportado)} dos ${fmt(meta)} da meta deste mês. Faltam ${fmt(meta-aportado)}.`);
+    } else if(meta > 0 && aportado >= meta){
+      push('aporte-ok', 'info', 'Meta de aporte batida',
+        `Meta do mês concluída: ${fmt(aportado)} aportados. Carteira em ${fmt(totalCarteira)}.`);
+    }
+    if(!meta && totalCarteira === 0 && (state.months||[]).length){
+      push('carteira-vazia', 'info', 'Sua carteira está vazia',
+        `Cadastre seus investimentos na Carteira de Investimentos pra acompanhar o patrimônio real.`);
+    }
+  }catch(e){ /* carteira ainda não inicializada */ }
+
+  // 8) dados desatualizados
+  if(state.lastUpdated){
+    const dias = Math.floor((Date.now() - new Date(state.lastUpdated).getTime())/86400000);
+    if(dias >= 10){
+      push('desatualizado', 'info', 'Faz tempo que você não atualiza',
+        `Seus dados não são atualizados há ${dias} dias. Uma passadinha rápida mantém tudo confiável.`);
+    }
+  }
+
   return list;
 }
 
@@ -1491,10 +1596,86 @@ function renderNotifications(){
   const dots = [document.getElementById('bellDotDesktop'), document.getElementById('bellDotMobile')];
   dots.forEach(d=>{ if(d) d.classList.toggle('show', notifs.length>0); });
   const list = document.getElementById('notifList');
-  if(!list) return;
-  list.innerHTML = notifs.length ? notifs.map(n=>`
-    <div class="notif-item ${n.type}"><span class="ni-dot"></span><span>${escapeHtml(n.text)}</span></div>
-  `).join('') : `<div class="notif-empty">Sem novidades por aqui. Tudo em dia.</div>`;
+  if(list){
+    list.innerHTML = notifs.length ? notifs.map(n=>`
+      <div class="notif-item ${n.type}"><span class="ni-dot"></span><span><b>${escapeHtml(n.title||'')}</b><br>${escapeHtml(n.text)}</span></div>
+    `).join('') : `<div class="notif-empty">Sem novidades por aqui. Tudo em dia.</div>`;
+  }
+  maybePushNotifications(notifs);
+  refreshPushBar();
+}
+
+/* ---------- Avisos no celular (notificações locais do navegador) ---------- */
+const PUSH_SEEN_KEY = 'balance_push_seen_v1';
+function pushSupported(){ return typeof window !== 'undefined' && 'Notification' in window; }
+function pushEnabled(){ return pushSupported() && Notification.permission === 'granted' && localStorage.getItem('balance_push_on') === '1'; }
+
+function refreshPushBar(){
+  const bar = document.getElementById('notifPushBar');
+  const txt = document.getElementById('notifPushTxt');
+  const btn = document.getElementById('btnEnablePush');
+  if(!bar || !txt || !btn) return;
+  bar.classList.remove('is-on','hide-btn');
+  if(!pushSupported()){
+    txt.textContent = 'Este navegador não suporta avisos no aparelho.';
+    bar.classList.add('hide-btn');
+  } else if(pushEnabled()){
+    txt.textContent = '✓ Avisos ativados neste aparelho.';
+    bar.classList.add('is-on');
+    btn.textContent = 'desativar';
+  } else if(Notification.permission === 'denied'){
+    txt.textContent = 'Avisos bloqueados. Libere as notificações nas configurações do site.';
+    bar.classList.add('hide-btn');
+  } else {
+    txt.textContent = 'Receba esses alertas direto no celular.';
+    btn.textContent = 'ativar avisos';
+  }
+}
+
+async function togglePush(){
+  if(!pushSupported()){ showToast('Seu navegador não suporta notificações.', true); return; }
+  if(pushEnabled()){
+    localStorage.setItem('balance_push_on','0');
+    refreshPushBar();
+    showToast('avisos desativados');
+    return;
+  }
+  if(window.top !== window.self && Notification.permission !== 'granted'){
+    showToast('Abra o app em uma aba própria (ou pela tela de início) para ativar os avisos.', true);
+    return;
+  }
+  let perm = Notification.permission;
+  if(perm !== 'granted') perm = await Notification.requestPermission();
+  if(perm !== 'granted'){ showToast('Permissão negada para notificações.', true); refreshPushBar(); return; }
+  localStorage.setItem('balance_push_on','1');
+  localStorage.removeItem(PUSH_SEEN_KEY);
+  refreshPushBar();
+  showNativeNotification('Balance', 'Pronto! Vou te avisar por aqui quando algo precisar da sua atenção.');
+  renderNotifications();
+}
+
+function showNativeNotification(title, body){
+  try{
+    new Notification(title, { body, icon: document.querySelector('link[rel="apple-touch-icon"]')?.href || undefined, tag: 'balance-'+title });
+  }catch(e){ console.warn('notificação falhou', e); }
+}
+
+// dispara no máximo 2 alertas novos por dia, sem repetir o mesmo aviso
+function maybePushNotifications(notifs){
+  if(!pushEnabled()) return;
+  const hoje = new Date().toISOString().slice(0,10);
+  let seen = {};
+  try{ seen = JSON.parse(localStorage.getItem(PUSH_SEEN_KEY) || '{}'); }catch(e){ seen = {}; }
+  if(seen.__day !== hoje) seen = { __day: hoje };
+  let enviados = 0;
+  notifs.filter(n=>n.type==='warn').concat(notifs.filter(n=>n.type!=='warn')).forEach(n=>{
+    if(enviados >= 2) return;
+    if(seen[n.id]) return;
+    seen[n.id] = true;
+    enviados++;
+    showNativeNotification(n.title || 'Balance', n.text);
+  });
+  localStorage.setItem(PUSH_SEEN_KEY, JSON.stringify(seen));
 }
 
 function toggleNotifPanel(){
@@ -3381,7 +3562,12 @@ function wireAppButtons(){
       closeNotifPanel();
     }
   });
+  const btnPush = document.getElementById('btnEnablePush');
+  if(btnPush) btnPush.onclick = (e)=>{ e.stopPropagation(); togglePush(); };
   renderNotifications();
+  // reavalia os alertas de tempos em tempos (e ao voltar pro app)
+  setInterval(()=>{ if(state) renderNotifications(); }, 60*60*1000);
+  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden && state) renderNotifications(); });
 }
 </script>
 </body>
