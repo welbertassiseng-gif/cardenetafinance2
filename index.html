@@ -944,6 +944,80 @@ let saveTimer = null;
 let saving = false;
 let dirty = false; // true quando há alterações ainda não salvas manualmente
 
+/* =========================================================
+   SINCRONIZAÇÃO ENTRE DISPOSITIVOS
+   Quando você salva em um celular/computador, os outros aparelhos que estão
+   com o app aberto recebem a atualização e recarregam os dados automaticamente.
+========================================================= */
+let realtimeChannel = null;
+let syncing = false;
+
+function applyServerState(data){
+  if(!data) return;
+  const incoming = Object.assign(emptyState(), data);
+  // não sobrescreve alterações locais ainda não salvas
+  if(dirty){
+    showToast('Há dados novos em outro aparelho. Salve ou recarregue a página.', true);
+    return;
+  }
+  if(state && state.lastUpdated && incoming.lastUpdated && incoming.lastUpdated === state.lastUpdated) return;
+  const keepSelected = state ? state.selectedMonth : null;
+  const keepDashboard = state ? state.dashboardMonth : null;
+  state = incoming;
+  if(keepSelected && (state.months||[]).some(m=>m.id===keepSelected)) state.selectedMonth = keepSelected;
+  if(keepDashboard && (state.months||[]).some(m=>m.id===keepDashboard)) state.dashboardMonth = keepDashboard;
+  ensureNavConfig();
+  renderNav();
+  renderSection();
+  renderStampAll();
+  renderNotifications();
+  showToast('atualizado com os dados mais recentes', false);
+}
+
+// Busca no servidor e aplica se houver algo mais novo (usado ao voltar pro app).
+async function refreshStateFromServer(){
+  if(!currentSession || syncing || saving) return;
+  syncing = true;
+  try{
+    const { data, error } = await sb.from('financial_data')
+      .select('data').eq('user_id', currentSession.user.id).maybeSingle();
+    if(error) throw error;
+    if(data && data.data) applyServerState(data.data);
+  }catch(e){ console.error('Falha ao sincronizar', e); }
+  finally{ syncing = false; }
+}
+
+function startRealtimeSync(){
+  if(!sb || !currentSession) return;
+  stopRealtimeSync();
+  realtimeChannel = sb.channel('financial_data_' + currentSession.user.id)
+    .on('postgres_changes', {
+      event: '*', schema: 'public', table: 'financial_data',
+      filter: 'user_id=eq.' + currentSession.user.id,
+    }, (payload)=>{
+      if(saving) return;
+      if(payload.new && payload.new.data) applyServerState(payload.new.data);
+      else refreshStateFromServer();
+    })
+    .subscribe();
+
+  // rede/aba: sempre que o app volta a ficar visível, confere se há algo mais novo
+  document.addEventListener('visibilitychange', onVisibleSync);
+  window.addEventListener('focus', onVisibleSync);
+  window.addEventListener('online', refreshStateFromServer);
+}
+
+function onVisibleSync(){
+  if(document.visibilityState === 'visible') refreshStateFromServer();
+}
+
+function stopRealtimeSync(){
+  if(realtimeChannel){ try{ sb.removeChannel(realtimeChannel); }catch(e){} realtimeChannel = null; }
+  document.removeEventListener('visibilitychange', onVisibleSync);
+  window.removeEventListener('focus', onVisibleSync);
+  window.removeEventListener('online', refreshStateFromServer);
+}
+
 async function loadStateFromServer(){
   const userId = currentSession.user.id;
   const { data, error } = await sb.from('financial_data').select('data').eq('user_id', userId).maybeSingle();
@@ -1449,16 +1523,45 @@ function normalizeMonthLabel(str){
 // Ao entrar no app, se existir um mês cadastrado (em "Gastos Mensais") cujo nome corresponda ao mês/ano
 // atuais (ex: "Novembro / 2026"), seleciona ele automaticamente — isso já reflete em "Gastos Mensais" e
 // em "Salários", que usam o mesmo mês selecionado. "Gastos Fixos" não depende de mês (é um modelo único).
+// Lê o rótulo de um mês cadastrado ("Setembro / 2026", "set/26"...) e devolve um número
+// comparável (ano*12 + mês). Retorna null quando não consegue identificar.
+function monthLabelRank(label){
+  const norm = normalizeMonthLabel(label);
+  let mi = -1;
+  PT_MONTH_NAMES.forEach((name, i)=>{
+    const n = normalizeMonthLabel(name);
+    if(mi === -1 && (norm.includes(n) || norm.includes(n.slice(0,3)))) mi = i;
+  });
+  if(mi === -1) return null;
+  const ym = norm.match(/(20\d{2})/) || norm.match(/(\d{2})(?!\d)/);
+  let year;
+  if(ym){ year = Number(ym[1]); if(year < 100) year += 2000; }
+  else { year = new Date().getFullYear(); }
+  return year * 12 + mi;
+}
+function currentMonthRank(){
+  const now = new Date();
+  return now.getFullYear() * 12 + now.getMonth();
+}
+// Escolhe o mês que deve aparecer ao abrir o app: o mês atual do calendário; se não estiver
+// cadastrado, o mês cadastrado mais recente que já passou; se todos forem futuros, o mais próximo.
+function pickDefaultMonthId(){
+  const months = state.months || [];
+  if(!months.length) return null;
+  const cur = currentMonthRank();
+  const ranked = months.map(m=>({ id:m.id, rank: monthLabelRank(m.label) })).filter(x=>x.rank !== null);
+  if(!ranked.length) return months[months.length-1].id;
+  const exact = ranked.find(x=>x.rank === cur);
+  if(exact) return exact.id;
+  const past = ranked.filter(x=>x.rank < cur).sort((a,b)=>b.rank-a.rank);
+  if(past.length) return past[0].id;
+  const future = ranked.filter(x=>x.rank > cur).sort((a,b)=>a.rank-b.rank);
+  return future.length ? future[0].id : months[months.length-1].id;
+}
 function selectCurrentMonthIfFound(){
   if(!Array.isArray(state.months) || !state.months.length) return;
-  const now = new Date();
-  const monthName = normalizeMonthLabel(PT_MONTH_NAMES[now.getMonth()]);
-  const year = String(now.getFullYear());
-  const current = state.months.find(m=>{
-    const norm = normalizeMonthLabel(m.label);
-    return norm.includes(monthName) && norm.includes(year);
-  });
-  if(current) state.selectedMonth = current.id;
+  const id = pickDefaultMonthId();
+  if(id){ state.selectedMonth = id; state.dashboardMonth = id; }
 }
 
 function riMonthKeyNow(){
@@ -1783,7 +1886,7 @@ let chartRef = null;
 function renderDashboard(){
   const months = state.months;
   if(!state.dashboardMonth || !months.find(m=>m.id===state.dashboardMonth)){
-    state.dashboardMonth = months.length ? months[months.length-1].id : null;
+    state.dashboardMonth = months.length ? pickDefaultMonthId() : null;
   }
   const month = months.find(m=>m.id===state.dashboardMonth);
   const sal = month ? state.salaries.find(s=>s.monthId===month.id) : null;
@@ -2018,7 +2121,7 @@ function buildCategoryRing(categories, total){
 function renderGastos(){
   const el = document.createElement('div');
   if(!state.months.find(m=>m.id===state.selectedMonth) && state.months.length){
-    state.selectedMonth = state.months[0].id;
+    state.selectedMonth = pickDefaultMonthId();
   }
   const month = state.months.find(m=>m.id===state.selectedMonth);
   const idx = month ? state.months.findIndex(m=>m.id===month.id) : -1;
@@ -2282,7 +2385,7 @@ function renderFixos(){
 function renderSalarios(){
   const el = document.createElement('div');
   if(!state.months.find(m=>m.id===state.selectedMonth) && state.months.length){
-    state.selectedMonth = state.months[0].id;
+    state.selectedMonth = pickDefaultMonthId();
   }
   const month = state.months.find(m=>m.id===state.selectedMonth);
   let sal = state.salaries.find(s=>s.monthId===state.selectedMonth);
@@ -3776,6 +3879,7 @@ async function enterApp(session){
   document.getElementById('authScreen').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
   wireAppButtons();
+  startRealtimeSync();
 }
 
 function wireAppButtons(){
@@ -3794,6 +3898,7 @@ function wireAppButtons(){
       const ok = confirm('Você tem alterações não salvas. Sair mesmo assim e perder essas alterações?');
       if(!ok) return;
     }
+    stopRealtimeSync();
     await sb.auth.signOut();
     currentSession = null;
     state = null;
