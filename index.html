@@ -1323,6 +1323,7 @@ function startInlineRename(id, itemEl){
     }
     scheduleSave();
     renderNav();
+    renderSection(); // atualiza o título no topo imediatamente
   };
   input.addEventListener('blur', commit);
   input.addEventListener('keydown', e=>{
@@ -1842,14 +1843,40 @@ async function togglePush(){
   if(perm !== 'granted'){ showToast('Permissão negada para notificações.', true); refreshPushBar(); return; }
   localStorage.setItem('balance_push_on','1');
   localStorage.removeItem(PUSH_SEEN_KEY);
+  await ensureServiceWorker();
   refreshPushBar();
   showNativeNotification('Balance', 'Pronto! Vou te avisar por aqui quando algo precisar da sua atenção.');
   renderNotifications();
 }
 
-function showNativeNotification(title, body){
+let swRegistration = null;
+async function ensureServiceWorker(){
+  if(!('serviceWorker' in navigator)) return null;
+  if(swRegistration) return swRegistration;
   try{
-    new Notification(title, { body, icon: document.querySelector('link[rel="apple-touch-icon"]')?.href || undefined, tag: 'balance-'+title });
+    swRegistration = await navigator.serviceWorker.register('./sw.js');
+    await navigator.serviceWorker.ready;
+  }catch(e){ console.warn('service worker indisponível', e); swRegistration = null; }
+  return swRegistration;
+}
+
+function showNativeNotification(title, body){
+  const opts = {
+    body,
+    icon: document.querySelector('link[rel="apple-touch-icon"]')?.href || undefined,
+    badge: document.querySelector('link[rel="apple-touch-icon"]')?.href || undefined,
+    tag: 'balance-'+title,
+    renotify: true,
+    data: { url: location.href },
+  };
+  // o Service Worker consegue exibir o aviso mesmo com a aba em segundo plano
+  // (e é o único caminho que funciona no Android/Chrome instalado).
+  if(swRegistration && swRegistration.showNotification){
+    swRegistration.showNotification(title, opts).catch(e=>console.warn('notificação falhou', e));
+    return;
+  }
+  try{
+    new Notification(title, opts);
   }catch(e){ console.warn('notificação falhou', e); }
 }
 
@@ -3611,9 +3638,22 @@ function renderSection(){
   else if(kind==='notas') node = renderNotas();
   else node = renderCustomSection(activeSection);
   container.appendChild(node);
+  syncSectionTitle(node, cfg, kind);
   if(kind==='dashboard') requestAnimationFrame(()=>requestAnimationFrame(drawChart));
   if(kind==='realInvest'){ const sid = activeSection; requestAnimationFrame(()=>requestAnimationFrame(()=>drawRealInvestChart(sid))); }
   if(kind==='carteira') requestAnimationFrame(()=>requestAnimationFrame(()=>{ drawWalletChart(); drawWalletSimChart(); }));
+}
+
+// mantém o título exibido no topo da seção igual ao rótulo do menu,
+// pra que renomear "Início" para "Visão geral" atualize a interface na hora.
+function syncSectionTitle(node, cfg, kind){
+  if(!cfg || !cfg.label) return;
+  if(kind==='carteira' && carteiraDetailId) return; // detalhe da carteira mostra o nome do item
+  const h2 = node.querySelector('.page-header h2') || node.querySelector('h2');
+  if(!h2) return;
+  const textNode = Array.from(h2.childNodes).find(n=>n.nodeType===3 && n.textContent.trim());
+  if(textNode) textNode.textContent = cfg.label + ' ';
+  else h2.insertBefore(document.createTextNode(cfg.label + ' '), h2.firstChild);
 }
 
 /* =========================================================
@@ -3899,6 +3939,7 @@ function wireAppButtons(){
       if(!ok) return;
     }
     stopRealtimeSync();
+    stopNotificationWatcher();
     await sb.auth.signOut();
     currentSession = null;
     state = null;
@@ -3965,9 +4006,41 @@ function wireAppButtons(){
   const btnPush = document.getElementById('btnEnablePush');
   if(btnPush) btnPush.onclick = (e)=>{ e.stopPropagation(); togglePush(); };
   renderNotifications();
-  // reavalia os alertas de tempos em tempos (e ao voltar pro app)
-  setInterval(()=>{ if(state) renderNotifications(); }, 60*60*1000);
-  document.addEventListener('visibilitychange', ()=>{ if(!document.hidden && state) renderNotifications(); });
+  startNotificationWatcher();
+}
+
+/* ---------- Vigilância em tempo real dos avisos ----------
+   Os alertas passam a chegar sozinhos, sem precisar entrar ou recarregar:
+   - a cada 60s o app confere no servidor se há dados novos e reavalia os avisos
+     (funciona também com a aba em segundo plano);
+   - qualquer alteração vinda de outro aparelho (realtime) reavalia na hora;
+   - a virada do dia também reavalia (avisos que dependem de data). */
+let notifWatcherTimer = null;
+let notifLastDay = new Date().toDateString();
+
+async function notificationTick(){
+  if(!currentSession) return;
+  await refreshStateFromServer();          // traz dados novos de outros aparelhos
+  const today = new Date().toDateString();
+  if(today !== notifLastDay){ notifLastDay = today; }
+  if(state) renderNotifications();         // recalcula e dispara os avisos do navegador
+}
+
+function startNotificationWatcher(){
+  stopNotificationWatcher();
+  if(pushEnabled()) ensureServiceWorker();
+  notifWatcherTimer = setInterval(notificationTick, 60*1000);
+  document.addEventListener('visibilitychange', onNotifVisibility);
+  window.addEventListener('online', notificationTick);
+  notificationTick();
+}
+
+function onNotifVisibility(){ if(!document.hidden) notificationTick(); }
+
+function stopNotificationWatcher(){
+  if(notifWatcherTimer){ clearInterval(notifWatcherTimer); notifWatcherTimer = null; }
+  document.removeEventListener('visibilitychange', onNotifVisibility);
+  window.removeEventListener('online', notificationTick);
 }
 </script>
 </body>
