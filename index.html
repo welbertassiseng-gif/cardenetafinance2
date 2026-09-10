@@ -320,6 +320,8 @@ tr.total-row td{font-weight:700; background:var(--forest); color:var(--on-dark);
 .item-desc-input{border:none; background:none; font-size:14px; color:var(--ink); padding:4px 0; flex:1; min-width:0;}
 .item-desc-input:focus{outline:none; border-bottom:1px dashed var(--gold);}
 .item-value-input{border:none !important; background:none !important; text-align:right; font-size:14px; width:110px; flex-shrink:0; padding:4px 2px !important;}
+.item-date-input{border:none !important; background:none !important; text-align:right; font-size:12.5px; color:var(--ink-soft); width:98px; flex-shrink:0; padding:4px 2px !important; font-family:'JetBrains Mono',monospace;}
+.item-date-input::-webkit-calendar-picker-indicator{opacity:0.55; filter:invert(0.5); cursor:pointer;}
 .cat-add-row{text-align:center; padding:10px 0 4px;}
 
 /* Bloco de Notas — lista de notas estilo iPhone */
@@ -494,6 +496,7 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
   .summary-ring{width:72px; height:72px;}
   .cat-badge{width:26px; height:26px; font-size:11px;}
   .item-value-input{width:92px;}
+  .item-date-input{width:82px; font-size:11.5px;}
 }
 @media(min-width:881px){
   .mobile-header, .drawer-overlay, .drawer, .bottom-tabbar{display:none !important;}
@@ -2312,17 +2315,19 @@ function renderGastos(){
       row.innerHTML = `
         <span class="item-dot"></span>
         <input type="text" value="${escAttr(item.desc)}" data-role="desc" class="item-desc-input" placeholder="descrição">
+        <input type="date" value="${escAttr(item.date||'')}" data-role="date" class="item-date-input" title="data do gasto">
         <input type="text" inputmode="decimal" class="money item-value-input" data-role="value">
         <button class="icon-btn" data-role="delItem" title="remover item">✕</button>
       `;
       row.querySelector('[data-role=desc]').addEventListener('input', e=>{ item.desc=e.target.value; scheduleSave(); });
+      row.querySelector('[data-role=date]').addEventListener('change', e=>{ item.date=e.target.value; scheduleSave(); });
       bindMoneyInput(row.querySelector('[data-role=value]'), ()=>item.value, v=>item.value=v, ()=>recalcGastos(month, ci));
       row.querySelector('[data-role=delItem]').addEventListener('click', ()=>{ cat.items.splice(ii,1); scheduleSave(); renderSection(); });
       itemsList.appendChild(row);
     });
 
     block.querySelector('[data-role=addItem]').addEventListener('click', ()=>{
-      cat.items.push({desc:'', value:0}); scheduleSave(); renderSection();
+      cat.items.push({desc:'', value:0, date:''}); scheduleSave(); renderSection();
     });
 
     block.querySelector('[data-role=delCat]').addEventListener('click', ()=>{
@@ -2346,7 +2351,7 @@ function renderGastos(){
   addCatBtn.style.marginTop = '2px';
   addCatBtn.textContent = '+ nova categoria';
   addCatBtn.addEventListener('click', ()=>{
-    month.categories.push({name:'Nova categoria', items:[{desc:'', value:0}]});
+    month.categories.push({name:'Nova categoria', items:[{desc:'', value:0, date:''}]});
     scheduleSave(); renderSection();
   });
   content.appendChild(addCatBtn);
