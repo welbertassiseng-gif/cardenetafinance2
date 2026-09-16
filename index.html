@@ -733,9 +733,11 @@ tr.total-row td:last-child{border-radius:0 10px 10px 0;}
     <div class="nav" id="navList"></div>
     <div class="user-badge"><span class="dot"></span> <b id="currentUserLabel"></b></div>
     <div class="sidebar-footer">
+      <div class="quick-actions quick-actions-footer" style="padding-bottom:0; margin-bottom:6px;">
+        <button class="qa-btn js-undo-btn" id="btnUndoDesktop" title="Desfazer última alteração" disabled><span class="ico">↶</span><span>desfazer</span></button>
+        <button class="qa-btn js-redo-btn" id="btnRedoDesktop" title="Refazer" disabled><span class="ico">↷</span><span>refazer</span></button>
+      </div>
       <div class="quick-actions quick-actions-footer">
-        <button class="qa-btn js-undo-btn" id="btnUndoDesktop" title="Desfazer última alteração" disabled><span class="ico">↶</span></button>
-        <button class="qa-btn js-redo-btn" id="btnRedoDesktop" title="Refazer" disabled><span class="ico">↷</span></button>
         <button class="qa-btn js-save-btn" id="btnSaveDesktop" title="Salvar alterações"><span class="ico">💾</span><span class="js-save-label">salvar</span></button>
         <button class="qa-btn" id="btnSettingsDesktop" title="Configurações"><span class="ico">⚙️</span><span>ajustes</span></button>
       </div>
@@ -755,8 +757,6 @@ tr.total-row td:last-child{border-radius:0 10px 10px 0;}
       <div class="mh-title" id="mobileHeaderTitle">Balance</div>
     </div>
     <div class="header-actions">
-      <button class="hdr-icon-btn js-undo-btn" id="btnUndoMobile" title="Desfazer última alteração" disabled style="border-color:rgba(251,249,241,0.3); color:var(--on-dark); padding:0 9px;">↶</button>
-      <button class="hdr-icon-btn js-redo-btn" id="btnRedoMobile" title="Refazer" disabled style="border-color:rgba(251,249,241,0.3); color:var(--on-dark); padding:0 9px;">↷</button>
       <button class="hdr-icon-btn js-save-btn" id="btnSaveMobile" title="Salvar alterações" style="border-color:rgba(251,249,241,0.3); color:var(--on-dark);">
         💾<span class="js-save-label">salvar</span><span class="save-dot"></span>
       </button>
@@ -789,9 +789,11 @@ tr.total-row td:last-child{border-radius:0 10px 10px 0;}
     <div class="nav" id="navListDrawer"></div>
     <div class="user-badge"><span class="dot"></span> <b id="currentUserLabelDrawer"></b></div>
     <div class="sidebar-footer">
+      <div class="quick-actions quick-actions-footer" style="padding-bottom:0; margin-bottom:6px;">
+        <button class="qa-btn js-undo-btn" id="btnUndoDrawer" title="Desfazer última alteração" disabled><span class="ico">↶</span><span>desfazer</span></button>
+        <button class="qa-btn js-redo-btn" id="btnRedoDrawer" title="Refazer" disabled><span class="ico">↷</span><span>refazer</span></button>
+      </div>
       <div class="quick-actions quick-actions-footer">
-        <button class="qa-btn js-undo-btn" id="btnUndoDrawer" title="Desfazer última alteração" disabled><span class="ico">↶</span></button>
-        <button class="qa-btn js-redo-btn" id="btnRedoDrawer" title="Refazer" disabled><span class="ico">↷</span></button>
         <button class="qa-btn js-save-btn" id="btnSaveDrawer" title="Salvar alterações"><span class="ico">💾</span><span class="js-save-label">salvar</span></button>
         <button class="qa-btn" id="btnSettingsDrawer" title="Configurações"><span class="ico">⚙️</span><span>ajustes</span></button>
       </div>
@@ -4078,10 +4080,8 @@ function wireAppButtons(){
   updateSaveIndicators();
 
   document.getElementById('btnUndoDesktop').onclick = performUndo;
-  document.getElementById('btnUndoMobile').onclick = performUndo;
   document.getElementById('btnUndoDrawer').onclick = performUndo;
   document.getElementById('btnRedoDesktop').onclick = performRedo;
-  document.getElementById('btnRedoMobile').onclick = performRedo;
   document.getElementById('btnRedoDrawer').onclick = performRedo;
   updateUndoRedoButtons();
 
