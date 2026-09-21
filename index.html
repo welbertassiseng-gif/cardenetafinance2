@@ -875,6 +875,262 @@ tr.total-row td:last-child{border-radius:0 10px 10px 0;}
   color: #0F172A;
 }
 
+
+/* ===================== DESPESAS: Todas · Categorias · Detalhe ===================== */
+@keyframes gxIn{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
+@keyframes gxPop{from{opacity:0; transform:scale(.97);} to{opacity:1; transform:none;}}
+@keyframes gxFade{from{opacity:0;} to{opacity:1;}}
+@keyframes gxGrow{from{height:0;}}
+@keyframes gxFlash{0%{background:var(--forest-pale); box-shadow:inset 3px 0 0 var(--gold);} 100%{background:transparent; box-shadow:inset 3px 0 0 transparent;}}
+.gx-view{animation:gxIn .24s ease both;}
+.gx-results-in{animation:gxFade .22s ease both;}
+
+/* abas Todas / Categorias */
+.gx-tabs{display:flex; gap:4px; padding:4px; background:var(--paper-dark); border-radius:14px; margin:2px 0 20px; width:fit-content; max-width:100%;}
+.gx-tab{border:none; background:transparent; color:var(--ink-soft); padding:9px 20px; border-radius:11px; font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14.5px; display:inline-flex; align-items:center; gap:8px; min-height:40px; transition:background .18s, color .18s, box-shadow .18s;}
+.gx-tab.active{background:var(--white); color:var(--ink); box-shadow:0 1px 2px rgba(15,23,42,.08), 0 6px 14px -8px rgba(15,23,42,.3);}
+.gx-count{font-family:'JetBrains Mono',monospace; font-size:11px; background:var(--paper-line); color:var(--ink-soft); border-radius:999px; padding:2px 8px;}
+.gx-tab.active .gx-count{background:var(--forest-pale); color:var(--gold);}
+@media (hover:hover) and (pointer:fine){ .gx-tab:not(.active):hover{color:var(--ink); background:rgba(148,163,184,.14);} }
+
+/* indicadores do resumo */
+.gx-stats{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:18px;}
+.gx-stats .stat{min-width:0;}
+.gx-stats .stat .label{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.gx-stats .stat .value{font-size:19px; text-overflow:ellipsis;}
+
+/* barra de busca / período / filtros */
+.gx-fbar{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:12px;}
+.gx-search{flex:1 1 260px; position:relative; min-width:0;}
+.gx-search svg{position:absolute; left:14px; top:50%; transform:translateY(-50%); width:17px; height:17px; color:var(--ink-soft); pointer-events:none;}
+.gx-search input{width:100%; min-height:44px; padding:11px 14px 11px 42px; border:1px solid var(--paper-line); border-radius:12px; background:var(--white); color:var(--ink); font-size:14.5px; transition:border-color .15s, box-shadow .15s;}
+.gx-search input:focus{border-color:var(--gold); box-shadow:0 0 0 3px rgba(59,130,246,.16);}
+.gx-select{min-height:44px; border:1px solid var(--paper-line); border-radius:12px; padding:10px 34px 10px 14px; background:var(--white); color:var(--ink); font-size:14px; font-weight:600; appearance:none; -webkit-appearance:none; cursor:pointer;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>"); background-repeat:no-repeat; background-position:right 12px center; max-width:100%;}
+.gx-select:focus{outline:none; border-color:var(--gold); box-shadow:0 0 0 3px rgba(59,130,246,.16);}
+.gx-fbtn{min-height:44px; display:inline-flex; align-items:center; gap:8px; padding:10px 16px; border:1px solid var(--paper-line); border-radius:12px; background:var(--white); color:var(--ink); font-weight:600; font-size:14px; transition:border-color .15s, background .15s;}
+.gx-fbtn svg{width:16px; height:16px;}
+.gx-fbtn.on{border-color:var(--gold); background:var(--forest-pale); color:var(--gold);}
+.gx-badge{min-width:20px; height:20px; border-radius:999px; background:var(--gold); color:#fff; font-size:11px; font-family:'JetBrains Mono',monospace; display:none; align-items:center; justify-content:center; padding:0 6px;}
+.gx-badge.show{display:inline-flex;}
+@media (hover:hover) and (pointer:fine){ .gx-fbtn:hover{border-color:var(--gold-light);} }
+
+/* painel de filtros e painel de adicionar (recolhíveis) */
+.gx-panel, .gx-add-wrap{display:grid; grid-template-rows:0fr; transition:grid-template-rows .26s ease, margin .26s ease; margin:0;}
+.gx-panel.open{grid-template-rows:1fr; margin-bottom:14px;}
+.gx-add-wrap.open{grid-template-rows:1fr; margin-bottom:18px;}
+.gx-panel-inner, .gx-add-inner{overflow:hidden; min-height:0;}
+.gx-panel-body{background:var(--white); border:1px solid var(--paper-line); border-radius:16px; padding:16px 18px; display:grid; gap:16px;}
+.gx-panel-body h5{margin:0 0 8px; font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); font-weight:600;}
+.gx-picks{display:flex; flex-wrap:wrap; gap:8px;}
+.gx-pick{border:1px solid var(--paper-line); background:var(--paper); color:var(--ink); border-radius:999px; padding:8px 14px; font-size:13px; font-weight:600; min-height:38px; transition:all .15s;}
+.gx-pick.on{background:var(--forest-pale); border-color:var(--gold); color:var(--gold);}
+.gx-range{display:grid; grid-template-columns:1fr 1fr; gap:12px; max-width:420px;}
+.gx-range input{width:100%; min-height:42px; padding:10px 12px; border:1px solid var(--paper-line); border-radius:10px; background:var(--paper); color:var(--ink); font-family:'JetBrains Mono',monospace; font-size:14px;}
+.gx-range input:focus{outline:none; border-color:var(--gold); box-shadow:0 0 0 3px rgba(59,130,246,.16);}
+.gx-range label{font-size:12px; color:var(--ink-soft); display:block; margin-bottom:4px;}
+.gx-add-card{margin-bottom:0 !important;}
+.gx-add-title{font-size:13px; color:var(--ink-soft); margin-bottom:14px;}
+.gx-add-title b{color:var(--ink);}
+.gx-err{color:var(--rust); font-size:12.5px; min-height:0; margin-top:8px;}
+.gx-err:empty{display:none;}
+
+/* chips de filtros ativos */
+.gx-chips{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:16px;}
+.gx-chips:empty{display:none;}
+.gx-chip{display:inline-flex; align-items:center; gap:8px; padding:6px 6px 6px 12px; border-radius:999px; background:var(--forest-pale); color:var(--gold); font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; animation:gxPop .2s ease both; max-width:100%;}
+.gx-chip span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.gx-chip button{width:22px; height:22px; border-radius:50%; border:none; background:rgba(59,130,246,.18); color:inherit; font-size:13px; line-height:1; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;}
+.gx-chip-clear{background:none; border:none; color:var(--ink-soft); text-decoration:underline; font-size:12.5px; padding:8px 6px; min-height:34px;}
+@media (hover:hover) and (pointer:fine){ .gx-chip button:hover{background:var(--gold); color:#fff;} .gx-chip-clear:hover{color:var(--ink);} }
+
+/* linha de ações + segmentado */
+.gx-actions-row{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:16px;}
+.gx-actions-row .btn{min-height:44px; padding:10px 22px;}
+.gx-seg{display:inline-flex; gap:3px; padding:3px; border-radius:11px; background:var(--paper-dark);}
+.gx-seg button{border:none; background:transparent; color:var(--ink-soft); padding:8px 14px; border-radius:9px; font-size:13px; font-weight:600; min-height:36px;}
+.gx-seg button.active{background:var(--white); color:var(--ink); box-shadow:0 1px 2px rgba(15,23,42,.1);}
+
+/* cabeçalho da lista */
+.gx-list-head{display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:12px;}
+.gx-count-txt{font-size:14px; color:var(--ink-soft);}
+.gx-count-txt b{color:var(--ink);}
+.gx-sort{display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--ink-soft);}
+
+/* lista de transações */
+.gx-list{background:var(--white); border:1px solid var(--paper-line); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; margin-bottom:22px;}
+.gx-tx{display:flex; align-items:center; gap:14px; padding:14px 18px; border-top:1px solid var(--paper-line); cursor:pointer; min-height:66px; transition:background .15s; position:relative;}
+.gx-tx:first-child{border-top:none;}
+.gx-tx:focus-visible{outline:2px solid var(--gold); outline-offset:-2px;}
+.gx-tx.is-new{animation:gxFlash 1.8s ease both;}
+.gx-tx-ico{width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+.gx-tx-ico svg{width:19px; height:19px;}
+.gx-tx-main{flex:1; min-width:0;}
+.gx-tx-desc{font-weight:600; font-size:15px; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.gx-tx-meta{font-size:12.5px; color:var(--ink-soft); margin-top:3px; display:flex; flex-wrap:wrap; gap:4px 8px; align-items:center;}
+.gx-tx-cat{display:inline-flex; align-items:center; gap:5px; padding:1px 8px; border-radius:999px; background:var(--paper-dark); font-size:11.5px; font-weight:600;}
+.gx-tx-amt{font-weight:700; font-size:15px; color:var(--rust); white-space:nowrap; flex-shrink:0;}
+.gx-tx-amt.pos{color:#059669;}
+.gx-tx-del{width:36px; height:36px; border-radius:10px; border:none; background:none; color:var(--ink-soft); opacity:.55; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .15s;}
+.gx-tx-del svg{width:16px; height:16px;}
+@media (hover:hover) and (pointer:fine){
+  .gx-tx:hover{background:var(--paper);}
+  .gx-tx-del{opacity:0;} .gx-tx:hover .gx-tx-del, .gx-tx-del:focus-visible{opacity:.8;}
+  .gx-tx-del:hover{background:var(--rust-pale); color:var(--rust); opacity:1 !important;}
+}
+.gx-more-btn{display:block; width:100%; padding:14px; border:none; border-top:1px solid var(--paper-line); background:none; color:var(--gold); font-weight:600; font-size:14px; min-height:48px;}
+
+/* estado vazio */
+.gx-empty{text-align:center; padding:44px 20px 40px; color:var(--ink-soft);}
+.gx-empty-ico{width:56px; height:56px; border-radius:18px; background:var(--forest-pale); color:var(--gold); display:inline-flex; align-items:center; justify-content:center; margin-bottom:14px;}
+.gx-empty-ico svg{width:26px; height:26px;}
+.gx-empty h4{font-size:17px; color:var(--ink); margin-bottom:6px;}
+.gx-empty p{margin:0 auto 16px; max-width:360px; font-size:14px; line-height:1.5;}
+
+/* Categorias: grupos e cartões */
+.gx-cats-head{display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:20px;}
+.gx-group{margin-bottom:28px;}
+.gx-group-head{display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin-bottom:14px; padding:0 2px;}
+.gx-group-title{font-family:'JetBrains Mono',monospace; font-size:11.5px; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-soft); font-weight:600;}
+.gx-group-meta{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-soft);}
+.gx-cat-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:16px;}
+.gx-card{position:relative; background:var(--white); border:1px solid var(--paper-line); border-radius:18px; padding:18px 18px 16px; box-shadow:var(--shadow); cursor:pointer; display:flex; flex-direction:column; min-width:0; animation:gxPop .28s ease both; transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;}
+.gx-card:focus-visible{outline:2px solid var(--gold); outline-offset:2px;}
+.gx-card:active{transform:scale(.985);}
+@media (hover:hover) and (pointer:fine){ .gx-card:hover{transform:translateY(-3px); border-color:var(--gold-light); box-shadow:0 2px 4px rgba(15,23,42,.05), 0 22px 40px -20px rgba(15,23,42,.35);} }
+.gx-card-top{display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px;}
+.gx-ico{width:46px; height:46px; border-radius:14px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+.gx-ico svg{width:22px; height:22px;}
+.gx-more{width:40px; height:40px; margin:-6px -8px 0 0; border-radius:50%; border:none; background:none; color:var(--ink-soft); display:inline-flex; align-items:center; justify-content:center; transition:background .15s;}
+.gx-more svg{width:20px; height:20px;}
+@media (hover:hover) and (pointer:fine){ .gx-more:hover{background:var(--paper-dark); color:var(--ink);} }
+.gx-card-name{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:17px; color:var(--ink); display:flex; align-items:center; gap:8px; min-width:0;}
+.gx-card-name .n{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.gx-trend{font-family:'JetBrains Mono',monospace; font-size:12px; font-weight:700; border-radius:999px; padding:1px 8px; flex-shrink:0;}
+.gx-trend.up{background:var(--rust-pale); color:var(--rust);}
+.gx-trend.down{background:var(--green-pale); color:#047857;}
+.gx-card-desc{font-size:13px; color:var(--ink-soft); line-height:1.45; margin-top:4px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; min-height:2.9em;}
+.gx-card-val{font-family:'JetBrains Mono',monospace; font-weight:700; font-size:20px; color:var(--rust); margin-top:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+.gx-card-val.zero{color:var(--ink-soft);}
+.gx-card-val.pos{color:#059669;}
+.gx-card-count{font-size:12.5px; color:var(--ink-soft); margin-top:2px;}
+.gx-card-foot{margin-top:14px; padding-top:12px; border-top:1px dashed var(--paper-line);}
+.gx-bud-cta{background:none; border:none; padding:6px 0; min-height:32px; color:var(--gold); font-weight:600; font-size:13px; display:inline-flex; align-items:center; gap:6px;}
+.gx-bud-cta svg{width:14px; height:14px;}
+.gx-bud-row{display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:12.5px; color:var(--ink-soft); margin-bottom:8px;}
+.gx-bud-row b{color:var(--ink); font-family:'JetBrains Mono',monospace; font-size:12.5px;}
+.gx-bud-edit{background:none; border:none; color:var(--gold); padding:4px; border-radius:8px; display:inline-flex;}
+.gx-bud-edit svg{width:14px; height:14px;}
+.gx-progress{height:7px; border-radius:999px; background:var(--paper-dark); overflow:hidden;}
+.gx-progress i{display:block; height:100%; border-radius:inherit; background:var(--gold); transition:width .7s cubic-bezier(.2,.8,.2,1);}
+.gx-progress.warn i{background:#F59E0B;}
+.gx-progress.over i{background:var(--rust);}
+.gx-bud-note{font-size:12px; color:var(--ink-soft); margin-top:6px;}
+.gx-bud-note.over{color:var(--rust); font-weight:600;}
+.gx-newcat{border:1.5px dashed var(--paper-line); background:none; border-radius:18px; min-height:120px; color:var(--ink-soft); font-weight:600; font-size:14px; display:flex; align-items:center; justify-content:center; gap:8px; transition:all .18s;}
+@media (hover:hover) and (pointer:fine){ .gx-newcat:hover{border-color:var(--gold); color:var(--gold); background:var(--forest-pale);} }
+
+/* Detalhe da categoria */
+.gx-crumbs{display:flex; align-items:center; flex-wrap:wrap; gap:4px; margin:4px 0 16px; font-size:13.5px;}
+.gx-crumbs .month-nav-arrow{margin-right:6px; width:38px; height:38px;}
+.gx-crumb{background:none; border:none; padding:8px 10px; border-radius:10px; color:var(--ink-soft); font-weight:600; min-height:38px; font-size:13.5px;}
+.gx-crumb.current{color:var(--ink); cursor:default;}
+.gx-sep{color:var(--ink-soft); opacity:.55;}
+@media (hover:hover) and (pointer:fine){ .gx-crumb:not(.current):hover{background:var(--paper-dark); color:var(--ink);} }
+.gx-chart-card{padding:22px 24px 20px;}
+.gx-detail-head{display:flex; justify-content:space-between; align-items:flex-start; gap:18px; flex-wrap:wrap;}
+.gx-detail-title{display:flex; align-items:center; gap:14px; min-width:0;}
+.gx-detail-title h3{font-size:21px; margin:0; display:block; overflow-wrap:anywhere;}
+.gx-eyebrow{font-family:'JetBrains Mono',monospace; font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--ink-soft); margin-top:4px;}
+.gx-avg{text-align:right;}
+.gx-avg .v{font-family:'JetBrains Mono',monospace; font-weight:700; font-size:26px; color:var(--ink); letter-spacing:-.02em;}
+.gx-avg .s{font-size:11.5px; color:var(--ink-soft); margin-top:2px;}
+.gx-detail-stats{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:20px;}
+.gx-mini{background:var(--paper); border:1px solid var(--paper-line); border-radius:14px; padding:12px 14px; min-width:0;}
+.gx-mini .l{font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft);}
+.gx-mini .v{font-family:'JetBrains Mono',monospace; font-weight:700; font-size:18px; color:var(--ink); margin-top:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.gx-mini .gx-progress{margin-top:8px; height:6px;}
+
+/* gráfico de barras dos últimos 6 meses */
+.gx-chart{position:relative; height:240px; margin-top:24px; padding-bottom:30px; --n:6;}
+.gx-plot{position:relative; height:100%;}
+.gx-base{position:absolute; left:0; right:0; bottom:0; border-top:1px solid var(--paper-line);}
+.gx-cols{position:absolute; inset:0; display:grid; grid-template-columns:repeat(var(--n),1fr); gap:clamp(4px,2vw,20px);}
+.gx-col{position:relative; height:100%;}
+.gx-bar{position:absolute; left:50%; bottom:0; width:min(70%,58px); transform:translateX(-50%); height:calc(var(--p) * (100% - 28px)); min-height:3px; background:var(--cc,var(--gold)); border-radius:10px 10px 3px 3px; animation:gxGrow .7s cubic-bezier(.2,.8,.2,1) both; animation-delay:calc(var(--i) * 60ms); transition:filter .15s;}
+.gx-bar.partial{opacity:.6; background-image:repeating-linear-gradient(135deg, rgba(255,255,255,.4) 0 6px, transparent 6px 12px);}
+.gx-bar.none{background:var(--paper-line); min-height:2px; height:2px; opacity:.8;}
+.gx-val{position:absolute; left:-4px; right:-4px; bottom:calc(var(--p) * (100% - 28px) + 7px); text-align:center; font-family:'JetBrains Mono',monospace; font-size:11.5px; font-weight:600; color:var(--ink); white-space:nowrap; animation:gxFade .4s ease both; animation-delay:calc(var(--i) * 60ms + 320ms);}
+.gx-val.muted{color:var(--ink-soft); font-weight:400;}
+.gx-avgline{position:absolute; left:0; right:0; bottom:calc(var(--p) * (100% - 28px)); border-top:1.5px dashed var(--ink-soft); opacity:.55; pointer-events:none; z-index:2;}
+.gx-avgline span{position:absolute; right:0; top:-18px; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--ink-soft); background:var(--white); padding:0 5px; border-radius:6px;}
+.gx-xl{position:absolute; left:0; right:0; bottom:0; height:30px; display:grid; grid-template-columns:repeat(var(--n),1fr); gap:clamp(4px,2vw,20px); padding-top:9px;}
+.gx-xl div{text-align:center; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-soft); line-height:1.15; white-space:nowrap;}
+.gx-xl div.sel{color:var(--ink); font-weight:700;}
+.gx-xl small{display:block; font-size:9px; text-transform:uppercase; letter-spacing:.05em; opacity:.85;}
+@media (hover:hover) and (pointer:fine){ .gx-col:hover .gx-bar:not(.none){filter:brightness(1.1);} }
+.gx-chart-empty{padding:36px 10px 26px; text-align:center; color:var(--ink-soft); font-size:14px;}
+
+/* menu de ações + modais */
+.gx-menu{position:fixed; z-index:2000; background:var(--white); border:1px solid var(--paper-line); border-radius:14px; box-shadow:0 18px 44px rgba(15,23,42,.24); padding:6px; min-width:220px; animation:gxPop .14s ease both;}
+.gx-menu button{display:flex; width:100%; align-items:center; gap:10px; padding:10px 12px; border:none; background:none; border-radius:9px; text-align:left; font-size:14px; color:var(--ink); min-height:42px;}
+.gx-menu button svg{width:16px; height:16px; color:var(--ink-soft); flex-shrink:0;}
+.gx-menu button.danger{color:var(--rust);} .gx-menu button.danger svg{color:var(--rust);}
+.gx-menu hr{border:none; border-top:1px solid var(--paper-line); margin:5px 4px;}
+@media (hover:hover) and (pointer:fine){ .gx-menu button:hover{background:var(--paper-dark);} .gx-menu button.danger:hover{background:var(--rust-pale);} }
+.gx-overlay{transition:opacity .15s ease;}
+.gx-overlay.closing{opacity:0;}
+.gx-modal{max-width:440px; animation:gxPop .18s ease both;}
+.gx-modal h3{font-size:19px; margin-bottom:6px;}
+.gx-modal .settings-desc{margin:0 0 14px;}
+.gx-modal .qa-field{margin-bottom:14px;}
+.gx-modal .qa-row{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+.gx-modal-actions{display:flex; gap:8px; margin-top:18px; align-items:center; flex-wrap:wrap; justify-content:flex-end;}
+.gx-modal-actions .btn{min-height:42px;}
+.gx-modal-actions .grow{flex:1;}
+.btn.gx-danger{color:var(--rust); border-color:var(--rust-pale);}
+@media (hover:hover) and (pointer:fine){ .btn.gx-danger:hover{background:var(--rust-pale); border-color:var(--rust);} }
+.gx-icon-grid{display:grid; grid-template-columns:repeat(6,1fr); gap:8px;}
+.gx-icon-opt{aspect-ratio:1; border-radius:12px; border:1.5px solid var(--paper-line); background:var(--paper); color:var(--ink); display:flex; align-items:center; justify-content:center; min-height:44px;}
+.gx-icon-opt svg{width:22px; height:22px;}
+.gx-icon-opt.on{border-color:var(--gold); background:var(--forest-pale); color:var(--gold);}
+@media (hover:hover) and (pointer:fine){ .gx-icon-opt:hover{border-color:var(--gold-light);} }
+
+/* tema escuro */
+body.theme-dark .gx-trend.down{color:#34D399;}
+body.theme-dark .gx-tx-amt.pos, body.theme-dark .gx-card-val.pos{color:#34D399;}
+body.theme-dark .gx-tab.active, body.theme-dark .gx-seg button.active{background:var(--forest-light);}
+body.theme-dark .gx-crumb.current, body.theme-dark .gx-avg .v, body.theme-dark .gx-mini .v{color:var(--ink);}
+
+/* responsivo */
+@media(max-width:880px){
+  .gx-cat-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:14px;}
+  .gx-chart-card{padding:18px 16px 16px;}
+}
+@media(max-width:640px){
+  .gx-tabs{display:flex; width:100%;} .gx-tab{flex:1; justify-content:center; padding:9px 10px;}
+  .gx-stats{gap:8px;} .gx-stats .stat{padding:10px 11px;} .gx-stats .stat .value{font-size:13.5px;} .gx-stats .stat .label{font-size:8.5px;}
+  .gx-search{flex-basis:100%;} .gx-select{flex:1;} .gx-fbtn{flex:0 0 auto;}
+  .gx-actions-row .btn{flex:1;} .gx-actions-row{gap:10px;}
+  .gx-tx{padding:12px 12px; gap:10px; min-height:64px;} .gx-tx-ico{width:36px; height:36px;} .gx-tx-del{width:34px; height:34px; opacity:.7;}
+  .gx-tx-desc{font-size:14.5px;} .gx-tx-amt{font-size:14px;}
+  .gx-detail-stats{grid-template-columns:1fr 1fr;} .gx-detail-stats .gx-mini:last-child{grid-column:1 / -1;}
+  .gx-avg{text-align:left; width:100%; padding-top:12px; border-top:1px dashed var(--paper-line);}
+  .gx-chart{height:210px;} .gx-val{font-size:10.5px;} .gx-xl div{font-size:10px;}
+  .gx-detail-title h3{font-size:18px;}
+  .gx-modal{padding:20px 18px;}
+}
+@media(max-width:560px){
+  .gx-cat-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px;}
+  .gx-card{padding:14px 13px 13px; border-radius:16px;}
+  .gx-ico{width:40px; height:40px; border-radius:12px;} .gx-ico svg{width:20px; height:20px;}
+  .gx-card-name{font-size:15px;} .gx-card-val{font-size:16.5px; margin-top:10px;} .gx-card-desc{font-size:12px;}
+  .gx-icon-grid{grid-template-columns:repeat(5,1fr);}
+}
+@media (prefers-reduced-motion:reduce){
+  .gx-view,.gx-card,.gx-bar,.gx-val,.gx-chip,.gx-modal,.gx-menu,.gx-results-in,.gx-tx.is-new{animation:none !important;}
+  .gx-panel,.gx-add-wrap,.gx-progress i{transition:none !important;}
+}
 </style>
 </head>
 <body>
@@ -1236,6 +1492,7 @@ function emptyState(){
     wallet: { monthlyGoal: 0, items: [] }, // "Carteira de Investimentos"
     notesList: [], // "Bloco de Notas" — lista de notas (estilo iPhone)
     navConfig: null, // preenchido por ensureNavConfig()
+    categoryMeta: {}, // Despesas: orçamento, ícone e descrição por categoria (chave = nome normalizado)
     removedCore: [], // seções do sistema excluídas permanentemente (não voltam ao menu)
     lastUpdated: null, selectedMonth: null, dashboardMonth: null,
   };
@@ -1316,12 +1573,14 @@ function updateUndoRedoButtons(){
 
 // captura o estado ANTES de qualquer clique/digitação/mudança mexer nele
 // (fase de captura roda antes dos handlers dos próprios botões/campos)
+const undoSkip = (e)=> !!(e.target && e.target.closest && e.target.closest('[data-no-undo]')); // filtros/abas/navegação não alteram dados
 document.addEventListener('click', (e)=>{
   if(e.target.closest && e.target.closest('.js-undo-btn, .js-redo-btn')) return;
+  if(undoSkip(e)) return;
   captureUndoPoint();
 }, true);
-document.addEventListener('input', ()=>captureUndoPoint(), true);
-document.addEventListener('change', ()=>captureUndoPoint(), true);
+document.addEventListener('input', (e)=>{ if(undoSkip(e)) return; captureUndoPoint(); }, true);
+document.addEventListener('change', (e)=>{ if(undoSkip(e)) return; captureUndoPoint(); }, true);
 
 /* =========================================================
    SINCRONIZAÇÃO ENTRE DISPOSITIVOS
@@ -2525,99 +2784,277 @@ function buildCategoryRing(categories, total){
   return `<svg viewBox="0 0 120 120" class="summary-ring">${arcs}</svg>`;
 }
 
-function renderGastos(){
-  const el = document.createElement('div');
-  if(!state.months.find(m=>m.id===state.selectedMonth) && state.months.length){
-    state.selectedMonth = pickDefaultMonthId();
-  }
-  const month = state.months.find(m=>m.id===state.selectedMonth);
-  const idx = month ? state.months.findIndex(m=>m.id===month.id) : -1;
+/* =========================================================
+   RENDER: GASTOS MENSAIS (Despesas) — Todas · Categorias · Detalhe da categoria
+   Tudo é derivado de state.months (categorias e itens que já existem). A única coisa
+   nova que se guarda é state.categoryMeta: orçamento, ícone e descrição por categoria.
+========================================================= */
+const GX_MONTH_SHORT = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const GX = {
+  view:'all',            // 'all' | 'cats' | 'detail'
+  catKey:null,
+  filters:{ search:'', period:'month', cats:[], min:null, max:null },
+  sort:'recent',
+  addOpen:false, focusAdd:false, filtersOpen:false, legacy:false,
+  limit:60, flash:null, lastAdd:{ date:'', cat:'' }, _rows:[]
+};
 
-  el.innerHTML = `
-    <div class="page-header">
-      <div><h2>Gastos Mensais</h2><div class="desc">Adicione categorias e itens à vontade. O subtotal de cada categoria e o total do mês somam sozinhos.</div></div>
-    </div>
-    <div class="month-nav">
-      <button class="month-nav-arrow" id="btnPrevMonth" title="mês anterior" ${idx<=0?'disabled':''}>‹</button>
-      <div class="month-nav-label">${month ? escapeHtml(month.label) : '—'}</div>
-      <button class="month-nav-arrow" id="btnNextMonth" title="próximo mês" ${(idx<0||idx>=state.months.length-1)?'disabled':''}>›</button>
-    </div>
-    <div class="toolbar" style="margin-top:12px;">
-      <select class="tag-select" id="monthSelect"></select>
-      <button class="btn secondary small" id="btnNewMonth">+ novo mês</button>
-      <button class="btn secondary small" id="btnDupMonth">duplicar mês atual</button>
-      <button class="btn gold small" id="btnApplyFixed">aplicar gastos fixos</button>
-      ${month ? `<button class="btn secondary small" id="btnDelMonth" style="border-color:var(--rust); color:var(--rust);">excluir mês</button>` : ''}
-    </div>
-    <div id="monthContent"></div>
-  `;
+/* ---------- ícones (linha, mesmo estilo do menu) ---------- */
+const GX_ICON_PATHS = {
+  food:'<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>',
+  cart:'<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>',
+  car:'<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/>',
+  home:'<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/>',
+  ticket:'<path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2M13 11v2M13 17v2"/>',
+  health:'<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/>',
+  book:'<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>',
+  plane:'<path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>',
+  repeat:'<path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/>',
+  shirt:'<path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/>',
+  barbell:'<path d="M6.5 6.5v11"/><path d="M17.5 6.5v11"/><path d="M3.5 9v6"/><path d="M20.5 9v6"/><path d="M6.5 12h11"/>',
+  gift:'<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"/>',
+  paw:'<circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="4" cy="8" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045C6.52 17.48 4.46 16.84 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"/>',
+  phone:'<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/>',
+  zap:'<path d="M13 2 3 14h9l-1 8 10-12h-9z"/>',
+  briefcase:'<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>',
+  landmark:'<path d="M3 21h18"/><path d="M5 21V10M9 21V10M15 21V10M19 21V10"/><path d="m3 10 9-6 9 6"/>',
+  fixos:NAV_ICON_PATHS.fixos,
+  tag:'<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".6" fill="currentColor"/>'
+};
+const GX_ICON_RULES = [
+  ['fixos',['gasto fixo','gastos fixos']],
+  ['repeat',['assinatura','netflix','spotify']],
+  ['health',['saude','medic','farmac','dentist','hospital','terapia','exame']],
+  ['food',['aliment','comida','mercado','supermerc','restaur','lanche','padaria','ifood','delivery','refeic','cafe']],
+  ['car',['transport','carro','uber','combust','gasolina','onibus','veicul','moto','estacion']],
+  ['home',['moradia','casa','aluguel','condomin','imovel','reforma']],
+  ['ticket',['lazer','entreten','diversao','cinema','festa','balada','jogo']],
+  ['book',['educa','escola','curso','faculdade','estudo','livro']],
+  ['plane',['viag','ferias','hotel','passagem','turismo']],
+  ['shirt',['roupa','vestuario','moda','calcado']],
+  ['barbell',['academia','esporte','fitness','treino']],
+  ['gift',['presente','doacao']],
+  ['paw',['pet','animal','veterin','racao']],
+  ['phone',['celular','telefone','internet','telecom']],
+  ['zap',['conta','luz','energia','agua','utilidade']],
+  ['briefcase',['trabalho','negocio','empresa','escritorio']],
+  ['landmark',['imposto','taxa','tarifa','banco','juros','financ','emprestimo','cartao']],
+  ['cart',['compra','shopping','loja','varejo','amazon']]
+];
+const GX_DEFAULT_DESC = {
+  food:'Mercado, restaurantes, delivery, padaria etc.', cart:'Compras em lojas, online e itens pessoais.',
+  car:'Combustível, transporte por app, manutenção etc.', home:'Aluguel, condomínio, contas da casa e reformas.',
+  ticket:'Passeios, cinema, jogos e diversão.', health:'Consultas, farmácia, exames e plano de saúde.',
+  book:'Cursos, mensalidades, livros e materiais.', plane:'Passagens, hospedagem e passeios de viagem.',
+  repeat:'Serviços recorrentes e streamings.', shirt:'Roupas, calçados e acessórios.',
+  barbell:'Academia, esportes e bem-estar.', gift:'Presentes e doações.', paw:'Ração, veterinário e cuidados com pets.',
+  phone:'Celular, internet e telefonia.', zap:'Luz, água, gás e outras contas.',
+  briefcase:'Gastos ligados ao trabalho e a negócios.', landmark:'Impostos, taxas e tarifas.',
+  fixos:'Gastos que se repetem todo mês.'
+};
+const GX_ICON_UI = {
+  search:'<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
+  filter:'<path d="M3 5h18M6 12h12M10 19h4"/>',
+  dots:'<circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/>',
+  pencil:'<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+  trash:'<path d="M3 6h18"/><path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>',
+  eye:'<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  palette:'<circle cx="13.5" cy="6.5" r="1" fill="currentColor"/><circle cx="17.5" cy="10.5" r="1" fill="currentColor"/><circle cx="8.5" cy="7.5" r="1" fill="currentColor"/><circle cx="6.5" cy="12.5" r="1" fill="currentColor"/><path d="M12 2a10 10 0 0 0 0 20c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.3-.5-.8-.5-1.3 0-1.1.9-2 2-2H17a5 5 0 0 0 5-5c0-4.4-4.5-8.4-10-8.4Z"/>',
+  text:'<path d="M4 7V4h16v3M9 20h6M12 4v16"/>',
+  shapes:'<rect x="3" y="3" width="8" height="8" rx="1.5"/><circle cx="17.5" cy="6.5" r="3.5"/><path d="m3 21 4-7 4 7Z"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+  receipt:'<path d="M4 2v20l3-2 2 2 3-2 3 2 2-2 3 2V2l-3 2-2-2-3 2-3-2-2 2Z"/><path d="M8 9h8M8 13h6"/>'
+};
+function gxSvg(path, size){
+  const s = size ? ` width="${size}" height="${size}"` : '';
+  return `<svg viewBox="0 0 24 24"${s} fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${path}</svg>`;
+}
+const gxUi = (name, size)=>gxSvg(GX_ICON_UI[name], size);
 
-  const sel = el.querySelector('#monthSelect');
-  sel.innerHTML = state.months.map(m=>`<option value="${m.id}" ${m.id===state.selectedMonth?'selected':''}>${escapeHtml(m.label)}</option>`).join('');
-  sel.addEventListener('change', ()=>{ state.selectedMonth = sel.value; renderSection(); });
+/* ---------- helpers de dados ---------- */
+function gxKey(name){ return String(name||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim(); }
+function gxSelMonth(){ return (state.months||[]).find(m=>m.id===state.selectedMonth) || null; }
+function gxMeta(key, create){
+  if(!state.categoryMeta || typeof state.categoryMeta!=='object'){ if(!create) return {}; state.categoryMeta = {}; }
+  let m = state.categoryMeta[key];
+  if(!m){ if(!create) return {}; m = state.categoryMeta[key] = {}; }
+  return m;
+}
+function gxIconKey(key, name){
+  const meta = gxMeta(key);
+  if(meta.icon && GX_ICON_PATHS[meta.icon]) return meta.icon;
+  const n = gxKey(name);
+  for(const [ik, words] of GX_ICON_RULES){ if(words.some(w=>n.includes(w))) return ik; }
+  return 'tag';
+}
+function gxTint(color, alpha){ return /^#[0-9a-f]{6}$/i.test(color||'') ? color + alpha : 'var(--forest-pale)'; }
+function gxMoneySigned(v){ if(!v) return fmt(0); return v>0 ? '- '+fmt(v) : '+ '+fmt(-v); }
+function gxShortNum(v){
+  const a = Math.abs(v);
+  if(a>=1e6) return (v/1e6).toLocaleString('pt-BR',{maximumFractionDigits:1})+' mi';
+  return Math.round(v).toLocaleString('pt-BR');
+}
+function gxPlural(n, one, many){ return n+' '+(n===1?one:many); }
+function gxFmtDate(t){
+  if(t.date && /^\d{4}-\d{2}-\d{2}$/.test(t.date)){ const [y,m,d]=t.date.split('-'); return `${d}/${m}/${y}`; }
+  return t.month ? String(t.month.label||'') : '';
+}
 
-  const prevBtn = el.querySelector('#btnPrevMonth');
-  const nextBtn = el.querySelector('#btnNextMonth');
-  if(prevBtn) prevBtn.addEventListener('click', ()=>{
-    if(idx>0){ state.selectedMonth = state.months[idx-1].id; renderSection(); }
-  });
-  if(nextBtn) nextBtn.addEventListener('click', ()=>{
-    if(idx>=0 && idx<state.months.length-1){ state.selectedMonth = state.months[idx+1].id; renderSection(); }
-  });
-
-  el.querySelector('#btnNewMonth').addEventListener('click', ()=>{
-    const label = prompt('Nome do novo mês (ex: Novembro / 2026):');
-    if(!label) return;
-    const id = uid();
-    state.months.push({id, label, categories:[]});
-    state.selectedMonth = id;
-    scheduleSave(); renderSection();
-  });
-
-  el.querySelector('#btnDupMonth').addEventListener('click', ()=>{
-    if(!month) return;
-    const label = prompt('Nome do novo mês (cópia de ' + month.label + '):', '');
-    if(!label) return;
-    const clone = JSON.parse(JSON.stringify(month));
-    clone.id = uid(); clone.label = label;
-    state.months.push(clone);
-    state.selectedMonth = clone.id;
-    scheduleSave(); renderSection();
-  });
-
-  el.querySelector('#btnApplyFixed').addEventListener('click', ()=>{
-    if(!month) return;
-    let cat = month.categories.find(c=>c.name==='Gastos Fixos');
-    if(!cat){ cat = {name:'Gastos Fixos', items:[]}; month.categories.unshift(cat); }
-    state.fixedExpenses.forEach(f=>{
-      if(!cat.items.find(i=>i.desc===f.name)) cat.items.push({desc:f.name, value:f.value});
+// Todas as categorias existentes (união dos meses), agrupadas pelo nome normalizado
+function gxUniverse(){
+  const map = new Map();
+  (state.months||[]).forEach(month=>{
+    (month.categories||[]).forEach(cat=>{
+      const k = gxKey(cat.name);
+      let e = map.get(k);
+      if(!e){ e = {key:k, name:cat.name||'Sem nome', entries:[]}; map.set(k,e); }
+      if(cat.name) e.name = cat.name; // fica o nome do mês mais recente
+      e.entries.push({cat, month});
     });
-    scheduleSave(); renderSection();
   });
-
-  const delBtn = el.querySelector('#btnDelMonth');
-  if(delBtn){
-    delBtn.addEventListener('click', ()=>{
-      if(!confirm(`Excluir "${month.label}" e todos os gastos dele?`)) return;
-      state.months = state.months.filter(m=>m.id!==month.id);
-      const salIdx = state.salaries.findIndex(s=>s.monthId===month.id);
-      if(salIdx>=0) state.salaries.splice(salIdx,1);
-      state.selectedMonth = state.months[0] ? state.months[0].id : null;
-      scheduleSave(); renderSection();
+  return map;
+}
+function gxMonthsOf(period, back){
+  const months = state.months||[];
+  if(period==='all') return back ? [] : months.slice();
+  const sel = gxSelMonth();
+  if(!sel) return [];
+  const r = monthLabelRank(sel.label);
+  if(r===null) return back ? [] : [sel];
+  if(period==='month' && !back) return [sel];
+  let lo, hi;
+  if(period==='month'){ lo = hi = r; }
+  else if(period==='3m'){ lo = r-2; hi = r; }
+  else if(period==='6m'){ lo = r-5; hi = r; }
+  else { const y = Math.floor(r/12); lo = y*12; hi = y*12+11; }
+  if(back){ const len = hi-lo+1; lo -= len; hi -= len; }
+  return months.filter(m=>{ const mr = monthLabelRank(m.label); return mr!==null && mr>=lo && mr<=hi; });
+}
+function gxPeriodLabel(period){
+  const sel = gxSelMonth();
+  if(period==='month') return sel ? sel.label : 'Mês';
+  if(period==='3m') return 'Últimos 3 meses';
+  if(period==='6m') return 'Últimos 6 meses';
+  if(period==='all') return 'Todo o histórico';
+  const r = sel ? monthLabelRank(sel.label) : null;
+  return r===null ? 'Ano' : 'Ano '+Math.floor(r/12);
+}
+function gxPeriodOptions(){
+  return ['month','3m','6m','year','all'].map(p=>`<option value="${p}" ${GX.filters.period===p?'selected':''}>${escapeHtml(gxPeriodLabel(p))}</option>`).join('');
+}
+// Transações = itens com valor ou descrição (linhas em branco do editor antigo não contam)
+function gxTx(months){
+  const out = []; let order = 0;
+  months.forEach(month=>{
+    const mr = monthLabelRank(month.label);
+    (month.categories||[]).forEach(cat=>{
+      const key = gxKey(cat.name);
+      (cat.items||[]).forEach(item=>{
+        const v = Number(item.value)||0;
+        const d = String(item.desc||'').trim();
+        if(v===0 && !d) return;
+        out.push({month, cat, item, key, catName:cat.name||'Sem nome', desc:d||'(sem descrição)', value:v, date:item.date||'', rank:mr, order:order++});
+      });
     });
-  }
+  });
+  return out;
+}
+function gxDateKey(t){
+  if(t.date) return t.date;
+  if(t.rank!==null){ return Math.floor(t.rank/12)+'-'+String(t.rank%12+1).padStart(2,'0')+'-00'; }
+  return '0000-00-00';
+}
+function gxSortTx(arr, mode){
+  const a = arr.slice();
+  if(mode==='oldest') a.sort((x,y)=> gxDateKey(x)<gxDateKey(y)?-1 : gxDateKey(x)>gxDateKey(y)?1 : x.order-y.order);
+  else if(mode==='high') a.sort((x,y)=>y.value-x.value || x.order-y.order);
+  else if(mode==='low') a.sort((x,y)=>x.value-y.value || x.order-y.order);
+  else if(mode==='az') a.sort((x,y)=>x.desc.localeCompare(y.desc,'pt-BR') || x.order-y.order);
+  else a.sort((x,y)=> gxDateKey(x)>gxDateKey(y)?-1 : gxDateKey(x)<gxDateKey(y)?1 : y.order-x.order);
+  return a;
+}
+function gxApplyFilters(txs, f){
+  const q = gxKey(f.search);
+  return txs.filter(t=>{
+    if(f.cats.length && !f.cats.includes(t.key)) return false;
+    if(f.min!==null && t.value < f.min) return false;
+    if(f.max!==null && t.value > f.max) return false;
+    if(q){
+      const hay = gxKey(t.desc+' '+t.catName+' '+gxFmtDate(t)+' '+t.month.label+' '+moneyDisplay(t.value));
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+function gxCurrentList(){
+  const f = GX.view==='detail' ? Object.assign({}, GX.filters, {cats:[GX.catKey]}) : GX.filters;
+  const months = gxMonthsOf(GX.filters.period);
+  const all = gxTx(months);
+  const rows = gxSortTx(gxApplyFilters(all, f), GX.sort);
+  return {rows, total:rows.reduce((s,t)=>s+t.value,0), months, all};
+}
+function gxCategoryStats(period){
+  const uni = gxUniverse();
+  const cur = gxTx(gxMonthsOf(period));
+  const prev = gxTx(gxMonthsOf(period, true));
+  const every = gxTx(state.months||[]);
+  const sum = arr=>arr.reduce((s,t)=>s+t.value,0);
+  const list = [];
+  uni.forEach((e,key)=>{
+    const c = cur.filter(t=>t.key===key), p = prev.filter(t=>t.key===key);
+    list.push({key, name:e.name, total:sum(c), count:c.length, prevTotal:sum(p), examples:every.filter(t=>t.key===key).map(t=>t.desc)});
+  });
+  return list;
+}
+function gxColorFor(key){
+  const months = state.months||[];
+  const pick = month=>{
+    const list = month.categories||[];
+    const i = list.findIndex(c=>gxKey(c.name)===key);
+    return i>=0 ? catColor(list[i], i) : null;
+  };
+  const sel = gxSelMonth();
+  if(sel){ const c = pick(sel); if(c) return c; }
+  for(let i=months.length-1;i>=0;i--){ const c = pick(months[i]); if(c) return c; }
+  return CAT_COLORS[0];
+}
+function gxDescFor(key, name, iconKey, examples){
+  const meta = gxMeta(key);
+  if(meta.desc) return meta.desc;
+  if(GX_DEFAULT_DESC[iconKey]) return GX_DEFAULT_DESC[iconKey];
+  const seen = [];
+  (examples||[]).forEach(d=>{ if(d && d!=='(sem descrição)' && !seen.includes(d) && seen.length<3) seen.push(d); });
+  return seen.length ? 'Ex.: '+seen.join(', ') : 'Gastos em '+name+'.';
+}
+function gxBudgetInfo(key, spent, nMonths){
+  const b = Number(gxMeta(key).budget)||0;
+  if(b<=0) return null;
+  const n = Math.max(1, nMonths);
+  const limit = b*n;
+  const pct = spent/limit*100;
+  return {monthly:b, limit, pct, left:limit-spent, cls: pct>100?'over': pct>=85?'warn':''};
+}
+function gxActiveFilterCount(){
+  const f = GX.filters;
+  return (f.period!=='month'?1:0) + (f.search.trim()?1:0) + f.cats.length + ((f.min!==null||f.max!==null)?1:0);
+}
 
-  const content = el.querySelector('#monthContent');
-  if(!month){
-    content.innerHTML = `<div class="card"><div class="empty-state">Nenhum mês cadastrado ainda. Clique em "+ novo mês" para começar.</div></div>`;
-    return el;
-  }
-
+/* ---------- resumo do mês (anel/donut já existente + indicadores) ---------- */
+function gxSummaryHTML(month){
   const total = monthTotal(month);
-
-  const summaryCard = document.createElement('div');
-  summaryCard.className = 'card month-summary-card';
-  summaryCard.innerHTML = `
+  const txs = gxTx([month]);
+  const cats = (month.categories||[]).map(c=>({c, t:categoryTotal(c)})).filter(x=>x.t>0).sort((a,b)=>b.t-a.t);
+  const top = cats[0];
+  const rank = monthLabelRank(month.label);
+  let cmp = null;
+  if(rank!==null){
+    const prev = (state.months||[]).filter(m=>m!==month && monthLabelRank(m.label)===rank-1);
+    if(prev.length){ const pt = prev.reduce((s,m)=>s+monthTotal(m),0); if(pt>0 && total>0) cmp = (total-pt)/pt*100; }
+  }
+  const third = cmp===null
+    ? `<div class="stat"><div class="label">Categorias com gasto</div><div class="value mono">${cats.length}</div></div>`
+    : `<div class="stat ${cmp>0?'neg':'pos'}"><div class="label">vs. mês anterior${rank===currentMonthRank()?' (parcial)':''}</div><div class="value mono">${cmp>0?'+':''}${Math.round(cmp)}%</div></div>`;
+  return `
     <div class="summary-total-row">
       <div>
         <div class="summary-total-value mono">${fmt(total)}</div>
@@ -2625,56 +3062,604 @@ function renderGastos(){
       </div>
       ${buildCategoryRing(month.categories, total)}
     </div>
-  `;
-  content.appendChild(summaryCard);
+    <div class="gx-stats">
+      <div class="stat"><div class="label">Transações</div><div class="value mono">${txs.length}</div></div>
+      <div class="stat"><div class="label" title="${top?escAttr(top.c.name):''}">${top ? 'Maior · '+escapeHtml(top.c.name||'Sem nome') : 'Maior categoria'}</div><div class="value mono">${top ? fmt(top.t) : '—'}</div></div>
+      ${third}
+    </div>`;
+}
+function gxRefreshSummary(){
+  const card = document.querySelector('.month-summary-card');
+  const month = gxSelMonth();
+  if(card && month) card.innerHTML = gxSummaryHTML(month);
+}
 
-  const quickAddCard = document.createElement('div');
-  quickAddCard.className = 'card quick-add-card';
-  const qaCatOptions = month.categories.map(c=>`<option value="${escAttr(c.name)}">${escapeHtml(c.name)}</option>`).join('')
-    + (month.categories.find(c=>c.name==='Sem categoria') ? '' : `<option value="Sem categoria">Sem categoria</option>`);
-  quickAddCard.innerHTML = `
-    <div class="qa-grid">
-      <div class="qa-field"><label>Descrição</label><input type="text" id="qaDesc" placeholder="ex: mercado"></div>
-      <div class="qa-field"><label>Valor</label><input type="text" inputmode="decimal" class="money" id="qaValor" placeholder="0,00"></div>
-      <div class="qa-field"><label>Data</label><input type="date" id="qaData"></div>
-      <div class="qa-field"><label>Tipo</label><select id="qaTipo"><option value="gasto">Gasto</option></select></div>
+/* ---------- modal genérico ---------- */
+function gxModal(html){
+  const ov = document.createElement('div');
+  ov.className = 'modal-overlay open gx-overlay';
+  ov.innerHTML = `<div class="modal-card gx-modal" role="dialog" aria-modal="true">${html}</div>`;
+  document.body.appendChild(ov);
+  const onKey = e=>{ if(e.key==='Escape') close(); };
+  const close = ()=>{
+    document.removeEventListener('keydown', onKey);
+    ov.classList.add('closing');
+    setTimeout(()=>ov.remove(), 160);
+  };
+  ov.addEventListener('mousedown', e=>{ if(e.target===ov) close(); });
+  document.addEventListener('keydown', onKey);
+  ov.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click', close));
+  return {el:ov.firstElementChild, close};
+}
+function gxSetErr(m, msg){ const e = m.el.querySelector('.gx-err'); if(e) e.textContent = msg||''; }
+function gxBindMoney(input){
+  input.addEventListener('blur', ()=>{ if(input.value.trim()) input.value = moneyDisplay(parseMoney(input.value)); });
+}
+
+/* ---------- menu de três pontos ---------- */
+let gxMenuEl = null;
+function gxCloseMenu(){
+  if(gxMenuEl){ gxMenuEl.remove(); gxMenuEl = null; }
+  document.removeEventListener('mousedown', gxMenuOutside, true);
+  document.removeEventListener('keydown', gxMenuKey, true);
+  window.removeEventListener('scroll', gxCloseMenu, true);
+  window.removeEventListener('resize', gxCloseMenu);
+}
+function gxMenuOutside(e){ if(gxMenuEl && !gxMenuEl.contains(e.target)) gxCloseMenu(); }
+function gxMenuKey(e){ if(e.key==='Escape') gxCloseMenu(); }
+function gxOpenMenu(anchor, key){
+  gxCloseMenu();
+  const e = gxUniverse().get(key); if(!e) return;
+  const hasBudget = (Number(gxMeta(key).budget)||0)>0;
+  const items = [
+    ['open','Ver transações','eye'], ['add','Adicionar despesa aqui','plus'],
+    ['budget', hasBudget?'Editar orçamento':'Definir orçamento','pencil'], '-',
+    ['desc','Editar descrição','text'], ['icon','Alterar ícone','shapes'], ['color','Alterar cor','palette'], ['rename','Renomear categoria','pencil'], '-',
+    ['remove','Remover categoria','trash','danger']
+  ];
+  const m = document.createElement('div');
+  m.className = 'gx-menu'; m.setAttribute('role','menu');
+  m.innerHTML = items.map(it=> it==='-' ? '<hr>' : `<button type="button" role="menuitem" data-act="${it[0]}" class="${it[3]||''}">${gxUi(it[2])}<span>${it[1]}</span></button>`).join('');
+  document.body.appendChild(m);
+  gxMenuEl = m;
+  const r = anchor.getBoundingClientRect();
+  const w = m.offsetWidth, h = m.offsetHeight;
+  let left = Math.min(Math.max(8, r.right - w), window.innerWidth - w - 8);
+  let top = r.bottom + 6;
+  if(top + h > window.innerHeight - 8) top = Math.max(8, r.top - h - 6);
+  m.style.left = left+'px'; m.style.top = top+'px';
+  m.addEventListener('click', ev=>{
+    const b = ev.target.closest('[data-act]'); if(!b) return;
+    const act = b.dataset.act;
+    gxCloseMenu();
+    if(act==='open') gxOpenCategory(key);
+    else if(act==='add'){ GX.addOpen = true; GX.focusAdd = true; gxOpenCategory(key); }
+    else if(act==='budget') gxOpenBudget(key);
+    else if(act==='desc') gxOpenDesc(key);
+    else if(act==='icon') gxOpenIcons(key);
+    else if(act==='color') gxPickColor(key, anchor);
+    else if(act==='rename') gxRenameCategory(key);
+    else if(act==='remove') gxRemoveCategory(key);
+  });
+  setTimeout(()=>{
+    document.addEventListener('mousedown', gxMenuOutside, true);
+    document.addEventListener('keydown', gxMenuKey, true);
+    window.addEventListener('scroll', gxCloseMenu, true);
+    window.addEventListener('resize', gxCloseMenu);
+  }, 0);
+}
+
+/* ---------- ações de categoria ---------- */
+function gxOpenCategory(key){
+  GX.view = 'detail'; GX.catKey = key; GX.filters.cats = [key];
+  GX.filters.search = ''; GX.filters.min = null; GX.filters.max = null;
+  GX.legacy = false; GX.limit = 60; GX.filtersOpen = false;
+  renderSection();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function gxLeaveDetail(to){
+  GX.view = to; GX.catKey = null; GX.filters.cats = []; GX.limit = 60;
+  renderSection();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function gxOpenBudget(key){
+  const e = gxUniverse().get(key); if(!e) return;
+  const cur = Number(gxMeta(key).budget)||0;
+  const m = gxModal(`
+    <h3>Orçamento · ${escapeHtml(e.name)}</h3>
+    <p class="settings-desc">Valor mensal planejado para esta categoria. Ele é comparado com o que foi gasto no período escolhido.</p>
+    <div class="qa-field"><label for="gxBudVal">Orçamento mensal</label><input type="text" id="gxBudVal" class="modal-money" inputmode="decimal" placeholder="0,00" autocomplete="off"></div>
+    <div class="gx-err"></div>
+    <div class="gx-modal-actions">
+      ${cur>0 ? '<button type="button" class="btn secondary small gx-danger" id="gxBudDel">Remover</button>' : ''}
+      <span class="grow"></span>
+      <button type="button" class="btn secondary small" data-close>Cancelar</button>
+      <button type="button" class="btn small" id="gxBudOk">Salvar</button>
+    </div>`);
+  const inp = m.el.querySelector('#gxBudVal');
+  if(cur>0) inp.value = moneyDisplay(cur);
+  gxBindMoney(inp);
+  setTimeout(()=>inp.focus(), 40);
+  const save = ()=>{
+    const v = parseMoney(inp.value);
+    if(!(v>0)){ gxSetErr(m, 'Informe um valor maior que zero.'); return; }
+    gxMeta(key, true).budget = v;
+    scheduleSave(); m.close(); renderSection(); showToast('✓ orçamento salvo', false);
+  };
+  m.el.querySelector('#gxBudOk').addEventListener('click', save);
+  inp.addEventListener('keydown', ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); save(); } });
+  const del = m.el.querySelector('#gxBudDel');
+  if(del) del.addEventListener('click', ()=>{ delete gxMeta(key, true).budget; scheduleSave(); m.close(); renderSection(); showToast('orçamento removido', false); });
+}
+function gxOpenDesc(key){
+  const e = gxUniverse().get(key); if(!e) return;
+  const meta = gxMeta(key);
+  const m = gxModal(`
+    <h3>Descrição · ${escapeHtml(e.name)}</h3>
+    <p class="settings-desc">Um texto curto que aparece no cartão da categoria.</p>
+    <div class="qa-field"><label for="gxDescIn">Descrição</label><input type="text" id="gxDescIn" maxlength="90" autocomplete="off"></div>
+    <div class="gx-modal-actions">
+      ${meta.desc ? '<button type="button" class="btn secondary small" id="gxDescReset">Usar padrão</button>' : ''}
+      <span class="grow"></span>
+      <button type="button" class="btn secondary small" data-close>Cancelar</button>
+      <button type="button" class="btn small" id="gxDescOk">Salvar</button>
+    </div>`);
+  const inp = m.el.querySelector('#gxDescIn');
+  inp.value = meta.desc || gxDescFor(key, e.name, gxIconKey(key, e.name), []);
+  setTimeout(()=>{ inp.focus(); inp.select(); }, 40);
+  const save = ()=>{
+    const v = inp.value.trim();
+    if(v) gxMeta(key, true).desc = v; else delete gxMeta(key, true).desc;
+    scheduleSave(); m.close(); renderSection();
+  };
+  m.el.querySelector('#gxDescOk').addEventListener('click', save);
+  inp.addEventListener('keydown', ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); save(); } });
+  const rs = m.el.querySelector('#gxDescReset');
+  if(rs) rs.addEventListener('click', ()=>{ delete gxMeta(key, true).desc; scheduleSave(); m.close(); renderSection(); });
+}
+function gxOpenIcons(key){
+  const e = gxUniverse().get(key); if(!e) return;
+  const cur = gxIconKey(key, e.name);
+  const opts = Object.keys(GX_ICON_PATHS).map(k=>`<button type="button" class="gx-icon-opt ${k===cur?'on':''}" data-ico="${k}" aria-label="${k}">${gxSvg(GX_ICON_PATHS[k])}</button>`).join('');
+  const m = gxModal(`
+    <h3>Ícone · ${escapeHtml(e.name)}</h3>
+    <p class="settings-desc">Escolha o ícone que representa esta categoria.</p>
+    <div class="gx-icon-grid">${opts}</div>
+    <div class="gx-modal-actions">
+      <button type="button" class="btn secondary small" id="gxIcoAuto">Automático</button>
+      <span class="grow"></span>
+      <button type="button" class="btn secondary small" data-close>Cancelar</button>
+    </div>`);
+  m.el.querySelectorAll('[data-ico]').forEach(b=>b.addEventListener('click', ()=>{
+    gxMeta(key, true).icon = b.dataset.ico; scheduleSave(); m.close(); renderSection();
+  }));
+  m.el.querySelector('#gxIcoAuto').addEventListener('click', ()=>{ delete gxMeta(key, true).icon; scheduleSave(); m.close(); renderSection(); });
+}
+function gxPickColor(key, anchor){
+  const e = gxUniverse().get(key); if(!e) return;
+  const fake = {color: gxColorFor(key)};
+  openColorPopover(anchor, fake, color=>{
+    e.entries.forEach(x=>{ x.cat.color = color; });
+    scheduleSave();
+    document.querySelectorAll('.gx-card').forEach(card=>{
+      if(card.dataset.cat===key){
+        card.querySelector('.gx-ico').style.cssText = `background:${gxTint(color,'22')}; color:${color};`;
+        card.style.setProperty('--cc', color);
+      }
+    });
+    gxRefreshSummary();
+  });
+}
+function gxRenameCategory(key){
+  const e = gxUniverse().get(key); if(!e) return;
+  const m = gxModal(`
+    <h3>Renomear categoria</h3>
+    <p class="settings-desc">O novo nome vale para essa categoria em todos os meses.</p>
+    <div class="qa-field"><label for="gxRenIn">Nome</label><input type="text" id="gxRenIn" maxlength="40" autocomplete="off"></div>
+    <div class="gx-err"></div>
+    <div class="gx-modal-actions"><span class="grow"></span><button type="button" class="btn secondary small" data-close>Cancelar</button><button type="button" class="btn small" id="gxRenOk">Salvar</button></div>`);
+  const inp = m.el.querySelector('#gxRenIn');
+  inp.value = e.name;
+  setTimeout(()=>{ inp.focus(); inp.select(); }, 40);
+  const save = ()=>{
+    const nn = inp.value.trim();
+    if(!nn){ gxSetErr(m, 'Informe um nome.'); return; }
+    const nk = gxKey(nn);
+    if(nk!==key && gxUniverse().has(nk)){ gxSetErr(m, 'Já existe uma categoria com esse nome.'); return; }
+    e.entries.forEach(x=>{ x.cat.name = nn; });
+    if(nk!==key){
+      if(state.categoryMeta && state.categoryMeta[key]){ state.categoryMeta[nk] = state.categoryMeta[key]; delete state.categoryMeta[key]; }
+      if(GX.catKey===key) GX.catKey = nk;
+      GX.filters.cats = GX.filters.cats.map(k=>k===key?nk:k);
+    }
+    scheduleSave(); m.close(); renderSection(); showToast('✓ categoria renomeada', false);
+  };
+  m.el.querySelector('#gxRenOk').addEventListener('click', save);
+  inp.addEventListener('keydown', ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); save(); } });
+}
+function gxNewCategory(){
+  const month = gxSelMonth(); if(!month) return;
+  const m = gxModal(`
+    <h3>Nova categoria</h3>
+    <p class="settings-desc">Ela aparece na hora em Categorias e já pode receber despesas.</p>
+    <div class="qa-field"><label for="gxNewIn">Nome</label><input type="text" id="gxNewIn" maxlength="40" placeholder="ex: Academia" autocomplete="off"></div>
+    <div class="gx-err"></div>
+    <div class="gx-modal-actions"><span class="grow"></span><button type="button" class="btn secondary small" data-close>Cancelar</button><button type="button" class="btn small" id="gxNewOk">Criar</button></div>`);
+  const inp = m.el.querySelector('#gxNewIn');
+  setTimeout(()=>inp.focus(), 40);
+  const save = ()=>{
+    const nn = inp.value.trim();
+    if(!nn){ gxSetErr(m, 'Informe um nome.'); return; }
+    if(gxUniverse().has(gxKey(nn))){ gxSetErr(m, 'Já existe uma categoria com esse nome.'); return; }
+    month.categories.push({name:nn, items:[]});
+    scheduleSave(); m.close(); renderSection(); showToast('✓ categoria criada', false);
+  };
+  m.el.querySelector('#gxNewOk').addEventListener('click', save);
+  inp.addEventListener('keydown', ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); save(); } });
+}
+function gxRemoveCategory(key){
+  const e = gxUniverse().get(key); if(!e) return;
+  const sel = gxSelMonth();
+  const inSel = e.entries.filter(x=>x.month===sel);
+  const others = e.entries.filter(x=>x.month!==sel);
+  const count = list=>list.reduce((s,x)=>s+(x.cat.items||[]).filter(i=>(Number(i.value)||0)!==0 || String(i.desc||'').trim()).length, 0);
+  const both = inSel.length && others.length;
+  const m = gxModal(`
+    <h3>Remover “${escapeHtml(e.name)}”?</h3>
+    <p class="settings-desc">${both
+      ? `Em ${escapeHtml(sel.label)} há ${gxPlural(count(inSel),'lançamento','lançamentos')}; nos outros meses, ${count(others)}. Os lançamentos removidos saem dos totais.`
+      : `${gxPlural(count(e.entries),'lançamento será excluído','lançamentos serão excluídos')} junto com a categoria.`}</p>
+    <div class="gx-modal-actions">
+      <button type="button" class="btn secondary small" data-close>Cancelar</button>
+      ${both ? `<button type="button" class="btn secondary small gx-danger" id="gxRmSel">Só em ${escapeHtml(sel.label)}</button>` : ''}
+      <button type="button" class="btn small" id="gxRmAll" style="background:var(--rust); box-shadow:none;">${both?'Em todos os meses':'Remover'}</button>
+    </div>`);
+  const remove = list=>{
+    list.forEach(x=>{ const i = x.month.categories.indexOf(x.cat); if(i>-1) x.month.categories.splice(i,1); });
+    if(!gxUniverse().has(key)){
+      if(state.categoryMeta) delete state.categoryMeta[key];
+      if(GX.catKey===key){ GX.view = 'cats'; GX.catKey = null; }
+      GX.filters.cats = GX.filters.cats.filter(k=>k!==key);
+    }
+    scheduleSave(); m.close(); renderSection(); showToast('categoria removida', false);
+  };
+  m.el.querySelector('#gxRmAll').addEventListener('click', ()=>remove(e.entries));
+  const rs = m.el.querySelector('#gxRmSel');
+  if(rs) rs.addEventListener('click', ()=>remove(inSel));
+}
+
+/* ---------- transações: editar / excluir / adicionar ---------- */
+function gxCategoryNames(month){
+  const names = [], seen = new Set();
+  (month.categories||[]).forEach(c=>{ const k = gxKey(c.name); if(!seen.has(k)){ seen.add(k); names.push(c.name); } });
+  gxUniverse().forEach(e=>{ if(!seen.has(e.key)){ seen.add(e.key); names.push(e.name); } });
+  if(!seen.has('sem categoria')) names.push('Sem categoria');
+  return names;
+}
+function gxOpenTxEditor(tx){
+  const names = gxCategoryNames(tx.month);
+  const opts = names.map(n=>`<option value="${escAttr(n)}" ${gxKey(n)===tx.key?'selected':''}>${escapeHtml(n||'Sem nome')}</option>`).join('');
+  const m = gxModal(`
+    <h3>Editar despesa</h3>
+    <p class="settings-desc">${escapeHtml(tx.month.label)}</p>
+    <div class="qa-field"><label for="gxEdDesc">Descrição</label><input type="text" id="gxEdDesc" autocomplete="off"></div>
+    <div class="qa-row">
+      <div class="qa-field"><label for="gxEdVal">Valor</label><input type="text" id="gxEdVal" class="money" inputmode="decimal" autocomplete="off"></div>
+      <div class="qa-field"><label for="gxEdDate">Data</label><input type="date" id="gxEdDate"></div>
     </div>
-    <div class="qa-row2">
-      <div class="qa-field"><label>Categoria</label><select id="qaCategoria">${qaCatOptions}</select></div>
-      <button class="btn" id="btnQaAdd">Adicionar</button>
-    </div>
-  `;
-  content.appendChild(quickAddCard);
-
-  const qaDataInput = quickAddCard.querySelector('#qaData');
-  qaDataInput.value = new Date().toISOString().slice(0,10);
-  const qaDescInput = quickAddCard.querySelector('#qaDesc');
-  const qaValorInput = quickAddCard.querySelector('#qaValor');
-  const qaCategoriaSelect = quickAddCard.querySelector('#qaCategoria');
-
-  function submitQuickAdd(){
-    const desc = qaDescInput.value.trim();
-    const valor = parseMoney(qaValorInput.value);
-    const data = qaDataInput.value || new Date().toISOString().slice(0,10);
-    const catName = qaCategoriaSelect.value || 'Sem categoria';
-    if(!desc){ alert('Informe a descrição do gasto.'); qaDescInput.focus(); return; }
-    if(!valor || valor<=0){ alert('Informe um valor válido.'); qaValorInput.focus(); return; }
-    let cat = month.categories.find(c=>c.name===catName);
+    <div class="qa-field"><label for="gxEdCat">Categoria</label><select id="gxEdCat">${opts}</select></div>
+    <div class="gx-err"></div>
+    <div class="gx-modal-actions">
+      <button type="button" class="btn secondary small gx-danger" id="gxEdDel">Excluir</button>
+      <span class="grow"></span>
+      <button type="button" class="btn secondary small" data-close>Cancelar</button>
+      <button type="button" class="btn small" id="gxEdOk">Salvar</button>
+    </div>`);
+  const dI = m.el.querySelector('#gxEdDesc'), vI = m.el.querySelector('#gxEdVal'), tI = m.el.querySelector('#gxEdDate'), cS = m.el.querySelector('#gxEdCat');
+  dI.value = String(tx.item.desc||''); vI.value = moneyDisplay(tx.item.value); tI.value = tx.item.date||'';
+  gxBindMoney(vI);
+  setTimeout(()=>dI.focus(), 40);
+  const save = ()=>{
+    const desc = dI.value.trim(), valor = parseMoney(vI.value);
+    if(!desc){ gxSetErr(m, 'Informe a descrição do gasto.'); return; }
+    if(!valor || valor<=0){ gxSetErr(m, 'Informe um valor válido.'); return; }
+    tx.item.desc = desc; tx.item.value = valor; tx.item.date = tI.value || '';
+    const nk = gxKey(cS.value);
+    if(nk!==tx.key){
+      let target = tx.month.categories.find(c=>gxKey(c.name)===nk);
+      if(!target){ target = {name:cS.value, items:[]}; tx.month.categories.push(target); }
+      const i = tx.cat.items.indexOf(tx.item); if(i>-1) tx.cat.items.splice(i,1);
+      target.items.push(tx.item);
+    }
+    scheduleSave(); m.close(); renderSection(); showToast('✓ despesa atualizada', false);
+  };
+  m.el.querySelector('#gxEdOk').addEventListener('click', save);
+  [dI, vI].forEach(i=>i.addEventListener('keydown', ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); save(); } }));
+  m.el.querySelector('#gxEdDel').addEventListener('click', ()=>{ m.close(); gxDeleteTx(tx); });
+}
+function gxDeleteTx(tx){
+  const i = tx.cat.items.indexOf(tx.item);
+  if(i>-1) tx.cat.items.splice(i,1);
+  scheduleSave(); renderSection(); showToast('despesa excluída (use “desfazer” se precisar)', false);
+}
+function gxAddPanelHTML(month){
+  const names = gxCategoryNames(month);
+  let pre = '';
+  if(GX.view==='detail'){ const e = gxUniverse().get(GX.catKey); pre = e ? e.name : ''; }
+  else if(GX.lastAdd.cat){ pre = names.find(n=>gxKey(n)===gxKey(GX.lastAdd.cat)) || ''; }
+  const preKey = gxKey(pre);
+  const opts = names.map((n,i)=>`<option value="${escAttr(n)}" ${(pre ? gxKey(n)===preKey : i===0)?'selected':''}>${escapeHtml(n||'Sem nome')}</option>`).join('');
+  return `
+    <div class="gx-add-wrap ${GX.addOpen?'open':''}" id="gxAddWrap"><div class="gx-add-inner">
+      <div class="card quick-add-card gx-add-card">
+        <div class="gx-add-title">Nova despesa em <b>${escapeHtml(month.label)}</b></div>
+        <div class="qa-grid">
+          <div class="qa-field"><label>Descrição</label><input type="text" id="qaDesc" placeholder="ex: mercado" autocomplete="off"></div>
+          <div class="qa-field"><label>Valor</label><input type="text" inputmode="decimal" class="money" id="qaValor" placeholder="0,00" autocomplete="off"></div>
+          <div class="qa-field"><label>Data</label><input type="date" id="qaData"></div>
+          <div class="qa-field"><label>Tipo</label><select id="qaTipo"><option value="gasto">Gasto</option></select></div>
+        </div>
+        <div class="qa-row2">
+          <div class="qa-field"><label>Categoria</label><select id="qaCategoria">${opts}</select></div>
+          <button class="btn" id="btnQaAdd" type="button">Adicionar</button>
+        </div>
+        <div class="gx-err" id="gxAddErr"></div>
+      </div>
+    </div></div>`;
+}
+function gxWireAddPanel(wrap, month){
+  const btn = wrap.querySelector('#gxBtnAdd');
+  const panel = wrap.querySelector('#gxAddWrap');
+  if(!panel) return;
+  const dI = panel.querySelector('#qaDesc'), vI = panel.querySelector('#qaValor'), tI = panel.querySelector('#qaData'), cS = panel.querySelector('#qaCategoria'), err = panel.querySelector('#gxAddErr');
+  tI.value = GX.lastAdd.date || new Date().toISOString().slice(0,10);
+  gxBindMoney(vI);
+  const submit = ()=>{
+    const desc = dI.value.trim(), valor = parseMoney(vI.value);
+    const data = tI.value || new Date().toISOString().slice(0,10);
+    const catName = cS.value || 'Sem categoria';
+    if(!desc){ err.textContent = 'Informe a descrição do gasto.'; dI.focus(); return; }
+    if(!valor || valor<=0){ err.textContent = 'Informe um valor válido.'; vI.focus(); return; }
+    let cat = month.categories.find(c=>gxKey(c.name)===gxKey(catName));
     if(!cat){ cat = {name:catName, items:[]}; month.categories.push(cat); }
     gastosCollapsedCats.delete(cat.name);
-    cat.items.push({desc, value:valor, date:data});
-    scheduleSave(); renderSection();
-  }
-  quickAddCard.querySelector('#btnQaAdd').addEventListener('click', submitQuickAdd);
-  [qaDescInput, qaValorInput].forEach(inp=>{
-    inp.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); submitQuickAdd(); } });
+    const item = {desc, value:valor, date:data};
+    cat.items.push(item);
+    GX.flash = item; GX.lastAdd = {date:data, cat:catName}; GX.focusAdd = true; GX.addOpen = true;
+    scheduleSave();
+    renderSection();
+    setTimeout(()=>{
+      const shown = document.querySelector('.gx-tx.is-new');
+      showToast(shown || GX.legacy ? '✓ despesa adicionada' : '✓ despesa adicionada (fora dos filtros atuais)', false);
+      GX.flash = null;
+    }, 30);
+  };
+  panel.querySelector('#btnQaAdd').addEventListener('click', submit);
+  [dI, vI].forEach(i=>i.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); submit(); } }));
+  [dI, vI, cS, tI].forEach(i=>i.addEventListener('input', ()=>{ err.textContent = ''; }));
+  if(btn) btn.addEventListener('click', ()=>{
+    GX.addOpen = !GX.addOpen;
+    panel.classList.toggle('open', GX.addOpen);
+    if(GX.addOpen) setTimeout(()=>dI.focus(), 260);
   });
+}
 
+/* ---------- barra de busca / período / filtros ---------- */
+function gxFilterBarHTML(mode){
+  const f = GX.filters;
+  const n = gxActiveFilterCount();
+  let picks = '';
+  if(mode==='all'){
+    picks = `<div><h5>Categoria</h5><div class="gx-picks">${
+      Array.from(gxUniverse().values()).map(e=>`<button type="button" class="gx-pick ${f.cats.includes(e.key)?'on':''}" data-pick="${escAttr(e.key)}">${escapeHtml(e.name||'Sem nome')}</button>`).join('') || '<span class="gx-count-txt">Nenhuma categoria ainda.</span>'
+    }</div></div>`;
+  }
+  return `
+    <div class="gx-fbar" data-no-undo>
+      <label class="gx-search">${gxUi('search')}<input type="search" id="gxSearch" placeholder="Buscar transação" autocomplete="off" value="${escAttr(f.search)}" aria-label="Buscar transação"></label>
+      <select class="gx-select" id="gxPeriod" aria-label="Período">${gxPeriodOptions()}</select>
+      <button type="button" class="gx-fbtn ${GX.filtersOpen||n?'on':''}" id="gxFBtn" aria-expanded="${GX.filtersOpen}">${gxUi('filter')}<span>Filtros</span><span class="gx-badge ${n?'show':''}" id="gxBadge">${n}</span></button>
+    </div>
+    <div class="gx-panel ${GX.filtersOpen?'open':''}" id="gxPanel" data-no-undo><div class="gx-panel-inner"><div class="gx-panel-body">
+      ${picks}
+      <div><h5>Faixa de valor</h5>
+        <div class="gx-range">
+          <div><label for="gxMin">Mínimo</label><input type="text" id="gxMin" inputmode="decimal" placeholder="0,00" value="${f.min!==null?escAttr(moneyDisplay(f.min)):''}" autocomplete="off"></div>
+          <div><label for="gxMax">Máximo</label><input type="text" id="gxMax" inputmode="decimal" placeholder="sem limite" value="${f.max!==null?escAttr(moneyDisplay(f.max)):''}" autocomplete="off"></div>
+        </div>
+      </div>
+      <div><button type="button" class="btn secondary small" data-clear-all>Limpar filtros</button></div>
+    </div></div></div>`;
+}
+function gxChipsHTML(){
+  const f = GX.filters, uni = gxUniverse(), chips = [];
+  if(f.period!=='month') chips.push(['period', 'Período: '+gxPeriodLabel(f.period)]);
+  f.cats.forEach(k=>{ const e = uni.get(k); chips.push(['cat:'+k, 'Categoria: '+(e?e.name:k)]); });
+  if(f.search.trim()) chips.push(['search', 'Busca: '+f.search.trim()]);
+  if(f.min!==null || f.max!==null){
+    const a = f.min!==null ? 'de '+fmt(f.min) : '', b = f.max!==null ? 'até '+fmt(f.max) : '';
+    chips.push(['value', 'Valor: '+[a,b].filter(Boolean).join(' ')]);
+  }
+  if(!chips.length) return '';
+  return chips.map(c=>`<span class="gx-chip"><span>${escapeHtml(c[1])}</span><button type="button" data-chip="${escAttr(c[0])}" aria-label="Remover filtro">×</button></span>`).join('')
+    + `<button type="button" class="gx-chip-clear" data-clear-all>Limpar todos</button>`;
+}
+function gxSyncControls(root){
+  const f = GX.filters;
+  const s = root.querySelector('#gxSearch'); if(s && s.value!==f.search) s.value = f.search;
+  const p = root.querySelector('#gxPeriod'); if(p) p.value = f.period;
+  const a = root.querySelector('#gxMin'); if(a) a.value = f.min!==null ? moneyDisplay(f.min) : '';
+  const b = root.querySelector('#gxMax'); if(b) b.value = f.max!==null ? moneyDisplay(f.max) : '';
+  root.querySelectorAll('[data-pick]').forEach(x=>x.classList.toggle('on', f.cats.includes(x.dataset.pick)));
+}
+function gxClearAll(){
+  GX.filters.search = ''; GX.filters.min = null; GX.filters.max = null; GX.filters.period = 'month';
+  GX.limit = 60;
+  if(GX.view==='detail'){ GX.filters.cats = []; GX.view = 'all'; GX.catKey = null; renderSection(); showToast('filtros limpos', false); return; }
+  GX.filters.cats = [];
+  showToast('filtros limpos', false);
+  renderSection();
+}
+
+/* atualiza chips, contagem e lista sem recriar a página (a busca não perde o foco) */
+function gxRefresh(root, animate){
+  root = root || document;
+  const box = root.querySelector('#gxResults'); if(!box) return;
+  const list = gxCurrentList();
+  GX._rows = list.rows;
+  const chips = root.querySelector('#gxChips'); if(chips) chips.innerHTML = gxChipsHTML();
+  const n = gxActiveFilterCount();
+  const badge = root.querySelector('#gxBadge'); if(badge){ badge.textContent = n; badge.classList.toggle('show', n>0); }
+  const fb = root.querySelector('#gxFBtn'); if(fb) fb.classList.toggle('on', GX.filtersOpen || n>0);
+  const cnt = root.querySelector('#gxCount');
+  if(cnt) cnt.innerHTML = `Exibindo <b>${gxPlural(list.rows.length,'transação','transações')}</b>${list.rows.length ? ` · <span class="mono">${gxMoneySigned(list.total)}</span>` : ''}`;
+  const detail = GX.view==='detail';
+  const multi = list.months.length>1;
+  const uni = gxUniverse();
+  if(!list.rows.length){
+    const filtered = n>0 && !(n===1 && detail);
+    box.innerHTML = `<div class="gx-list"><div class="gx-empty">
+      <div class="gx-empty-ico">${gxUi(filtered?'search':'receipt')}</div>
+      <h4>${filtered ? 'Nenhuma transação encontrada' : 'Nenhuma despesa por aqui'}</h4>
+      <p>${filtered ? 'Nenhum lançamento combina com a busca e os filtros atuais.' : `Ainda não há despesas em ${escapeHtml(gxPeriodLabel(GX.filters.period))}${detail?' nesta categoria':''}.`}</p>
+      ${filtered ? '<button type="button" class="btn secondary small" data-clear-all>Limpar filtros</button>' : '<button type="button" class="btn small" data-open-add>+ Adicionar despesa</button>'}
+    </div></div>`;
+  } else {
+    const shown = list.rows.slice(0, GX.limit);
+    const rows = shown.map((t,i)=>{
+      const color = gxColorFor(t.key);
+      const ik = gxIconKey(t.key, t.catName);
+      const showCat = !detail;
+      return `<div class="gx-tx ${GX.flash===t.item?'is-new':''}" role="button" tabindex="0" data-i="${i}">
+        ${showCat ? `<span class="gx-tx-ico" style="background:${gxTint(color,'22')}; color:${color};">${gxSvg(GX_ICON_PATHS[ik])}</span>` : ''}
+        <div class="gx-tx-main">
+          <div class="gx-tx-desc">${escapeHtml(t.desc)}</div>
+          <div class="gx-tx-meta"><span>${escapeHtml(gxFmtDate(t))}</span>${showCat ? `<span class="gx-tx-cat">${escapeHtml(t.catName)}</span>` : ''}${(multi && t.date) ? `<span>· ${escapeHtml(t.month.label)}</span>` : ''}</div>
+        </div>
+        <div class="gx-tx-amt mono ${t.value<0?'pos':''}">${gxMoneySigned(t.value)}</div>
+        <button type="button" class="gx-tx-del" data-del="${i}" aria-label="Excluir despesa" title="Excluir">${gxUi('trash')}</button>
+      </div>`;
+    }).join('');
+    const more = list.rows.length>shown.length ? `<button type="button" class="gx-more-btn" data-more>Mostrar mais (${list.rows.length-shown.length} restantes)</button>` : '';
+    box.innerHTML = `<div class="gx-list">${rows}${more}</div>`;
+  }
+  if(animate){ box.classList.remove('gx-results-in'); void box.offsetWidth; box.classList.add('gx-results-in'); }
+}
+function gxWireList(wrap){
+  const box = wrap.querySelector('#gxResults');
+  wrap.addEventListener('click', e=>{
+    const chip = e.target.closest('[data-chip]');
+    if(chip){
+      const t = chip.dataset.chip, f = GX.filters;
+      if(t==='period') f.period = 'month';
+      else if(t==='search') f.search = '';
+      else if(t==='value'){ f.min = null; f.max = null; }
+      else if(t.startsWith('cat:')){
+        const k = t.slice(4);
+        if(GX.view==='detail'){ f.cats = []; gxLeaveDetail('all'); return; }
+        f.cats = f.cats.filter(x=>x!==k);
+      }
+      GX.limit = 60; gxSyncControls(wrap); gxRefresh(wrap, true); showToast('filtro removido', false);
+      return;
+    }
+    if(e.target.closest('[data-clear-all]')){ gxClearAll(); return; }
+    if(e.target.closest('[data-open-add]')){
+      GX.addOpen = true;
+      const p = wrap.querySelector('#gxAddWrap'); if(p) p.classList.add('open');
+      const d = wrap.querySelector('#qaDesc'); if(d) setTimeout(()=>d.focus(), 260);
+      return;
+    }
+    if(e.target.closest('[data-more]')){ GX.limit += 60; gxRefresh(wrap, false); return; }
+    const pick = e.target.closest('[data-pick]');
+    if(pick){
+      const k = pick.dataset.pick, f = GX.filters;
+      f.cats = f.cats.includes(k) ? f.cats.filter(x=>x!==k) : f.cats.concat([k]);
+      pick.classList.toggle('on', f.cats.includes(k));
+      GX.limit = 60; gxRefresh(wrap, true);
+      return;
+    }
+    const del = e.target.closest('[data-del]');
+    if(del){ e.stopPropagation(); const t = GX._rows[Number(del.dataset.del)]; if(t) gxDeleteTx(t); return; }
+    const row = e.target.closest('.gx-tx');
+    if(row){ const t = GX._rows[Number(row.dataset.i)]; if(t) gxOpenTxEditor(t); }
+  });
+  wrap.addEventListener('keydown', e=>{
+    if((e.key==='Enter' || e.key===' ') && e.target.classList && e.target.classList.contains('gx-tx')){
+      e.preventDefault(); const t = GX._rows[Number(e.target.dataset.i)]; if(t) gxOpenTxEditor(t);
+    }
+  });
+  const s = wrap.querySelector('#gxSearch');
+  if(s) s.addEventListener('input', ()=>{ GX.filters.search = s.value; GX.limit = 60; gxRefresh(wrap, false); });
+  const p = wrap.querySelector('#gxPeriod');
+  if(p) p.addEventListener('change', ()=>{ GX.filters.period = p.value; GX.limit = 60; gxRefresh(wrap, true); });
+  const fb = wrap.querySelector('#gxFBtn');
+  if(fb) fb.addEventListener('click', ()=>{
+    GX.filtersOpen = !GX.filtersOpen;
+    wrap.querySelector('#gxPanel').classList.toggle('open', GX.filtersOpen);
+    fb.setAttribute('aria-expanded', GX.filtersOpen);
+    gxRefresh(wrap, false);
+  });
+  const rng = (id, prop)=>{
+    const i = wrap.querySelector(id); if(!i) return;
+    i.addEventListener('input', ()=>{ GX.filters[prop] = i.value.trim()==='' ? null : parseMoney(i.value); GX.limit = 60; gxRefresh(wrap, false); });
+    gxBindMoney(i);
+  };
+  rng('#gxMin','min'); rng('#gxMax','max');
+  const sortSel = wrap.querySelector('#gxSort');
+  if(sortSel) sortSel.addEventListener('change', ()=>{ GX.sort = sortSel.value; gxRefresh(wrap, true); });
+  gxRefresh(wrap, false);
+}
+function gxListHeadHTML(){
+  return `<div class="gx-list-head" data-no-undo>
+    <div class="gx-count-txt" id="gxCount"></div>
+    <label class="gx-sort">Ordenado por
+      <select class="gx-select" id="gxSort" aria-label="Ordenar">
+        <option value="recent" ${GX.sort==='recent'?'selected':''}>Mais recentes</option>
+        <option value="oldest" ${GX.sort==='oldest'?'selected':''}>Mais antigas</option>
+        <option value="high" ${GX.sort==='high'?'selected':''}>Maior valor</option>
+        <option value="low" ${GX.sort==='low'?'selected':''}>Menor valor</option>
+        <option value="az" ${GX.sort==='az'?'selected':''}>Descrição (A–Z)</option>
+      </select></label>
+  </div>`;
+}
+
+/* ---------- visão: TODAS ---------- */
+function gxBuildAll(body, month){
+  const wrap = document.createElement('div');
+  wrap.className = 'gx-view';
+  wrap.innerHTML = `
+    ${GX.legacy ? '' : gxFilterBarHTML('all')}
+    ${GX.legacy ? '' : '<div class="gx-chips" id="gxChips" data-no-undo></div>'}
+    <div class="gx-actions-row">
+      <button type="button" class="btn" id="gxBtnAdd">+ Adicionar</button>
+      <div class="gx-seg" role="group" aria-label="Modo de exibição" data-no-undo>
+        <button type="button" data-legacy="0" class="${GX.legacy?'':'active'}">Lista</button>
+        <button type="button" data-legacy="1" class="${GX.legacy?'active':''}">Editar categorias</button>
+      </div>
+    </div>
+    ${gxAddPanelHTML(month)}
+    ${GX.legacy ? '<div id="gxLegacy"></div>' : gxListHeadHTML() + '<div id="gxResults"></div>'}`;
+  body.appendChild(wrap);
+  wrap.querySelectorAll('[data-legacy]').forEach(b=>b.addEventListener('click', ()=>{ GX.legacy = b.dataset.legacy==='1'; renderSection(); }));
+  gxWireAddPanel(wrap, month);
+  if(GX.legacy) gxLegacyEditor(wrap.querySelector('#gxLegacy'), month);
+  else gxWireList(wrap);
+}
+
+/* editor por categoria (o editor original, preservado: renomear, cor, itens em linha, excluir) */
+function gxMigrateMetaKey(oldKey, newKey){
+  if(oldKey===newKey || !state.categoryMeta || !state.categoryMeta[oldKey] || state.categoryMeta[newKey]) return;
+  if(gxUniverse().has(oldKey)) return; // outro mês ainda usa o nome antigo
+  state.categoryMeta[newKey] = state.categoryMeta[oldKey];
+  delete state.categoryMeta[oldKey];
+}
+function gxLegacyEditor(host, month){
   const catsCard = document.createElement('div');
   catsCard.className = 'card cats-card';
   catsCard.innerHTML = `<div class="cats-card-label">Categorias</div><div id="catsListWrap"></div>`;
-  content.appendChild(catsCard);
+  host.appendChild(catsCard);
   const catsWrap = catsCard.querySelector('#catsListWrap');
+  if(!month.categories.length) catsWrap.innerHTML = `<div class="empty-state">Nenhuma categoria neste mês ainda.</div>`;
 
   month.categories.forEach((cat, ci)=>{
     const catTotal = categoryTotal(cat);
@@ -2704,16 +3689,7 @@ function renderGastos(){
         cat.color = newColor;
         colorBtn.style.background = newColor;
         scheduleSave();
-        const summaryCard = content.querySelector('.month-summary-card');
-        if(summaryCard) summaryCard.innerHTML = `
-          <div class="summary-total-row">
-            <div>
-              <div class="summary-total-value mono">${fmt(monthTotal(month))}</div>
-              <div class="summary-total-label">total gasto</div>
-            </div>
-            ${buildCategoryRing(month.categories, monthTotal(month))}
-          </div>
-        `;
+        gxRefreshSummary();
       });
     });
 
@@ -2722,13 +3698,13 @@ function renderGastos(){
       const oldName = cat.name;
       cat.name = e.target.value;
       if(gastosCollapsedCats.has(oldName)){ gastosCollapsedCats.delete(oldName); gastosCollapsedCats.add(cat.name); }
+      gxMigrateMetaKey(gxKey(oldName), gxKey(cat.name));
       const addBtn = block.querySelector('[data-role=addItem]');
       if(addBtn) addBtn.textContent = `+ item em "${cat.name}"`;
       scheduleSave();
     });
 
     const itemsList = block.querySelector('[data-role=itemsList]');
-    // ordena os itens da categoria por data (mais antiga -> mais atual); itens sem data ficam no final
     const sortedItems = cat.items.slice().sort((a,b)=>{
       const da = a.date || '', db = b.date || '';
       if(!da && !db) return 0;
@@ -2760,13 +3736,11 @@ function renderGastos(){
     block.querySelector('[data-role=addItem]').addEventListener('click', ()=>{
       cat.items.push({desc:'', value:0, date:''}); scheduleSave(); renderSection();
     });
-
     block.querySelector('[data-role=delCat]').addEventListener('click', ()=>{
       if(!confirm(`Remover categoria "${cat.name}"?`)) return;
       gastosCollapsedCats.delete(cat.name);
       month.categories.splice(ci,1); scheduleSave(); renderSection();
     });
-
     block.querySelector('[data-role=toggle]').addEventListener('click', ()=>{
       const itemsEl = block.querySelector('[data-role=items]');
       const chevron = block.querySelector('[data-role=toggle]');
@@ -2785,8 +3759,314 @@ function renderGastos(){
     month.categories.push({name:'Nova categoria', items:[{desc:'', value:0, date:''}]});
     scheduleSave(); renderSection();
   });
-  content.appendChild(addCatBtn);
+  host.appendChild(addCatBtn);
+}
 
+/* ---------- visão: CATEGORIAS (cartões) ---------- */
+function gxCardHTML(s, nMonths, idx){
+  const color = gxColorFor(s.key);
+  const ik = gxIconKey(s.key, s.name);
+  const desc = gxDescFor(s.key, s.name, ik, s.examples);
+  let trend = '';
+  if(s.total>0 && s.prevTotal>0){
+    const pct = (s.total-s.prevTotal)/s.prevTotal*100;
+    if(Math.abs(pct)>=1) trend = `<span class="gx-trend ${pct>0?'up':'down'}" title="${pct>0?'+':''}${Math.round(pct)}% vs. período anterior">${pct>0?'↑':'↓'}</span>`;
+  }
+  const b = gxBudgetInfo(s.key, s.total, nMonths);
+  const foot = b
+    ? `<div class="gx-bud-row"><span>Orçamento${nMonths>1?' ('+nMonths+' meses)':''}</span><b>${fmt(b.limit)}</b><button type="button" class="gx-bud-edit" data-budget="${escAttr(s.key)}" aria-label="Editar orçamento">${gxUi('pencil')}</button></div>
+       <div class="gx-progress ${b.cls}"><i style="width:${Math.min(100,Math.max(0,b.pct)).toFixed(1)}%"></i></div>
+       <div class="gx-bud-note ${b.cls==='over'?'over':''}">${b.left>=0 ? 'Restam '+fmt(b.left)+' · '+Math.round(b.pct)+'% usado' : 'Excedido em '+fmt(-b.left)}</div>`
+    : `<button type="button" class="gx-bud-cta" data-budget="${escAttr(s.key)}">Definir orçamento ${gxUi('pencil')}</button>`;
+  return `<article class="gx-card" role="button" tabindex="0" data-cat="${escAttr(s.key)}" style="--cc:${color}; animation-delay:${Math.min(idx,12)*30}ms" data-no-undo>
+    <div class="gx-card-top">
+      <span class="gx-ico" style="background:${gxTint(color,'22')}; color:${color};">${gxSvg(GX_ICON_PATHS[ik])}</span>
+      <button type="button" class="gx-more" data-menu="${escAttr(s.key)}" aria-label="Ações da categoria" aria-haspopup="menu">${gxUi('dots')}</button>
+    </div>
+    <div class="gx-card-name"><span class="n">${escapeHtml(s.name||'Sem nome')}</span>${trend}</div>
+    <div class="gx-card-desc">${escapeHtml(desc)}</div>
+    <div class="gx-card-val ${s.total===0?'zero':(s.total<0?'pos':'')}">${s.total===0?fmt(0):gxMoneySigned(s.total)}</div>
+    <div class="gx-card-count">${gxPlural(s.count,'transação','transações')}</div>
+    <div class="gx-card-foot">${foot}</div>
+  </article>`;
+}
+function gxBuildCats(body, month){
+  const wrap = document.createElement('div');
+  wrap.className = 'gx-view';
+  const period = GX.filters.period;
+  const stats = gxCategoryStats(period);
+  const nMonths = Math.max(1, gxMonthsOf(period).length);
+  const neg = stats.filter(s=>s.total!==0).sort((a,b)=>Math.abs(b.total)-Math.abs(a.total));
+  const zero = stats.filter(s=>s.total===0).sort((a,b)=>String(a.name).localeCompare(String(b.name),'pt-BR'));
+  const negSum = neg.reduce((s,x)=>s+x.total,0);
+  let i = 0;
+  const group = (title, list, meta, extra)=> `<section class="gx-group">
+      <div class="gx-group-head"><span class="gx-group-title">${title}</span><span class="gx-group-meta">${meta}</span></div>
+      <div class="gx-cat-grid">${list.map(s=>gxCardHTML(s, nMonths, i++)).join('')}${extra||''}</div></section>`;
+  const newBtn = `<button type="button" class="gx-newcat" data-newcat>${gxUi('plus',18)} Nova categoria</button>`;
+  let html = `<div class="gx-cats-head" data-no-undo>
+      <select class="gx-select" id="gxPeriod" aria-label="Período">${gxPeriodOptions()}</select>
+      <button type="button" class="btn secondary small" data-newcat>+ Nova categoria</button>
+    </div>`;
+  if(!stats.length){
+    html += `<div class="card"><div class="gx-empty"><div class="gx-empty-ico">${gxUi('shapes')}</div><h4>Nenhuma categoria ainda</h4><p>Crie a primeira categoria ou adicione uma despesa para ela aparecer aqui.</p><button type="button" class="btn small" data-newcat>+ Nova categoria</button></div></div>`;
+  } else {
+    html += neg.length ? group('Negativas', neg, `${neg.length} · ${gxMoneySigned(negSum)}`, zero.length?'':newBtn)
+      : `<div class="card"><div class="gx-empty" style="padding:26px 20px;"><h4>Nada gasto em ${escapeHtml(gxPeriodLabel(period))}</h4><p>Nenhuma categoria teve movimentação neste período.</p></div></div>`;
+    if(zero.length) html += group('Zeradas', zero, gxPlural(zero.length,'categoria','categorias'), newBtn);
+  }
+  wrap.innerHTML = html;
+  body.appendChild(wrap);
+  const p = wrap.querySelector('#gxPeriod');
+  if(p) p.addEventListener('change', ()=>{ GX.filters.period = p.value; renderSection(); });
+  wrap.addEventListener('click', e=>{
+    if(e.target.closest('[data-newcat]')){ gxNewCategory(); return; }
+    const more = e.target.closest('[data-menu]');
+    if(more){ e.stopPropagation(); gxOpenMenu(more, more.dataset.menu); return; }
+    const bud = e.target.closest('[data-budget]');
+    if(bud){ e.stopPropagation(); gxOpenBudget(bud.dataset.budget); return; }
+    const card = e.target.closest('.gx-card');
+    if(card) gxOpenCategory(card.dataset.cat);
+  });
+  wrap.addEventListener('keydown', e=>{
+    if((e.key==='Enter' || e.key===' ') && e.target.classList && e.target.classList.contains('gx-card')){ e.preventDefault(); gxOpenCategory(e.target.dataset.cat); }
+  });
+}
+
+/* ---------- visão: DETALHE DA CATEGORIA ---------- */
+// Últimos 6 meses terminando no mês selecionado — valores reais somados por mês cadastrado
+function gxCatSeries(key){
+  const months = state.months||[];
+  const selIdx = months.findIndex(m=>m.id===state.selectedMonth);
+  const sel = months[selIdx];
+  const out = [];
+  const totalOf = ms=>{ let t = 0; ms.forEach(m=>(m.categories||[]).forEach(c=>{ if(gxKey(c.name)===key) t += categoryTotal(c); })); return t; };
+  const selRank = sel ? monthLabelRank(sel.label) : null;
+  const cur = currentMonthRank();
+  if(selRank!==null){
+    for(let r=selRank-5; r<=selRank; r++){
+      const ms = months.filter(m=>monthLabelRank(m.label)===r);
+      out.push({label:GX_MONTH_SHORT[((r%12)+12)%12]+'/'+String(Math.floor(r/12)).slice(2), registered:ms.length>0, total:totalOf(ms), partial:r===cur, sel:r===selRank});
+    }
+  } else if(sel){
+    months.slice(Math.max(0,selIdx-5), selIdx+1).forEach(m=>{
+      out.push({label:String(m.label).split(' / ')[0].slice(0,7), registered:true, total:totalOf([m]), partial:false, sel:m===sel});
+    });
+  }
+  return out;
+}
+function gxChartHTML(key, color){
+  const series = gxCatSeries(key);
+  const reg = series.filter(s=>s.registered);
+  const full = reg.filter(s=>!s.partial);
+  const base = full.length ? full : reg;
+  const avg = base.length ? base.reduce((s,x)=>s+x.total,0)/base.length : 0;
+  const hasPartial = series.some(s=>s.partial);
+  const max = Math.max(1, ...series.map(s=>s.total));
+  const anyData = series.some(s=>s.total>0);
+  let note;
+  if(!base.length) note = 'sem meses cadastrados';
+  else if(full.length && reg.length>full.length) note = `média de ${gxPlural(full.length,'mês fechado','meses fechados')}`;
+  else if(full.length) note = `média de ${gxPlural(full.length,'mês','meses')}`;
+  else note = 'base: mês atual (parcial)';
+  let chart;
+  if(!anyData){
+    chart = `<div class="gx-chart-empty">Ainda não há gastos nesta categoria nos últimos 6 meses.</div>`;
+  } else {
+    const cols = series.map((s,i)=>{
+      const p = s.registered ? s.total/max : 0;
+      const label = !s.registered ? '—' : gxShortNum(s.total);
+      return `<div class="gx-col" title="${escAttr(s.label+': '+(s.registered ? fmt(s.total)+(s.partial?' (mês parcial)':'') : 'mês não cadastrado'))}" style="--p:${p.toFixed(4)}; --i:${i};">
+        <div class="gx-bar ${s.partial?'partial':''} ${(!s.registered || s.total<=0)?'none':''}"></div>
+        <div class="gx-val ${(!s.registered||s.total<=0)?'muted':''}">${label}</div></div>`;
+    }).join('');
+    const xl = series.map(s=>`<div class="${s.sel?'sel':''}">${escapeHtml(s.label)}${s.partial?'<small>parcial</small>':''}</div>`).join('');
+    chart = `<div class="gx-chart" style="--n:${series.length}; --cc:${color};" role="img" aria-label="Gastos mensais da categoria nos últimos ${series.length} meses">
+      <div class="gx-plot"><div class="gx-base"></div>
+        ${avg>0 ? `<div class="gx-avgline" style="--p:${Math.min(1,avg/max).toFixed(4)};"><span>média</span></div>` : ''}
+        <div class="gx-cols">${cols}</div></div>
+      <div class="gx-xl">${xl}</div></div>`;
+  }
+  return {chart, avg, note, hasPartial};
+}
+function gxBuildDetail(body, month){
+  const e = gxUniverse().get(GX.catKey);
+  const key = GX.catKey;
+  const color = gxColorFor(key);
+  const ik = gxIconKey(key, e.name);
+  const c = gxChartHTML(key, color);
+  const list = gxCurrentList();
+  const nMonths = Math.max(1, list.months.length);
+  const catAll = list.all.filter(t=>t.key===key);
+  const spent = catAll.reduce((s,t)=>s+t.value,0);
+  const b = gxBudgetInfo(key, spent, nMonths);
+  const budgetCell = b
+    ? `<div class="l">Orçamento · ${Math.round(b.pct)}%</div><div class="v">${fmt(b.limit)}</div><div class="gx-progress ${b.cls}"><i style="width:${Math.min(100,Math.max(0,b.pct)).toFixed(1)}%"></i></div>`
+    : `<div class="l">Orçamento</div><button type="button" class="gx-bud-cta" data-budget="${escAttr(key)}">Definir orçamento ${gxUi('pencil')}</button>`;
+  const wrap = document.createElement('div');
+  wrap.className = 'gx-view';
+  wrap.innerHTML = `
+    <nav class="gx-crumbs" aria-label="Navegação" data-no-undo>
+      <button type="button" class="month-nav-arrow" data-go="cats" title="Voltar para Categorias" aria-label="Voltar para Categorias">‹</button>
+      <button type="button" class="gx-crumb" data-go="all">Despesas</button><span class="gx-sep">›</span>
+      <button type="button" class="gx-crumb" data-go="cats">Categorias</button><span class="gx-sep">›</span>
+      <span class="gx-crumb current" aria-current="page">${escapeHtml(e.name||'Sem nome')}</span>
+    </nav>
+    ${gxFilterBarHTML('detail')}
+    <div class="gx-chips" id="gxChips" data-no-undo></div>
+    <section class="card gx-chart-card">
+      <div class="gx-detail-head">
+        <div class="gx-detail-title">
+          <span class="gx-ico" style="background:${gxTint(color,'22')}; color:${color};">${gxSvg(GX_ICON_PATHS[ik])}</span>
+          <div><h3>Gastos em ${escapeHtml(e.name||'Sem nome')}</h3>
+          <div class="gx-eyebrow">Últimos 6 meses${c.hasPartial?' · mês atual parcial':''}</div></div>
+        </div>
+        <div class="gx-avg"><div class="gx-eyebrow" style="margin:0 0 4px;">Média mensal</div><div class="v">${fmt(c.avg)}</div><div class="s">${escapeHtml(c.note)}</div></div>
+      </div>
+      ${c.chart}
+      <div class="gx-detail-stats">
+        <div class="gx-mini"><div class="l">Total · ${escapeHtml(gxPeriodLabel(GX.filters.period))}</div><div class="v">${gxMoneySigned(spent)}</div></div>
+        <div class="gx-mini"><div class="l">Transações</div><div class="v">${catAll.length}</div></div>
+        <div class="gx-mini">${budgetCell}</div>
+      </div>
+    </section>
+    <div class="gx-actions-row"><button type="button" class="btn" id="gxBtnAdd">+ Adicionar</button></div>
+    ${gxAddPanelHTML(month)}
+    ${gxListHeadHTML()}
+    <div id="gxResults"></div>`;
+  body.appendChild(wrap);
+  wrap.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click', ()=>gxLeaveDetail(b.dataset.go)));
+  const bud = wrap.querySelector('[data-budget]');
+  if(bud) bud.addEventListener('click', ()=>gxOpenBudget(key));
+  gxWireAddPanel(wrap, month);
+  gxWireList(wrap);
+}
+
+/* ---------- abas Todas / Categorias ---------- */
+function gxTabsEl(){
+  const period = GX.filters.period;
+  const txs = gxTx(gxMonthsOf(period));
+  const sums = new Map();
+  txs.forEach(t=>sums.set(t.key,(sums.get(t.key)||0)+t.value));
+  const catCount = Array.from(sums.values()).filter(v=>v!==0).length;
+  const el = document.createElement('div');
+  el.className = 'gx-tabs'; el.setAttribute('role','tablist'); el.setAttribute('data-no-undo','');
+  el.innerHTML = `
+    <button type="button" class="gx-tab ${GX.view==='all'?'active':''}" role="tab" aria-selected="${GX.view==='all'}" data-gx-view="all">Todas <span class="gx-count">${txs.length}</span></button>
+    <button type="button" class="gx-tab ${GX.view==='cats'?'active':''}" role="tab" aria-selected="${GX.view==='cats'}" data-gx-view="cats">Categorias <span class="gx-count">${catCount}</span></button>`;
+  el.querySelectorAll('[data-gx-view]').forEach(b=>b.addEventListener('click', ()=>{
+    if(GX.view===b.dataset.gxView) return;
+    GX.view = b.dataset.gxView; GX.limit = 60;
+    renderSection();
+  }));
+  return el;
+}
+
+/* ---------- página ---------- */
+function renderGastos(){
+  gxCloseMenu();
+  const el = document.createElement('div');
+  if(!state.months.find(m=>m.id===state.selectedMonth) && state.months.length){
+    state.selectedMonth = pickDefaultMonthId();
+  }
+  const month = state.months.find(m=>m.id===state.selectedMonth);
+  const idx = month ? state.months.findIndex(m=>m.id===month.id) : -1;
+  if(GX.view==='detail' && !gxUniverse().has(GX.catKey)){ GX.view = 'cats'; GX.catKey = null; GX.filters.cats = []; }
+  const detail = GX.view==='detail';
+
+  el.innerHTML = `
+    <div class="page-header">
+      <div><h2>Gastos Mensais</h2><div class="desc">Veja o mês inteiro, explore por categoria e lance novas despesas. Totais, médias e gráficos somam sozinhos.</div></div>
+    </div>
+    <div class="month-nav" data-no-undo>
+      <button class="month-nav-arrow" id="btnPrevMonth" title="mês anterior" ${idx<=0?'disabled':''}>‹</button>
+      <div class="month-nav-label">${month ? escapeHtml(month.label) : '—'}</div>
+      <button class="month-nav-arrow" id="btnNextMonth" title="próximo mês" ${(idx<0||idx>=state.months.length-1)?'disabled':''}>›</button>
+    </div>
+    <div class="toolbar" style="margin-top:12px;">
+      <select class="tag-select" id="monthSelect"></select>
+      ${detail ? '' : `
+      <button class="btn secondary small" id="btnNewMonth">+ novo mês</button>
+      <button class="btn secondary small" id="btnDupMonth">duplicar mês atual</button>
+      <button class="btn gold small" id="btnApplyFixed">aplicar gastos fixos</button>
+      ${month ? `<button class="btn secondary small" id="btnDelMonth" style="border-color:var(--rust); color:var(--rust);">excluir mês</button>` : ''}`}
+    </div>
+    <div id="gxContent"></div>
+  `;
+
+  const sel = el.querySelector('#monthSelect');
+  sel.innerHTML = state.months.map(m=>`<option value="${m.id}" ${m.id===state.selectedMonth?'selected':''}>${escapeHtml(m.label)}</option>`).join('');
+  sel.addEventListener('change', ()=>{ state.selectedMonth = sel.value; renderSection(); });
+
+  const prevBtn = el.querySelector('#btnPrevMonth');
+  const nextBtn = el.querySelector('#btnNextMonth');
+  if(prevBtn) prevBtn.addEventListener('click', ()=>{
+    if(idx>0){ state.selectedMonth = state.months[idx-1].id; renderSection(); }
+  });
+  if(nextBtn) nextBtn.addEventListener('click', ()=>{
+    if(idx>=0 && idx<state.months.length-1){ state.selectedMonth = state.months[idx+1].id; renderSection(); }
+  });
+
+  const on = (id, fn)=>{ const b = el.querySelector(id); if(b) b.addEventListener('click', fn); };
+  on('#btnNewMonth', ()=>{
+    const label = prompt('Nome do novo mês (ex: Novembro / 2026):');
+    if(!label) return;
+    const id = uid();
+    state.months.push({id, label, categories:[]});
+    state.selectedMonth = id;
+    scheduleSave(); renderSection();
+  });
+  on('#btnDupMonth', ()=>{
+    if(!month) return;
+    const label = prompt('Nome do novo mês (cópia de ' + month.label + '):', '');
+    if(!label) return;
+    const clone = JSON.parse(JSON.stringify(month));
+    clone.id = uid(); clone.label = label;
+    state.months.push(clone);
+    state.selectedMonth = clone.id;
+    scheduleSave(); renderSection();
+  });
+  on('#btnApplyFixed', ()=>{
+    if(!month) return;
+    let cat = month.categories.find(c=>c.name==='Gastos Fixos');
+    if(!cat){ cat = {name:'Gastos Fixos', items:[]}; month.categories.unshift(cat); }
+    state.fixedExpenses.forEach(f=>{
+      if(!cat.items.find(i=>i.desc===f.name)) cat.items.push({desc:f.name, value:f.value});
+    });
+    scheduleSave(); renderSection();
+  });
+  on('#btnDelMonth', ()=>{
+    if(!confirm(`Excluir "${month.label}" e todos os gastos dele?`)) return;
+    state.months = state.months.filter(m=>m.id!==month.id);
+    const salIdx = state.salaries.findIndex(s=>s.monthId===month.id);
+    if(salIdx>=0) state.salaries.splice(salIdx,1);
+    state.selectedMonth = state.months[0] ? state.months[0].id : null;
+    scheduleSave(); renderSection();
+  });
+
+  const content = el.querySelector('#gxContent');
+  if(!month){
+    content.innerHTML = `<div class="card"><div class="empty-state">Nenhum mês cadastrado ainda. Clique em "+ novo mês" para começar.</div></div>`;
+    return el;
+  }
+  if(!detail){
+    const summary = document.createElement('div');
+    summary.className = 'card month-summary-card';
+    summary.innerHTML = gxSummaryHTML(month);
+    content.appendChild(summary);
+    content.appendChild(gxTabsEl());
+  }
+  const body = document.createElement('div');
+  body.id = 'gxBody';
+  content.appendChild(body);
+  if(detail) gxBuildDetail(body, month);
+  else if(GX.view==='cats') gxBuildCats(body, month);
+  else gxBuildAll(body, month);
+
+  if(GX.addOpen && GX.focusAdd){
+    GX.focusAdd = false;
+    setTimeout(()=>{ const d = document.getElementById('qaDesc'); if(d) d.focus({preventScroll:true}); }, 60);
+  }
   return el;
 }
 function recalcGastos(month, ci){
