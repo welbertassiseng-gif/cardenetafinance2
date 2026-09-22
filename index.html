@@ -1106,6 +1106,7 @@ tr.total-row td:last-child{border-radius:0 10px 10px 0;}
 .gx-mini{background:var(--paper); border:1px solid var(--paper-line); border-radius:14px; padding:12px 14px; min-width:0;}
 .gx-mini .l{font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft);}
 .gx-mini .v{font-family:'JetBrains Mono',monospace; font-weight:700; font-size:18px; color:var(--ink); margin-top:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.gx-mini .s{font-size:11px; color:var(--ink-soft); margin-top:3px;}
 .gx-mini .gx-progress{margin-top:8px; height:6px;}
 
 /* gráfico de barras dos últimos 6 meses */
@@ -4148,11 +4149,11 @@ function gxBuildDetail(body, month){
           <div><h3>Gastos em ${escapeHtml(e.name||'Sem nome')}</h3>
           <div class="gx-eyebrow">Últimos 6 meses${c.hasPartial?' · mês atual parcial':''}</div></div>
         </div>
-        <div class="gx-avg"><div class="gx-eyebrow" style="margin:0 0 4px;">Média mensal</div><div class="v">${fmt(c.avg)}</div><div class="s">${escapeHtml(c.note)}</div></div>
+        <div class="gx-avg"><div class="gx-eyebrow" style="margin:0 0 4px;">Total · ${escapeHtml(gxPeriodLabel(GX.filters.period))}</div><div class="v">${gxMoneySigned(spent)}</div></div>
       </div>
       ${c.chart}
       <div class="gx-detail-stats">
-        <div class="gx-mini"><div class="l">Total · ${escapeHtml(gxPeriodLabel(GX.filters.period))}</div><div class="v">${gxMoneySigned(spent)}</div></div>
+        <div class="gx-mini"><div class="l">Média mensal</div><div class="v">${fmt(c.avg)}</div><div class="s">${escapeHtml(c.note)}</div></div>
         <div class="gx-mini"><div class="l">Transações</div><div class="v">${catAll.length}</div></div>
         <div class="gx-mini">${budgetCell}</div>
       </div>
