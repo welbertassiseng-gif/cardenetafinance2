@@ -1489,8 +1489,21 @@ body.theme-dark .gx-crumb.current, body.theme-dark .gx-avg .v, body.theme-dark .
 const SUPABASE_URL = "https://apcspognnfymkemmqyzd.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_3EVv-sQvRcQAoebiCoUdFw_2FtXb_I8";
 
-const supabaseReady = SUPABASE_URL.startsWith('http') && SUPABASE_ANON_KEY.length > 20;
-const sb = supabaseReady ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+const supabaseConfigured = SUPABASE_URL.startsWith('http') && SUPABASE_ANON_KEY.length > 20;
+// Além de configurado, o SDK do Supabase precisa ter realmente carregado do CDN — se a rede
+// falhar, for bloqueada por firewall/ad-blocker, ou o CDN cair, `window.supabase` não existe
+// e chamar createClient() direto quebraria o script inteiro com uma exceção não tratada.
+let supabaseLoadError = false;
+let sb = null;
+if(supabaseConfigured){
+  if(typeof window.supabase !== 'undefined' && typeof window.supabase.createClient === 'function'){
+    try{ sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY); }
+    catch(e){ console.error('Falha ao iniciar o Supabase', e); supabaseLoadError = true; }
+  } else {
+    supabaseLoadError = true;
+  }
+}
+const supabaseReady = supabaseConfigured && !!sb;
 
 /* =========================================================
    HELPERS GERAIS
@@ -1710,6 +1723,9 @@ document.addEventListener('change', (e)=>{ if(undoSkip(e)) return; captureUndoPo
 ========================================================= */
 let realtimeChannel = null;
 let syncing = false;
+// Guarda o "lastUpdated" que sabemos estar salvo no servidor, para detectar se outra aba/
+// dispositivo salvou algo depois da última vez que sincronizamos aqui (ver checkForRemoteConflict).
+let lastSyncedAt = null;
 
 function applyServerState(data){
   if(!data) return;
@@ -1723,6 +1739,7 @@ function applyServerState(data){
   const keepSelected = state ? state.selectedMonth : null;
   const keepDashboard = state ? state.dashboardMonth : null;
   state = incoming;
+  lastSyncedAt = state.lastUpdated || null;
   if(keepSelected && (state.months||[]).some(m=>m.id===keepSelected)) state.selectedMonth = keepSelected;
   if(keepDashboard && (state.months||[]).some(m=>m.id===keepDashboard)) state.dashboardMonth = keepDashboard;
   undoStack = []; redoStack = []; updateUndoRedoButtons();
@@ -1732,6 +1749,22 @@ function applyServerState(data){
   renderStampAll();
   renderNotifications();
   showToast('atualizado com os dados mais recentes', false);
+}
+
+// Confere se o servidor tem uma versão mais nova do que a última que sincronizamos aqui —
+// acontece quando outra aba/dispositivo salvou algo enquanto esta aba estava com alterações
+// pendentes (que bloqueiam a sincronização automática, ver applyServerState acima).
+async function checkForRemoteConflict(){
+  if(!lastSyncedAt || !currentSession) return false;
+  try{
+    const { data, error } = await sb.from('financial_data')
+      .select('data').eq('user_id', currentSession.user.id).maybeSingle();
+    if(error || !data || !data.data) return false;
+    const remoteUpdatedAt = data.data.lastUpdated;
+    return !!(remoteUpdatedAt && remoteUpdatedAt !== lastSyncedAt);
+  }catch(e){
+    return false; // se a checagem falhar, não bloqueia o salvamento por causa disso
+  }
 }
 
 // Busca no servidor e aplica se houver algo mais novo (usado ao voltar pro app).
@@ -1781,13 +1814,14 @@ function stopRealtimeSync(){
 async function loadStateFromServer(){
   const userId = currentSession.user.id;
   const { data, error } = await sb.from('financial_data').select('data').eq('user_id', userId).maybeSingle();
-  if(error){ console.error(error); state = emptyState(); return; }
+  if(error){ console.error(error); state = emptyState(); lastSyncedAt = null; return; }
   if(data && data.data && Object.keys(data.data).length){
     state = Object.assign(emptyState(), data.data);
   } else {
     state = emptyState();
     await sb.from('financial_data').insert({ user_id: userId, data: state });
   }
+  lastSyncedAt = state.lastUpdated || null;
 }
 
 // O app não salva mais sozinho a cada alteração — só marca que existe algo
@@ -1800,6 +1834,19 @@ function scheduleSave(){
 
 async function persistState(){
   if(!currentSession) return false;
+
+  // Alguém pode ter salvo em outra aba/aparelho depois da última vez que sincronizamos aqui
+  // (isso acontece quando a sincronização automática ficou bloqueada por termos alterações
+  // pendentes no momento — ver applyServerState). Sem essa checagem, o upsert abaixo
+  // sobrescreveria silenciosamente aquelas mudanças com os dados desta aba.
+  if(await checkForRemoteConflict()){
+    const ok = confirm('Os dados foram alterados em outro aparelho/aba desde a última vez que sincronizamos aqui. Salvar agora vai sobrescrever essas mudanças.\n\nSalvar mesmo assim?\n\n(Cancelar mantém suas alterações só nesta aba, sem salvar — recarregue a página para ver os dados mais recentes antes de decidir.)');
+    if(!ok){
+      showToast('Salvamento cancelado. Recarregue a página para ver os dados mais recentes.', true);
+      return false;
+    }
+  }
+
   state.lastUpdated = new Date().toISOString();
   saving = true;
   updateSaveIndicators();
@@ -1808,6 +1855,7 @@ async function persistState(){
       .upsert({ user_id: currentSession.user.id, data: state, updated_at: new Date().toISOString() });
     if(error) throw error;
     dirty = false;
+    lastSyncedAt = state.lastUpdated;
     showToast('✓ salvo', false);
     renderStampAll();
     renderNotifications();
@@ -4062,6 +4110,22 @@ function gxBuildCats(body, month){
 }
 
 /* ---------- visão: DETALHE DA CATEGORIA ---------- */
+// Média mensal "real": considera TODOS os meses cadastrados da categoria, do primeiro mês com
+// gasto até o mês atual do calendário (nunca entra mês futuro, mesmo que a pessoa já tenha
+// editado valores nele) — meses com R$ 0 na categoria não contam para a média.
+function gxCatAverage(key){
+  const months = state.months||[];
+  const cur = currentMonthRank();
+  const totalOf = m=>{ let t=0; (m.categories||[]).forEach(c=>{ if(gxKey(c.name)===key) t += categoryTotal(c); }); return t; };
+  const eligible = months
+    .map(m=>({ rank: monthLabelRank(m.label), total: totalOf(m) }))
+    .filter(x=>x.rank!==null && x.rank<=cur);
+  const closed = eligible.filter(x=>x.rank!==cur && x.total>0);
+  const base = closed.length ? closed : eligible.filter(x=>x.total>0);
+  const avg = base.length ? base.reduce((s,x)=>s+x.total,0)/base.length : 0;
+  const note = base.length ? `média de ${gxPlural(base.length,'mês com gasto','meses com gasto')}` : 'sem gastos registrados';
+  return {avg, note};
+}
 // Últimos 6 meses terminando no mês selecionado — valores reais somados por mês cadastrado
 function gxCatSeries(key){
   const months = state.months||[];
@@ -4085,18 +4149,10 @@ function gxCatSeries(key){
 }
 function gxChartHTML(key, color){
   const series = gxCatSeries(key);
-  const reg = series.filter(s=>s.registered);
-  const full = reg.filter(s=>!s.partial);
-  const base = full.length ? full : reg;
-  const avg = base.length ? base.reduce((s,x)=>s+x.total,0)/base.length : 0;
+  const {avg, note} = gxCatAverage(key);
   const hasPartial = series.some(s=>s.partial);
   const max = Math.max(1, ...series.map(s=>s.total));
   const anyData = series.some(s=>s.total>0);
-  let note;
-  if(!base.length) note = 'sem meses cadastrados';
-  else if(full.length && reg.length>full.length) note = `média de ${gxPlural(full.length,'mês fechado','meses fechados')}`;
-  else if(full.length) note = `média de ${gxPlural(full.length,'mês','meses')}`;
-  else note = 'base: mês atual (parcial)';
   let chart;
   if(!anyData){
     chart = `<div class="gx-chart-empty">Ainda não há gastos nesta categoria nos últimos 6 meses.</div>`;
@@ -5608,6 +5664,11 @@ function showAuthError(msg){
   const el = document.getElementById('authError');
   el.textContent = msg; el.classList.add('show');
 }
+function supabaseUnavailableMsg(){
+  return supabaseLoadError
+    ? 'Não foi possível conectar ao servidor agora. Verifique sua internet e recarregue a página.'
+    : 'O site ainda não foi conectado ao banco de dados.';
+}
 function clearAuthError(){
   const el = document.getElementById('authError');
   el.classList.remove('show'); el.textContent = '';
@@ -5662,7 +5723,7 @@ function wireAuthForm(){
 
   document.getElementById('loginForm').addEventListener('submit', async (e)=>{
     e.preventDefault();
-    if(!supabaseReady) return showAuthError('O site ainda não foi conectado ao banco de dados.');
+    if(!supabaseReady) return showAuthError(supabaseUnavailableMsg());
     clearAuthError();
     const email = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPass').value;
@@ -5676,7 +5737,7 @@ function wireAuthForm(){
 
   document.getElementById('registerForm').addEventListener('submit', async (e)=>{
     e.preventDefault();
-    if(!supabaseReady) return showAuthError('O site ainda não foi conectado ao banco de dados.');
+    if(!supabaseReady) return showAuthError(supabaseUnavailableMsg());
     clearAuthError();
     const name = document.getElementById('regName').value.trim();
     const email = document.getElementById('regEmail').value.trim();
@@ -5704,7 +5765,7 @@ function wireAuthForm(){
 
   document.getElementById('forgotForm').addEventListener('submit', async (e)=>{
     e.preventDefault();
-    if(!supabaseReady) return showAuthError('O site ainda não foi conectado ao banco de dados.');
+    if(!supabaseReady) return showAuthError(supabaseUnavailableMsg());
     clearAuthError();
     const email = document.getElementById('forgotEmail').value.trim();
     const btn = document.getElementById('forgotSubmitBtn');
@@ -5837,7 +5898,15 @@ async function boot(){
   document.getElementById('loadingScreen').style.display = 'none';
 
   if(!supabaseReady){
-    document.getElementById('configWarning').style.display = 'block';
+    const warnEl = document.getElementById('configWarning');
+    if(supabaseLoadError){
+      warnEl.innerHTML = 'Não foi possível conectar ao servidor agora. Verifique sua internet e tente novamente.<br><button type="button" class="btn secondary small" id="btnReloadPage" style="margin-top:10px;">Recarregar página</button>';
+      const btnReload = document.getElementById('btnReloadPage');
+      if(btnReload) btnReload.addEventListener('click', ()=>location.reload());
+    } else {
+      warnEl.textContent = 'Este site ainda não foi conectado a um banco de dados. Configure SUPABASE_URL e SUPABASE_ANON_KEY no início do arquivo antes de publicar.';
+    }
+    warnEl.style.display = 'block';
     document.getElementById('authScreen').style.display = 'flex';
     wireAuthForm();
     return;
@@ -5909,6 +5978,7 @@ function wireAppButtons(){
     await sb.auth.signOut();
     currentSession = null;
     state = null;
+    lastSyncedAt = null;
     undoStack = []; redoStack = [];
     updateUndoRedoButtons();
     closeDrawer();
