@@ -160,6 +160,26 @@ input,select{font-family:inherit;}
   .qa-btn.js-save-btn.is-dirty:hover{filter:brightness(1.05);}
 }
 
+/* Desfazer/Refazer/Salvar: apenas ícone, sem rótulo de texto (tooltip cobre a acessibilidade) */
+.qa-btn.js-undo-btn span:not(.ico),
+.qa-btn.js-redo-btn span:not(.ico),
+.qa-btn.js-save-btn .js-save-label,
+.hdr-icon-btn .js-save-label{display:none !important;}
+.qa-btn .ico{font-size:16px;}
+
+/* Botão Salvar: estado "dirty" (alterações pendentes) em destaque vibrante, com pulso sutil */
+@keyframes qaDirtyPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,0.55);}
+  50%{box-shadow:0 0 0 7px rgba(16,185,129,0);}
+}
+.qa-btn.js-save-btn.is-dirty,
+.hdr-icon-btn.js-save-btn.is-dirty{
+  background:#10B981 !important; border-color:#10B981 !important; color:#fff !important;
+  animation:qaDirtyPulse 1.7s ease-in-out infinite;
+}
+.qa-btn.js-save-btn.is-saving,
+.hdr-icon-btn.js-save-btn.is-saving{animation:none;}
+
 /* botões compactos de salvar/configurações no cabeçalho mobile */
 .hdr-icon-btn{
   position:relative; background:none; border:1px solid var(--paper-line); border-radius:6px;
@@ -305,6 +325,16 @@ tr.total-row td{font-weight:700; background:var(--forest); color:var(--on-dark);
 .color-popover-custom{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:10px; padding-top:10px; border-top:1px solid var(--paper-line); }
 .color-popover-custom label{ font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-soft); font-family:'JetBrains Mono',monospace; }
 .color-popover-custom input[type=color]{ width:34px; height:28px; border:1px solid var(--paper-line); border-radius:6px; padding:0; background:none; cursor:pointer; }
+
+/* Seletores de cor do gráfico Receita × Gastos (Início) */
+.chart-color-controls{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+.chart-color-swatch{
+  display:inline-flex; align-items:center; gap:7px; border:1px solid var(--paper-line); background:var(--white);
+  border-radius:999px; padding:6px 12px 6px 8px; font-size:11.5px; font-family:'JetBrains Mono',monospace; color:var(--ink-soft);
+  transition:border-color .15s, background .15s;
+}
+.chart-color-swatch i{width:13px; height:13px; border-radius:50%; background:var(--sw); display:inline-block; border:1px solid rgba(0,0,0,0.12); flex-shrink:0;}
+@media (hover:hover) and (pointer:fine){ .chart-color-swatch:hover{border-color:var(--gold-light); color:var(--ink);} }
 .cat-name-input{
   border:none; background:none; font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:15.5px;
   color:var(--ink); padding:3px 0; flex:1; min-width:0;
@@ -603,10 +633,37 @@ body.theme-dark .bottom-tab.active .bt-icon{background:var(--gold); border-color
 @media (hover:hover) and (pointer:fine){ .nav-item:hover{background:rgba(148,163,184,0.12);} }
 .nav-add-btn{border-radius:10px;}
 .qa-btn{border-radius:10px;}
-.qa-btn.js-save-btn.is-dirty{background:var(--gold); border-color:var(--gold); color:#fff;}
+.qa-btn.js-save-btn.is-dirty{background:#10B981; border-color:#10B981; color:#fff;}
 .user-badge{border-color:rgba(148,163,184,0.14);}
 .user-badge .dot{background:#34D399; box-shadow:0 0 0 3px rgba(52,211,153,0.18);}
 .sidebar-footer button{border-radius:8px; border-color:rgba(148,163,184,0.3);}
+
+/* Barra lateral recolhível (desktop) */
+.sidebar{transition:width .25s ease; overflow-x:hidden;}
+.sidebar-collapse-btn{
+  background:none; border:1px solid rgba(251,249,241,0.3); border-radius:8px;
+  width:30px; height:30px; display:flex; align-items:center; justify-content:center;
+  color:var(--on-dark); flex-shrink:0; transition:background .15s, transform .15s;
+}
+.sidebar-collapse-btn svg{width:15px; height:15px; transition:transform .25s ease; display:block;}
+@media (hover:hover) and (pointer:fine){ .sidebar-collapse-btn:hover{background:rgba(251,249,241,0.14);} }
+.sidebar.collapsed .sidebar-collapse-btn svg{transform:rotate(180deg);}
+
+.sidebar.collapsed{width:78px;}
+.sidebar.collapsed .brand{flex-direction:column !important; align-items:center !important; gap:10px !important; padding:20px 10px 14px !important;}
+.sidebar.collapsed .brand > div:first-child{flex-direction:column !important; align-items:center !important; gap:8px !important;}
+.sidebar.collapsed .brand > div:first-child > div:last-child{display:none;}
+.sidebar.collapsed .brand-actions{flex-direction:column;}
+.sidebar.collapsed .brand-actions .bell-btn{display:none;}
+.sidebar.collapsed .nav{display:none;}
+.sidebar.collapsed .user-badge{display:none;}
+.sidebar.collapsed .sidebar-footer-note,
+.sidebar.collapsed .sidebar-footer-actions,
+.sidebar.collapsed #btnSettingsDesktop{display:none;}
+.sidebar.collapsed .sidebar-footer{padding:12px 8px 16px;}
+.sidebar.collapsed .quick-actions{padding:10px 8px 2px;}
+.sidebar.collapsed .quick-actions-footer{padding:0 0 10px;}
+.sidebar.collapsed .qa-btn .ico{font-size:15px;}
 
 /* Superfícies */
 .card{border-radius:var(--radius); border-color:var(--paper-line); padding:22px 24px; transition:box-shadow .2s ease, transform .2s ease;}
@@ -1096,6 +1153,27 @@ tr.total-row td:last-child{border-radius:0 10px 10px 0;}
 .gx-icon-opt.on{border-color:var(--gold); background:var(--forest-pale); color:var(--gold);}
 @media (hover:hover) and (pointer:fine){ .gx-icon-opt:hover{border-color:var(--gold-light);} }
 
+/* Seletor de ícone/emoji da categoria — abas */
+.gx-icon-tabs{display:flex; gap:6px; margin-bottom:14px; border-bottom:1px solid var(--paper-line);}
+.gx-icon-tab{
+  background:none; border:none; padding:8px 4px 10px; font-size:13px; font-weight:600; color:var(--ink-soft);
+  border-bottom:2px solid transparent; margin-bottom:-1px;
+}
+.gx-icon-tab.active{color:var(--forest); border-bottom-color:var(--gold);}
+.gx-icon-tab-panel{max-height:340px; overflow-y:auto;}
+.gx-emoji-cats{margin-top:12px;}
+.gx-emoji-cat-label{font-family:'JetBrains Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-soft); margin:12px 0 6px;}
+.gx-emoji-cat-label:first-child{margin-top:0;}
+.gx-emoji-grid{display:grid; grid-template-columns:repeat(8,1fr); gap:5px;}
+.gx-emoji-opt{
+  aspect-ratio:1; border-radius:9px; border:1.5px solid var(--paper-line); background:var(--paper);
+  display:flex; align-items:center; justify-content:center; font-size:18px; min-height:36px; line-height:1;
+}
+.gx-emoji-opt.on{border-color:var(--gold); background:var(--forest-pale);}
+@media (hover:hover) and (pointer:fine){ .gx-emoji-opt:hover{border-color:var(--gold-light); transform:scale(1.08);} }
+.gx-emoji-ico{display:inline-flex; align-items:center; justify-content:center; line-height:1;}
+@media (max-width:600px){ .gx-emoji-grid{grid-template-columns:repeat(6,1fr);} }
+
 /* tema escuro */
 body.theme-dark .gx-trend.down{color:#34D399;}
 body.theme-dark .gx-tx-amt.pos, body.theme-dark .gx-card-val.pos{color:#34D399;}
@@ -1267,9 +1345,14 @@ body.theme-dark .gx-crumb.current, body.theme-dark .gx-avg .v, body.theme-dark .
           <div class="sub">controle financeiro</div>
         </div>
       </div>
-      <button class="bell-btn" id="btnBellDesktop" title="Notificações" style="border-color:rgba(251,249,241,0.3); color:var(--on-dark);">
-        🔔<span class="bell-dot" id="bellDotDesktop"></span>
-      </button>
+      <div class="brand-actions" style="display:flex; align-items:center; gap:6px;">
+        <button class="bell-btn" id="btnBellDesktop" title="Notificações" style="border-color:rgba(251,249,241,0.3); color:var(--on-dark);">
+          🔔<span class="bell-dot" id="bellDotDesktop"></span>
+        </button>
+        <button class="sidebar-collapse-btn" id="btnSidebarCollapse" type="button" title="Recolher menu" aria-label="Recolher menu" aria-expanded="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+      </div>
     </div>
     <div class="nav" id="navList"></div>
     <div class="user-badge"><span class="dot"></span> <b id="currentUserLabel"></b></div>
@@ -1282,8 +1365,8 @@ body.theme-dark .gx-crumb.current, body.theme-dark .gx-avg .v, body.theme-dark .
         <button class="qa-btn js-save-btn" id="btnSaveDesktop" title="Salvar alterações"><span class="ico">💾</span><span class="js-save-label">salvar</span></button>
         <button class="qa-btn" id="btnSettingsDesktop" title="Configurações"><span class="ico">⚙️</span><span>ajustes</span></button>
       </div>
-      Dados salvos na sua conta
-      <div>
+      <div class="sidebar-footer-note">Dados salvos na sua conta</div>
+      <div class="sidebar-footer-actions">
         <button id="btnExport">Exportar backup</button>
         <button id="btnImport">Importar</button>
         <button id="btnLogout">Sair</button>
@@ -1494,8 +1577,25 @@ function emptyState(){
     navConfig: null, // preenchido por ensureNavConfig()
     categoryMeta: {}, // Despesas: orçamento, ícone e descrição por categoria (chave = nome normalizado)
     removedCore: [], // seções do sistema excluídas permanentemente (não voltam ao menu)
+    chartColors: null, // Início: cores personalizadas do gráfico Receita × Gastos ({receita, gastos})
     lastUpdated: null, selectedMonth: null, dashboardMonth: null,
   };
+}
+function ensureChartColors(){
+  if(!state.chartColors || typeof state.chartColors!=='object') state.chartColors = {};
+  if(!state.chartColors.receita) state.chartColors.receita = '#3B82F6';
+  if(!state.chartColors.gastos) state.chartColors.gastos = '#F87171';
+  return state.chartColors;
+}
+function shadeHex(hex, amt){
+  try{
+    let c = String(hex||'').replace('#','');
+    if(c.length===3) c = c.split('').map(x=>x+x).join('');
+    const num = parseInt(c,16);
+    let r = (num>>16)+amt, g = ((num>>8)&0xFF)+amt, b = (num&0xFF)+amt;
+    r = Math.min(255,Math.max(0,r)); g = Math.min(255,Math.max(0,g)); b = Math.min(255,Math.max(0,b));
+    return '#'+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);
+  }catch(e){ return hex; }
 }
 
 let state = null;
@@ -1503,6 +1603,26 @@ let currentSession = null; // sessão do Supabase (user + token)
 let saveTimer = null;
 let saving = false;
 let dirty = false; // true quando há alterações ainda não salvas manualmente
+
+/* =========================================================
+   BARRA LATERAL RECOLHÍVEL (desktop)
+========================================================= */
+let sidebarCollapsed = false;
+try{ sidebarCollapsed = localStorage.getItem('balanceSidebarCollapsed') === '1'; }catch(e){}
+function applySidebarCollapsed(){
+  const sb = document.querySelector('.sidebar');
+  if(sb) sb.classList.toggle('collapsed', sidebarCollapsed);
+  const btn = document.getElementById('btnSidebarCollapse');
+  if(btn){
+    btn.setAttribute('aria-expanded', String(!sidebarCollapsed));
+    btn.title = sidebarCollapsed ? 'Expandir menu' : 'Recolher menu';
+  }
+}
+function toggleSidebarCollapsed(){
+  sidebarCollapsed = !sidebarCollapsed;
+  try{ localStorage.setItem('balanceSidebarCollapsed', sidebarCollapsed ? '1' : '0'); }catch(e){}
+  applySidebarCollapsed();
+}
 
 /* =========================================================
    DESFAZER / REFAZER
@@ -2589,7 +2709,15 @@ function renderDashboard(){
 
     <div class="grid-2" style="margin-top:22px;">
       <div class="card" id="chartCard">
-        <h3>Receita × Gastos por mês</h3>
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+          <h3>Receita × Gastos por mês</h3>
+          ${months.length ? `
+            <div class="chart-color-controls">
+              <button type="button" class="chart-color-swatch" id="btnColorReceita" style="--sw:${ensureChartColors().receita}" title="Cor de Receita no gráfico" aria-label="Cor de Receita no gráfico"><i></i>Receita</button>
+              <button type="button" class="chart-color-swatch" id="btnColorGastos" style="--sw:${ensureChartColors().gastos}" title="Cor de Gastos no gráfico" aria-label="Cor de Gastos no gráfico"><i></i>Gastos</button>
+            </div>
+          ` : ''}
+        </div>
         <div id="chartCardBody">
           ${!months.length ? `
             <div class="empty-state">Assim que você cadastrar um mês em "Gastos Mensais", esse gráfico aparece aqui sozinho.<br><br><button class="btn secondary small" id="btnGoToGastos">Ir para Gastos Mensais</button></div>
@@ -2638,6 +2766,30 @@ function renderDashboard(){
   el.querySelectorAll('#btnGoToGastos').forEach(btn=>{
     btn.addEventListener('click', ()=>{ activeSection='gastos'; renderNav(); renderSection(); });
   });
+  const btnColorReceita = el.querySelector('#btnColorReceita');
+  const btnColorGastos = el.querySelector('#btnColorGastos');
+  if(btnColorReceita){
+    btnColorReceita.addEventListener('click', ()=>{
+      const colors = ensureChartColors();
+      openColorPopover(btnColorReceita, {color: colors.receita}, color=>{
+        colors.receita = color;
+        btnColorReceita.style.setProperty('--sw', color);
+        scheduleSave();
+        drawChart();
+      });
+    });
+  }
+  if(btnColorGastos){
+    btnColorGastos.addEventListener('click', ()=>{
+      const colors = ensureChartColors();
+      openColorPopover(btnColorGastos, {color: colors.gastos}, color=>{
+        colors.gastos = color;
+        btnColorGastos.style.setProperty('--sw', color);
+        scheduleSave();
+        drawChart();
+      });
+    });
+  }
   bindEyeToggles(el);
   return el;
 }
@@ -2668,11 +2820,12 @@ function drawChart(){
 
     if(chartRef){ chartRef.destroy(); chartRef = null; }
 
+    const chartColors = ensureChartColors();
     chartRef = new Chart(canvas.getContext('2d'), {
       type:'bar',
       data:{ labels, datasets:[
-        {label:'Receita', data:salData, backgroundColor:'#3B82F6', hoverBackgroundColor:'#2563EB', borderRadius:6},
-        {label:'Gastos', data:gastosData, backgroundColor:'#F87171', hoverBackgroundColor:'#EF4444', borderRadius:6},
+        {label:'Receita', data:salData, backgroundColor:chartColors.receita, hoverBackgroundColor:shadeHex(chartColors.receita,-25), borderRadius:6},
+        {label:'Gastos', data:gastosData, backgroundColor:chartColors.gastos, hoverBackgroundColor:shadeHex(chartColors.gastos,-25), borderRadius:6},
       ]},
       options:{
         responsive:true, maintainAspectRatio:false,
@@ -2819,7 +2972,15 @@ const GX_ICON_PATHS = {
   briefcase:'<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>',
   landmark:'<path d="M3 21h18"/><path d="M5 21V10M9 21V10M15 21V10M19 21V10"/><path d="m3 10 9-6 9 6"/>',
   fixos:NAV_ICON_PATHS.fixos,
-  tag:'<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".6" fill="currentColor"/>'
+  tag:'<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".6" fill="currentColor"/>',
+  wallet:'<rect x="2" y="6" width="20" height="14" rx="2"/><path d="M2 10h20"/><circle cx="17" cy="15" r="1.2" fill="currentColor"/>',
+  coffee:'<path d="M3 8h14v6a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/><path d="M17 9h1a2 2 0 1 1 0 4h-1"/><path d="M7 2c-.5 1 .5 1.5 0 3M11 2c-.5 1 .5 1.5 0 3"/>',
+  music:'<circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/><path d="M9 18V6l12-2v12"/>',
+  umbrella:'<path d="M12 2a10 10 0 0 1 10 10H2A10 10 0 0 1 12 2Z"/><path d="M12 12v8a2 2 0 0 1-4 0"/><path d="M12 2v2"/>',
+  star:'<path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1Z"/>',
+  bike:'<circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/>',
+  wrench:'<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L2 19l3 3 7.3-7.3a4 4 0 0 0 5.4-5.4l-2.8 2.8-2-2Z"/>',
+  baby:'<circle cx="12" cy="10" r="8"/><path d="M9 12h.01M15 12h.01"/><path d="M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5"/>'
 };
 const GX_ICON_RULES = [
   ['fixos',['gasto fixo','gastos fixos']],
@@ -2887,6 +3048,29 @@ function gxIconKey(key, name){
   for(const [ik, words] of GX_ICON_RULES){ if(words.some(w=>n.includes(w))) return ik; }
   return 'tag';
 }
+/* ---------- identidade visual da categoria: emoji (se definido) ou ícone SVG ---------- */
+function gxIconMarkup(key, name, size){
+  const meta = gxMeta(key);
+  if(meta.emoji){
+    const fs = size ? size + 3 : 19;
+    return `<span class="gx-emoji-ico" style="font-size:${fs}px;">${escapeHtml(meta.emoji)}</span>`;
+  }
+  return gxSvg(GX_ICON_PATHS[gxIconKey(key, name)], size);
+}
+/* ---------- emojis categorizados para a identidade visual das categorias de gasto ---------- */
+const GX_EMOJI_CATEGORIES = [
+  ['Alimentação', ['🍔','🍕','🍟','🌮','🍣','🍜','🍩','🍰','☕','🍺','🍷','🥗','🍎','🧀','🥐','🍦']],
+  ['Transporte', ['🚗','🚕','🚌','🚆','🚲','🛵','⛽','🅿️','✈️','🚢','🚦','🛴']],
+  ['Casa', ['🏠','🛋️','🛏️','🧹','🧺','🔧','💡','🚿','🪴','🔑']],
+  ['Compras', ['🛒','🛍️','👗','👟','💄','📦','🎁','💍']],
+  ['Lazer', ['🎬','🎮','🎉','🎵','⚽','🎨','📚','🎲','🏖️','🎤']],
+  ['Saúde', ['💊','🏥','🩺','🦷','🧠','💉','🧘','🏋️']],
+  ['Trabalho', ['💼','💻','🖨️','📈','🏢','📅']],
+  ['Viagem', ['🧳','🗺️','🏨','🛂','🌍']],
+  ['Pets', ['🐶','🐱','🐦','🐠','🦴']],
+  ['Finanças', ['💰','💳','🏦','📉','📊','💸','🪙']],
+  ['Outros', ['⭐','❤️','🔥','✨','📌','🏷️','❓']]
+];
 function gxTint(color, alpha){ return /^#[0-9a-f]{6}$/i.test(color||'') ? color + alpha : 'var(--forest-pale)'; }
 function gxMoneySigned(v){ if(!v) return fmt(0); return v>0 ? '- '+fmt(v) : '+ '+fmt(-v); }
 function gxShortNum(v){
@@ -3219,21 +3403,64 @@ function gxOpenDesc(key){
 }
 function gxOpenIcons(key){
   const e = gxUniverse().get(key); if(!e) return;
+  const meta = gxMeta(key);
+  const curEmoji = meta.emoji || '';
   const cur = gxIconKey(key, e.name);
-  const opts = Object.keys(GX_ICON_PATHS).map(k=>`<button type="button" class="gx-icon-opt ${k===cur?'on':''}" data-ico="${k}" aria-label="${k}">${gxSvg(GX_ICON_PATHS[k])}</button>`).join('');
+  const iconOpts = Object.keys(GX_ICON_PATHS).map(k=>`<button type="button" class="gx-icon-opt ${!curEmoji && k===cur?'on':''}" data-ico="${k}" aria-label="${k}">${gxSvg(GX_ICON_PATHS[k])}</button>`).join('');
+  const emojiCats = GX_EMOJI_CATEGORIES.map(([label, list])=>`
+    <div class="gx-emoji-cat-label">${escapeHtml(label)}</div>
+    <div class="gx-emoji-grid">${list.map(em=>`<button type="button" class="gx-emoji-opt ${em===curEmoji?'on':''}" data-emoji="${em}" aria-label="${em}">${em}</button>`).join('')}</div>
+  `).join('');
   const m = gxModal(`
     <h3>Ícone · ${escapeHtml(e.name)}</h3>
-    <p class="settings-desc">Escolha o ícone que representa esta categoria.</p>
-    <div class="gx-icon-grid">${opts}</div>
+    <p class="settings-desc">Escolha um ícone ou um emoji para representar esta categoria.</p>
+    <div class="gx-icon-tabs" role="tablist">
+      <button type="button" class="gx-icon-tab ${!curEmoji?'active':''}" data-tab="icons" role="tab">Ícones</button>
+      <button type="button" class="gx-icon-tab ${curEmoji?'active':''}" data-tab="emoji" role="tab">Emoji</button>
+    </div>
+    <div class="gx-icon-tab-panel" data-panel="icons" style="display:${curEmoji?'none':'block'}">
+      <div class="gx-icon-grid">${iconOpts}</div>
+    </div>
+    <div class="gx-icon-tab-panel" data-panel="emoji" style="display:${curEmoji?'block':'none'}">
+      <div class="qa-field">
+        <label for="gxEmojiIn">Digite ou cole qualquer emoji</label>
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="gxEmojiIn" maxlength="8" autocomplete="off" placeholder="😀" value="${escAttr(curEmoji)}" style="flex:1;">
+          <button type="button" class="btn small" id="gxEmojiOk">Usar</button>
+        </div>
+      </div>
+      <div class="gx-emoji-cats">${emojiCats}</div>
+    </div>
     <div class="gx-modal-actions">
       <button type="button" class="btn secondary small" id="gxIcoAuto">Automático</button>
       <span class="grow"></span>
       <button type="button" class="btn secondary small" data-close>Cancelar</button>
     </div>`);
-  m.el.querySelectorAll('[data-ico]').forEach(b=>b.addEventListener('click', ()=>{
-    gxMeta(key, true).icon = b.dataset.ico; scheduleSave(); m.close(); renderSection();
+  m.el.querySelectorAll('.gx-icon-tab').forEach(tab=>tab.addEventListener('click', ()=>{
+    m.el.querySelectorAll('.gx-icon-tab').forEach(t=>t.classList.toggle('active', t===tab));
+    m.el.querySelectorAll('.gx-icon-tab-panel').forEach(p=>{ p.style.display = p.dataset.panel===tab.dataset.tab ? 'block' : 'none'; });
   }));
-  m.el.querySelector('#gxIcoAuto').addEventListener('click', ()=>{ delete gxMeta(key, true).icon; scheduleSave(); m.close(); renderSection(); });
+  m.el.querySelectorAll('[data-ico]').forEach(b=>b.addEventListener('click', ()=>{
+    const mm = gxMeta(key, true); mm.icon = b.dataset.ico; delete mm.emoji;
+    scheduleSave(); m.close(); renderSection();
+  }));
+  m.el.querySelectorAll('[data-emoji]').forEach(b=>b.addEventListener('click', ()=>{
+    const mm = gxMeta(key, true); mm.emoji = b.dataset.emoji;
+    scheduleSave(); m.close(); renderSection();
+  }));
+  const emojiIn = m.el.querySelector('#gxEmojiIn');
+  const applyEmojiInput = ()=>{
+    const v = emojiIn.value.trim();
+    const mm = gxMeta(key, true);
+    if(v) mm.emoji = v; else delete mm.emoji;
+    scheduleSave(); m.close(); renderSection();
+  };
+  emojiIn.addEventListener('keydown', ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); applyEmojiInput(); } });
+  m.el.querySelector('#gxEmojiOk').addEventListener('click', applyEmojiInput);
+  m.el.querySelector('#gxIcoAuto').addEventListener('click', ()=>{
+    const mm = gxMeta(key, true); delete mm.icon; delete mm.emoji;
+    scheduleSave(); m.close(); renderSection();
+  });
 }
 function gxPickColor(key, anchor){
   const e = gxUniverse().get(key); if(!e) return;
@@ -3531,7 +3758,7 @@ function gxRefresh(root, animate){
       const ik = gxIconKey(t.key, t.catName);
       const showCat = !detail;
       return `<div class="gx-tx ${GX.flash===t.item?'is-new':''}" role="button" tabindex="0" data-i="${i}">
-        ${showCat ? `<span class="gx-tx-ico" style="background:${gxTint(color,'22')}; color:${color};">${gxSvg(GX_ICON_PATHS[ik])}</span>` : ''}
+        ${showCat ? `<span class="gx-tx-ico" style="background:${gxTint(color,'22')}; color:${color};">${gxIconMarkup(t.key, t.catName)}</span>` : ''}
         <div class="gx-tx-main">
           <div class="gx-tx-desc">${escapeHtml(t.desc)}</div>
           <div class="gx-tx-meta"><span>${escapeHtml(gxFmtDate(t))}</span>${showCat ? `<span class="gx-tx-cat">${escapeHtml(t.catName)}</span>` : ''}${(multi && t.date) ? `<span>· ${escapeHtml(t.month.label)}</span>` : ''}</div>
@@ -3780,7 +4007,7 @@ function gxCardHTML(s, nMonths, idx){
     : `<button type="button" class="gx-bud-cta" data-budget="${escAttr(s.key)}">Definir orçamento ${gxUi('pencil')}</button>`;
   return `<article class="gx-card" role="button" tabindex="0" data-cat="${escAttr(s.key)}" style="--cc:${color}; animation-delay:${Math.min(idx,12)*30}ms" data-no-undo>
     <div class="gx-card-top">
-      <span class="gx-ico" style="background:${gxTint(color,'22')}; color:${color};">${gxSvg(GX_ICON_PATHS[ik])}</span>
+      <span class="gx-ico" style="background:${gxTint(color,'22')}; color:${color};">${gxIconMarkup(s.key, s.name)}</span>
       <button type="button" class="gx-more" data-menu="${escAttr(s.key)}" aria-label="Ações da categoria" aria-haspopup="menu">${gxUi('dots')}</button>
     </div>
     <div class="gx-card-name"><span class="n">${escapeHtml(s.name||'Sem nome')}</span>${trend}</div>
@@ -3917,7 +4144,7 @@ function gxBuildDetail(body, month){
     <section class="card gx-chart-card">
       <div class="gx-detail-head">
         <div class="gx-detail-title">
-          <span class="gx-ico" style="background:${gxTint(color,'22')}; color:${color};">${gxSvg(GX_ICON_PATHS[ik])}</span>
+          <span class="gx-ico" style="background:${gxTint(color,'22')}; color:${color};">${gxIconMarkup(key, e.name)}</span>
           <div><h3>Gastos em ${escapeHtml(e.name||'Sem nome')}</h3>
           <div class="gx-eyebrow">Últimos 6 meses${c.hasPartial?' · mês atual parcial':''}</div></div>
         </div>
@@ -5712,6 +5939,10 @@ function wireAppButtons(){
   document.getElementById('btnRedoDesktop').onclick = performRedo;
   document.getElementById('btnRedoDrawer').onclick = performRedo;
   updateUndoRedoButtons();
+
+  const btnSidebarCollapse = document.getElementById('btnSidebarCollapse');
+  if(btnSidebarCollapse){ btnSidebarCollapse.onclick = toggleSidebarCollapsed; }
+  applySidebarCollapsed();
 
   importFile.onchange = async (e)=>{
     const file = e.target.files[0];
