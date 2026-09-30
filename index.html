@@ -352,6 +352,9 @@ tr.total-row td{font-weight:700; background:var(--forest); color:var(--on-dark);
 .item-desc-input:focus{outline:none; border-bottom:1px dashed var(--gold);}
 .item-value-input{border:none !important; background:none !important; text-align:right; font-size:14px; width:110px; flex-shrink:0; padding:4px 2px !important;}
 .item-date-input{border:none !important; background:none !important; text-align:right; font-size:12.5px; color:var(--ink-soft); width:98px; flex-shrink:0; padding:4px 2px !important; font-family:'JetBrains Mono',monospace;}
+.item-banco-input{border:none !important; background:none !important; font-size:12.5px; color:var(--ink-soft); width:92px; flex-shrink:0; padding:4px 2px !important; border-bottom:1px dashed var(--paper-line) !important;}
+.item-banco-input:focus{outline:none; border-bottom-color:var(--gold) !important;}
+.gx-tx-bank{display:inline-flex; align-items:center; gap:4px; padding:1px 8px; border-radius:999px; border:1px solid var(--paper-line); font-size:11.5px; font-weight:600; color:var(--ink-soft);}
 .item-date-input::-webkit-calendar-picker-indicator{opacity:0.55; filter:invert(0.5); cursor:pointer;}
 .cat-add-row{text-align:center; padding:10px 0 4px;}
 
@@ -544,6 +547,7 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
   .item-row{flex-wrap:wrap; row-gap:2px; padding:10px 0;}
   .item-dot{display:none;}
   .item-desc-input{flex:1 1 100%; order:1; font-size:14.5px; padding:2px 0 6px;}
+  .item-banco-input{order:2; flex:0 1 auto; width:84px;}
   .item-date-input{order:2; flex:0 1 auto; width:auto; max-width:112px; font-size:12px;}
   .item-value-input{order:3; flex:1 1 auto; width:auto; font-size:14.5px;}
   .item-row .icon-btn{order:4; flex:0 0 auto;}
@@ -3202,6 +3206,11 @@ function gxSortTx(arr, mode){
   if(mode==='oldest') a.sort((x,y)=> gxDateKey(x)<gxDateKey(y)?-1 : gxDateKey(x)>gxDateKey(y)?1 : x.order-y.order);
   else if(mode==='high') a.sort((x,y)=>y.value-x.value || x.order-y.order);
   else if(mode==='low') a.sort((x,y)=>x.value-y.value || x.order-y.order);
+  else if(mode==='banco') a.sort((x,y)=>{
+    const bx = String(x.item.banco||'').trim(), by = String(y.item.banco||'').trim();
+    if(!bx && by) return 1; if(bx && !by) return -1;
+    return bx.localeCompare(by,'pt-BR') || (gxDateKey(x)>gxDateKey(y)?-1 : gxDateKey(x)<gxDateKey(y)?1 : y.order-x.order);
+  });
   else if(mode==='az') a.sort((x,y)=>x.desc.localeCompare(y.desc,'pt-BR') || x.order-y.order);
   else a.sort((x,y)=> gxDateKey(x)>gxDateKey(y)?-1 : gxDateKey(x)<gxDateKey(y)?1 : y.order-x.order);
   return a;
@@ -3213,7 +3222,7 @@ function gxApplyFilters(txs, f){
     if(f.min!==null && t.value < f.min) return false;
     if(f.max!==null && t.value > f.max) return false;
     if(q){
-      const hay = gxKey(t.desc+' '+t.catName+' '+gxFmtDate(t)+' '+t.month.label+' '+moneyDisplay(t.value));
+      const hay = gxKey(t.desc+' '+t.catName+' '+(t.item.banco||'')+' '+gxFmtDate(t)+' '+t.month.label+' '+moneyDisplay(t.value));
       if(!hay.includes(q)) return false;
     }
     return true;
@@ -3624,6 +3633,7 @@ function gxOpenTxEditor(tx){
       <div class="qa-field"><label for="gxEdDate">Data</label><input type="date" id="gxEdDate"></div>
     </div>
     <div class="qa-field"><label for="gxEdCat">Categoria</label><select id="gxEdCat">${opts}</select></div>
+    <div class="qa-field"><label for="gxEdBanco">Banco</label><input type="text" id="gxEdBanco" list="gxBancosDL" placeholder="ex: Nubank" maxlength="30" autocomplete="off"></div>
     <div class="gx-err"></div>
     <div class="gx-modal-actions">
       <button type="button" class="btn secondary small gx-danger" id="gxEdDel">Excluir</button>
@@ -3632,6 +3642,8 @@ function gxOpenTxEditor(tx){
       <button type="button" class="btn small" id="gxEdOk">Salvar</button>
     </div>`);
   const dI = m.el.querySelector('#gxEdDesc'), vI = m.el.querySelector('#gxEdVal'), tI = m.el.querySelector('#gxEdDate'), cS = m.el.querySelector('#gxEdCat');
+  gxEnsureBankList();
+  const bI = m.el.querySelector('#gxEdBanco'); bI.value = String(tx.item.banco||'');
   dI.value = String(tx.item.desc||''); vI.value = moneyDisplay(tx.item.value); tI.value = tx.item.date||'';
   gxBindMoney(vI);
   setTimeout(()=>dI.focus(), 40);
@@ -3640,6 +3652,7 @@ function gxOpenTxEditor(tx){
     if(!desc){ gxSetErr(m, 'Informe a descrição do gasto.'); return; }
     if(!valor || valor<=0){ gxSetErr(m, 'Informe um valor válido.'); return; }
     tx.item.desc = desc; tx.item.value = valor; tx.item.date = tI.value || '';
+    const bn = bI.value.trim(); if(bn) tx.item.banco = bn; else delete tx.item.banco;
     const nk = gxKey(cS.value);
     if(nk!==tx.key){
       let target = tx.month.categories.find(c=>gxKey(c.name)===nk);
@@ -3650,7 +3663,7 @@ function gxOpenTxEditor(tx){
     scheduleSave(); m.close(); renderSection(); showToast('✓ despesa atualizada', false);
   };
   m.el.querySelector('#gxEdOk').addEventListener('click', save);
-  [dI, vI].forEach(i=>i.addEventListener('keydown', ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); save(); } }));
+  [dI, vI, bI].forEach(i=>i.addEventListener('keydown', ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); save(); } }));
   m.el.querySelector('#gxEdDel').addEventListener('click', ()=>{ m.close(); gxDeleteTx(tx); });
 }
 function gxDeleteTx(tx){
@@ -3673,21 +3686,88 @@ function gxAddPanelHTML(month){
           <div class="qa-field"><label>Descrição</label><input type="text" id="qaDesc" placeholder="ex: mercado" autocomplete="off"></div>
           <div class="qa-field"><label>Valor</label><input type="text" inputmode="decimal" class="money" id="qaValor" placeholder="0,00" autocomplete="off"></div>
           <div class="qa-field"><label>Data</label><input type="date" id="qaData"></div>
-          <div class="qa-field"><label>Tipo</label><select id="qaTipo"><option value="gasto">Gasto</option></select></div>
+          <div class="qa-field"><label>Tipo</label><select id="qaTipo"><option value="gasto">Gasto</option><option value="parcelas">Parcelas</option></select></div>
         </div>
         <div class="qa-row2">
+          <div class="qa-field" id="qaParcWrap" style="display:none;max-width:130px;"><label>Nº de parcelas</label><input type="number" id="qaParcelas" min="2" max="48" step="1" value="3" inputmode="numeric"></div>
           <div class="qa-field"><label>Categoria</label><select id="qaCategoria">${opts}</select></div>
+          <div class="qa-field"><label>Banco</label><input type="text" id="qaBanco" list="gxBancosDL" placeholder="ex: Nubank" maxlength="30" autocomplete="off" value="${escAttr(GX.lastAdd.banco||'')}"></div>
           <button class="btn" id="btnQaAdd" type="button">Adicionar</button>
         </div>
+        <div class="settings-desc" id="qaParcHint" style="display:none;margin-top:10px;"></div>
         <div class="gx-err" id="gxAddErr"></div>
       </div>
     </div></div>`;
+}
+/* ---------- banco de cada despesa (campo livre, com sugestões dos já usados) ---------- */
+const GX_BANCOS_PADRAO = ['Nubank','Itaú','Bradesco','Santander','Banco do Brasil','Caixa','Inter','C6 Bank','PicPay','Mercado Pago','Dinheiro'];
+function gxBankNames(){
+  const names = [], seen = new Set();
+  const add = n=>{ n = String(n||'').trim(); const k = gxKey(n); if(n && !seen.has(k)){ seen.add(k); names.push(n); } };
+  (state.months||[]).forEach(mo=>(mo.categories||[]).forEach(c=>(c.items||[]).forEach(it=>add(it.banco))));
+  names.sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  GX_BANCOS_PADRAO.forEach(add);
+  return names;
+}
+function gxEnsureBankList(){
+  let dl = document.getElementById('gxBancosDL');
+  if(!dl){ dl = document.createElement('datalist'); dl.id = 'gxBancosDL'; document.body.appendChild(dl); }
+  dl.innerHTML = gxBankNames().map(n=>`<option value="${escAttr(n)}"></option>`).join('');
+}
+/* ---------- parcelas: lança a mesma despesa nos meses seguintes ---------- */
+function gxMonthLabelFromRank(rank){
+  return PT_MONTH_NAMES[rank%12] + ' / ' + Math.floor(rank/12);
+}
+// Acha o mês cadastrado com esse "rank" (ano*12+mês); se não existir, cria já na posição cronológica.
+function gxFindOrCreateMonth(rank, created){
+  let m = state.months.find(x=>monthLabelRank(x.label)===rank);
+  if(m) return m;
+  m = {id:uid(), label:gxMonthLabelFromRank(rank), categories:[]};
+  const idx = state.months.findIndex(x=>{ const r = monthLabelRank(x.label); return r!==null && r>rank; });
+  if(idx===-1) state.months.push(m); else state.months.splice(idx,0,m);
+  created.push(m.label);
+  return m;
+}
+// Data da parcela k: mesmo dia da data escolhida, no mês alvo (ajusta p/ o último dia se o mês for mais curto).
+function gxInstallmentDate(baseISO, rank){
+  const day = Number((baseISO||'').slice(8,10)) || 1;
+  const y = Math.floor(rank/12), mi = rank%12;
+  const last = new Date(y, mi+1, 0).getDate();
+  return y+'-'+String(mi+1).padStart(2,'0')+'-'+String(Math.min(day,last)).padStart(2,'0');
+}
+function gxAddInstallments(month, catName, desc, valor, data, total, banco){
+  const baseRank = monthLabelRank(month.label);
+  if(baseRank===null) return {error:'Não consegui identificar o mês "'+month.label+'". Use um nome como "Novembro / 2026" para lançar parcelas.'};
+  const groupId = uid(), created = [];
+  let first = null;
+  for(let n=1; n<=total; n++){
+    const target = n===1 ? month : gxFindOrCreateMonth(baseRank+n-1, created);
+    let cat = target.categories.find(c=>gxKey(c.name)===gxKey(catName));
+    if(!cat){ cat = {name:catName, items:[]}; target.categories.push(cat); }
+    const item = {desc: desc+' ('+n+'/'+total+')', value:valor, date: n===1 ? data : gxInstallmentDate(data, baseRank+n-1), parcela:{id:groupId, n, total}};
+    if(banco) item.banco = banco;
+    cat.items.push(item);
+    if(n===1) first = item;
+  }
+  return {first, created, lastLabel: gxMonthLabelFromRank(baseRank+total-1)};
 }
 function gxWireAddPanel(wrap, month){
   const btn = wrap.querySelector('#gxBtnAdd');
   const panel = wrap.querySelector('#gxAddWrap');
   if(!panel) return;
   const dI = panel.querySelector('#qaDesc'), vI = panel.querySelector('#qaValor'), tI = panel.querySelector('#qaData'), cS = panel.querySelector('#qaCategoria'), err = panel.querySelector('#gxAddErr');
+  gxEnsureBankList();
+  const bI = panel.querySelector('#qaBanco');
+  const tipoS = panel.querySelector('#qaTipo'), pW = panel.querySelector('#qaParcWrap'), pI = panel.querySelector('#qaParcelas'), pH = panel.querySelector('#qaParcHint');
+  const updParc = ()=>{
+    const isP = tipoS.value==='parcelas';
+    pW.style.display = isP ? '' : 'none';
+    const n = parseInt(pI.value,10), v = parseMoney(vI.value);
+    if(isP && n>=2 && v>0){ pH.style.display = ''; pH.textContent = n+'x de '+fmt(v)+' = '+fmt(v*n)+' · lança nos '+(n-1)+' meses seguintes também'; }
+    else if(isP){ pH.style.display = ''; pH.textContent = 'O valor informado é o de cada parcela. Ela será lançada nos meses seguintes automaticamente.'; }
+    else pH.style.display = 'none';
+  };
+  [tipoS, pI, vI].forEach(i=>{ i.addEventListener('input', updParc); i.addEventListener('change', updParc); });
   tI.value = GX.lastAdd.date || new Date().toISOString().slice(0,10);
   gxBindMoney(vI);
   const submit = ()=>{
@@ -3696,23 +3776,36 @@ function gxWireAddPanel(wrap, month){
     const catName = cS.value || 'Sem categoria';
     if(!desc){ err.textContent = 'Informe a descrição do gasto.'; dI.focus(); return; }
     if(!valor || valor<=0){ err.textContent = 'Informe um valor válido.'; vI.focus(); return; }
-    let cat = month.categories.find(c=>gxKey(c.name)===gxKey(catName));
-    if(!cat){ cat = {name:catName, items:[]}; month.categories.push(cat); }
-    gastosCollapsedCats.delete(cat.name);
-    const item = {desc, value:valor, date:data};
-    cat.items.push(item);
-    GX.flash = item; GX.lastAdd = {date:data, cat:catName}; GX.focusAdd = true; GX.addOpen = true;
+    const banco = bI.value.trim();
+    const isParc = tipoS.value==='parcelas';
+    const total = parseInt(pI.value,10);
+    if(isParc && !(total>=2 && total<=48)){ err.textContent = 'Informe entre 2 e 48 parcelas.'; pI.focus(); return; }
+    let item, msg = '✓ despesa adicionada';
+    if(isParc){
+      const r = gxAddInstallments(month, catName, desc, valor, data, total, banco);
+      if(r.error){ err.textContent = r.error; return; }
+      item = r.first;
+      msg = '✓ '+total+' parcelas lançadas até '+r.lastLabel + (r.created.length ? ' ('+r.created.length+(r.created.length>1?' meses criados)':' mês criado)') : '');
+    } else {
+      let cat = month.categories.find(c=>gxKey(c.name)===gxKey(catName));
+      if(!cat){ cat = {name:catName, items:[]}; month.categories.push(cat); }
+      item = {desc, value:valor, date:data};
+      if(banco) item.banco = banco;
+      cat.items.push(item);
+    }
+    gastosCollapsedCats.delete((month.categories.find(c=>gxKey(c.name)===gxKey(catName))||{}).name);
+    GX.flash = item; GX.lastAdd = {date:data, cat:catName, banco}; GX.focusAdd = true; GX.addOpen = true;
     scheduleSave();
     renderSection();
     setTimeout(()=>{
       const shown = document.querySelector('.gx-tx.is-new');
-      showToast(shown || GX.legacy ? '✓ despesa adicionada' : '✓ despesa adicionada (fora dos filtros atuais)', false);
+      showToast(isParc ? msg : (shown || GX.legacy ? msg : msg+' (fora dos filtros atuais)'), false);
       GX.flash = null;
     }, 30);
   };
   panel.querySelector('#btnQaAdd').addEventListener('click', submit);
-  [dI, vI].forEach(i=>i.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); submit(); } }));
-  [dI, vI, cS, tI].forEach(i=>i.addEventListener('input', ()=>{ err.textContent = ''; }));
+  [dI, vI, bI].forEach(i=>i.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); submit(); } }));
+  [dI, vI, cS, tI, pI, tipoS, bI].forEach(i=>i.addEventListener('input', ()=>{ err.textContent = ''; }));
   if(btn) btn.addEventListener('click', ()=>{
     GX.addOpen = !GX.addOpen;
     panel.classList.toggle('open', GX.addOpen);
@@ -3810,7 +3903,7 @@ function gxRefresh(root, animate){
         ${showCat ? `<span class="gx-tx-ico" style="background:${gxTint(color,'22')}; color:${color};">${gxIconMarkup(t.key, t.catName)}</span>` : ''}
         <div class="gx-tx-main">
           <div class="gx-tx-desc">${escapeHtml(t.desc)}</div>
-          <div class="gx-tx-meta"><span>${escapeHtml(gxFmtDate(t))}</span>${showCat ? `<span class="gx-tx-cat">${escapeHtml(t.catName)}</span>` : ''}${(multi && t.date) ? `<span>· ${escapeHtml(t.month.label)}</span>` : ''}</div>
+          <div class="gx-tx-meta"><span>${escapeHtml(gxFmtDate(t))}</span>${showCat ? `<span class="gx-tx-cat">${escapeHtml(t.catName)}</span>` : ''}${t.item.banco ? `<span class="gx-tx-bank" title="banco">${escapeHtml(t.item.banco)}</span>` : ''}${(multi && t.date) ? `<span>· ${escapeHtml(t.month.label)}</span>` : ''}</div>
         </div>
         <div class="gx-tx-amt mono ${t.value<0?'pos':''}">${gxMoneySigned(t.value)}</div>
         <button type="button" class="gx-tx-del" data-del="${i}" aria-label="Excluir despesa" title="Excluir">${gxUi('trash')}</button>
@@ -3895,6 +3988,7 @@ function gxListHeadHTML(){
         <option value="high" ${GX.sort==='high'?'selected':''}>Maior valor</option>
         <option value="low" ${GX.sort==='low'?'selected':''}>Menor valor</option>
         <option value="az" ${GX.sort==='az'?'selected':''}>Descrição (A–Z)</option>
+        <option value="banco" ${GX.sort==='banco'?'selected':''}>Banco (A–Z)</option>
       </select></label>
   </div>`;
 }
@@ -3980,6 +4074,7 @@ function gxLegacyEditor(host, month){
       scheduleSave();
     });
 
+    gxEnsureBankList();
     const itemsList = block.querySelector('[data-role=itemsList]');
     const sortedItems = cat.items.slice().sort((a,b)=>{
       const da = a.date || '', db = b.date || '';
@@ -3994,11 +4089,13 @@ function gxLegacyEditor(host, month){
       row.innerHTML = `
         <span class="item-dot"></span>
         <input type="text" value="${escAttr(item.desc)}" data-role="desc" class="item-desc-input" placeholder="descrição">
+        <input type="text" value="${escAttr(item.banco||'')}" data-role="banco" class="item-banco-input" list="gxBancosDL" placeholder="banco" maxlength="30" title="banco desta despesa" autocomplete="off">
         <input type="date" value="${escAttr(item.date||'')}" data-role="date" class="item-date-input" title="data do gasto">
         <input type="text" inputmode="decimal" class="money item-value-input" data-role="value">
         <button class="icon-btn" data-role="delItem" title="remover item">✕</button>
       `;
       row.querySelector('[data-role=desc]').addEventListener('input', e=>{ item.desc=e.target.value; scheduleSave(); });
+      row.querySelector('[data-role=banco]').addEventListener('change', e=>{ const b = e.target.value.trim(); if(b) item.banco=b; else delete item.banco; scheduleSave(); gxEnsureBankList(); });
       row.querySelector('[data-role=date]').addEventListener('change', e=>{ item.date=e.target.value; scheduleSave(); renderSection(); });
       bindMoneyInput(row.querySelector('[data-role=value]'), ()=>item.value, v=>item.value=v, ()=>recalcGastos(month, ci));
       row.querySelector('[data-role=delItem]').addEventListener('click', ()=>{
