@@ -576,6 +576,12 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
 .auth-field label{display:block; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-soft); font-family:'JetBrains Mono',monospace; margin-bottom:5px;}
 .auth-field input{width:100%; padding:11px; border:1px solid var(--paper-line); border-radius:2px; font-size:14.5px; background:var(--paper); font-family:'DM Sans',sans-serif;}
 .auth-field input:focus{outline:none; border-color:var(--gold); background:var(--white);}
+.pw-wrap{position:relative; display:block;}
+.pw-wrap input{padding-right:44px !important;}
+.pw-eye{position:absolute; right:4px; top:50%; transform:translateY(-50%); width:36px; height:36px; min-height:0; padding:0; display:flex; align-items:center; justify-content:center; background:none; border:none; box-shadow:none; border-radius:8px; color:var(--ink-soft); cursor:pointer;}
+.pw-eye:hover{color:var(--ink);}
+.pw-eye:focus-visible{outline:2px solid var(--gold); outline-offset:-2px;}
+.pw-eye svg{width:18px; height:18px; display:block;}
 .auth-error{background:var(--rust-pale); color:var(--rust); font-size:12.5px; padding:10px 12px; border-radius:2px; margin-bottom:14px; font-family:'JetBrains Mono',monospace; display:none; line-height:1.5;}
 .auth-error.show{display:block;}
 .auth-success{background:var(--green-pale); color:var(--forest); font-size:12.5px; padding:10px 12px; border-radius:2px; margin-bottom:14px; font-family:'JetBrains Mono',monospace; display:none; line-height:1.5;}
@@ -5789,6 +5795,53 @@ function setAuthForm(name){
   document.querySelectorAll('.auth-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===name));
 }
 
+/* ---------- olhinho: mostrar/ocultar senha em todos os campos de senha ---------- */
+function wirePasswordToggles(){
+  const EYE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1.5 12S5.5 5 12 5s10.5 7 10.5 7-4 7-10.5 7S1.5 12 1.5 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+  const EYE_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.9 17.9A10.6 10.6 0 0 1 12 19C5.5 19 1.5 12 1.5 12a18.5 18.5 0 0 1 4.6-5.4M9.9 5.2A9.9 9.9 0 0 1 12 5c6.5 0 10.5 7 10.5 7a18.6 18.6 0 0 1-2.2 3.2M1 1l22 22"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
+  document.querySelectorAll('input[type=password]').forEach(inp=>{
+    if(inp.dataset.pwWired) return;
+    inp.dataset.pwWired = '1';
+    const wrap = document.createElement('span');
+    wrap.className = 'pw-wrap';
+    inp.parentNode.insertBefore(wrap, inp);
+    wrap.appendChild(inp);
+    const btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'pw-eye';
+    const set = (show)=>{
+      inp.type = show ? 'text' : 'password';
+      btn.innerHTML = show ? EYE_OFF : EYE;
+      btn.title = btn.ariaLabel = show ? 'Ocultar senha' : 'Mostrar senha';
+      btn.setAttribute('aria-pressed', show ? 'true' : 'false');
+    };
+    set(false);
+    btn.addEventListener('mousedown', e=>e.preventDefault()); // não tira o foco do campo
+    btn.addEventListener('click', ()=> set(inp.type === 'password'));
+    wrap.appendChild(btn);
+    if(inp.form) inp.form.addEventListener('reset', ()=> set(false));
+  });
+}
+
+/* ---------- link de recuperação de senha ---------- */
+function readAuthUrl(){
+  const hash = new URLSearchParams((window.location.hash||'').replace(/^#/,''));
+  const qs = new URLSearchParams(window.location.search);
+  const get = k => hash.get(k) || qs.get(k) || '';
+  return {
+    isRecovery: qs.get('reset') === '1' || hash.get('type') === 'recovery',
+    errCode: get('error_code') || get('error'),
+    errDesc: get('error_description')
+  };
+}
+function cleanAuthUrl(){
+  try{ history.replaceState(null, '', window.location.pathname); }catch(e){}
+}
+function recoveryLinkErrorMsg(u){
+  if(/expired|otp/i.test(u.errCode + ' ' + u.errDesc))
+    return 'Este link de recuperação expirou ou já foi usado. Peça um novo link abaixo e abra-o logo depois de receber o e-mail.';
+  return 'Não foi possível validar o link de recuperação. Peça um novo link abaixo.';
+}
+
 function wireAuthForm(){
   // Wire landing screen buttons
   const btnLandingLogin = document.getElementById('btnLandingLogin');
@@ -5865,10 +5918,12 @@ function wireAuthForm(){
     if(!supabaseReady) return showAuthError(supabaseUnavailableMsg());
     clearAuthError();
     const email = document.getElementById('forgotEmail').value.trim();
+    if(window.location.protocol === 'file:'){ showAuthError('Abra o site pelo endereço publicado (https://…) para recuperar a senha. Em arquivo local o link do e-mail não consegue voltar para cá.'); return; }
     const btn = document.getElementById('forgotSubmitBtn');
     btn.disabled = true; btn.textContent = 'Enviando…';
+    // endereço de retorno limpo (sem ?query nem #hash): precisa estar na lista "Redirect URLs" do Supabase
     const { error } = await sb.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + window.location.pathname + '?reset=1'
+      redirectTo: window.location.href.split('#')[0].split('?')[0]
     });
     btn.disabled = false; btn.textContent = 'Enviar link de recuperação';
     if(error){ showAuthError(traduzErro(error)); return; }
@@ -5883,12 +5938,18 @@ function wireAuthForm(){
     if(p1 !== p2){ showAuthError('As senhas não coincidem.'); return; }
     if(p1.length < 6){ showAuthError('Use pelo menos 6 caracteres.'); return; }
     const btn = document.getElementById('resetSubmitBtn');
+    const { data:{ session:rs } } = await sb.auth.getSession();
+    if(!rs){ setAuthForm('forgot'); showAuthError('A sessão de recuperação expirou. Peça um novo link abaixo.'); return; }
     btn.disabled = true; btn.textContent = 'Salvando…';
     const { error } = await sb.auth.updateUser({ password: p1 });
     btn.disabled = false; btn.textContent = 'Salvar nova senha';
     if(error){ showAuthError(traduzErro(error)); return; }
-    showAuthSuccess('Senha alterada! Você já pode entrar com a nova senha.');
-    setTimeout(()=> setAuthForm('login'), 1400);
+    cleanAuthUrl();
+    showAuthSuccess('Senha alterada! Entrando…');
+    setTimeout(async ()=>{
+      const { data:{ session:ns } } = await sb.auth.getSession();
+      if(ns) enterApp(ns); else setAuthForm('login');
+    }, 1200);
   });
 }
 
@@ -5897,6 +5958,7 @@ function traduzErro(error){
   if(/already registered|already exists/i.test(msg)) return 'Já existe uma conta com esse e-mail. Tente entrar.';
   if(/invalid login credentials/i.test(msg)) return 'E-mail ou senha incorretos.';
   if(/email not confirmed/i.test(msg)) return 'Confirme seu e-mail antes de entrar — verifique sua caixa de entrada.';
+  if(/only request this after|security purposes/i.test(msg)) return 'Aguarde cerca de um minuto antes de pedir outro link.';
   if(/rate limit/i.test(msg)) return 'Muitas tentativas seguidas. Aguarde um pouco e tente de novo.';
   if(/network/i.test(msg)) return 'Falha de conexão. Verifique sua internet e tente novamente.';
   return msg || 'Não foi possível concluir. Tente novamente.';
@@ -5991,6 +6053,7 @@ function wireSettingsModal(){
 
 async function boot(){
   applySavedTheme();
+  wirePasswordToggles();
   wireSettingsModal();
   document.getElementById('loadingScreen').style.display = 'none';
 
@@ -6011,11 +6074,20 @@ async function boot(){
 
   wireAuthForm();
 
-  // fluxo de redefinição de senha (o link do e-mail volta com ?reset=1)
-  const isResetFlow = new URLSearchParams(window.location.search).get('reset') === '1';
+  // link do e-mail de recuperação: pode voltar com ?reset=1, com #type=recovery ou com #error=... (link expirado/já usado)
+  const authUrl = readAuthUrl();
+
+  if(authUrl.errCode){
+    cleanAuthUrl();
+    document.getElementById('authScreen').style.display = 'flex';
+    setAuthForm('forgot');
+    showAuthError(recoveryLinkErrorMsg(authUrl));
+    return;
+  }
 
   sb.auth.onAuthStateChange((event, session)=>{
     if(event === 'PASSWORD_RECOVERY'){
+      document.getElementById('landingScreen').style.display = 'none';
       document.getElementById('authScreen').style.display = 'flex';
       setAuthForm('reset');
     }
@@ -6023,9 +6095,12 @@ async function boot(){
 
   const { data: { session } } = await sb.auth.getSession();
 
-  if(isResetFlow){
+  if(authUrl.isRecovery){
+    cleanAuthUrl();
+    document.getElementById('landingScreen').style.display = 'none';
     document.getElementById('authScreen').style.display = 'flex';
-    setAuthForm('reset');
+    if(session){ setAuthForm('reset'); }
+    else { setAuthForm('forgot'); showAuthError(recoveryLinkErrorMsg(authUrl)); }
     return;
   }
 
