@@ -666,10 +666,8 @@ body.theme-dark .bottom-tab.active .bt-icon{background:var(--gold); border-color
 .sidebar.collapsed .brand-actions{flex-direction:column;}
 .sidebar.collapsed .brand-actions .bell-btn{display:none;}
 .sidebar.collapsed .nav{display:none;}
-.sidebar.collapsed .user-badge{display:none;}
 .sidebar.collapsed .sidebar-footer-note,
-.sidebar.collapsed .sidebar-footer-actions,
-.sidebar.collapsed #btnSettingsDesktop{display:none;}
+.sidebar.collapsed .sidebar-footer-actions{display:none;}
 .sidebar.collapsed .sidebar-footer{padding:12px 8px 16px;}
 .sidebar.collapsed .quick-actions{padding:10px 8px 2px;}
 .sidebar.collapsed .quick-actions-footer{padding:0 0 10px;}
@@ -1220,6 +1218,58 @@ body.theme-dark .gx-crumb.current, body.theme-dark .gx-avg .v, body.theme-dark .
   .gx-view,.gx-card,.gx-bar,.gx-val,.gx-chip,.gx-modal,.gx-menu,.gx-results-in,.gx-tx.is-new{animation:none !important;}
   .gx-panel,.gx-add-wrap,.gx-progress i{transition:none !important;}
 }
+
+/* ===== AJUDA ===== */
+.hlp-overlay{position:fixed;inset:0;z-index:120;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;padding:18px}
+.hlp-overlay.open{display:flex}
+.hlp-panel{background:var(--white);color:var(--ink);width:min(940px,100%);height:min(780px,100%);border-radius:18px;border:1px solid var(--paper-line);box-shadow:0 24px 60px rgba(0,0,0,.3);display:flex;flex-direction:column;overflow:hidden}
+.hlp-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:18px 22px 12px}
+.hlp-head h3{font-size:22px}.hlp-head p{margin:3px 0 0;font-size:13px;color:var(--ink-soft)}
+.hlp-head button{background:none;border:0;color:var(--ink-soft);font-size:20px;line-height:1;padding:4px 6px}
+.hlp-bar{display:flex;gap:10px;flex-wrap:wrap;padding:0 22px 12px;border-bottom:1px solid var(--paper-line)}
+.hlp-bar input{flex:1;min-width:200px;padding:10px 12px;border:1px solid var(--paper-line);border-radius:10px;background:var(--paper);color:var(--ink);font-size:14px}
+.hlp-bar input:focus{outline:none;border-color:var(--gold)}
+.hlp-tabs{display:flex;gap:4px;background:var(--paper-dark);padding:3px;border-radius:10px}
+.hlp-tabs button{border:0;background:none;color:var(--ink-soft);padding:7px 14px;border-radius:8px;font-size:13px;font-weight:600}
+.hlp-tabs button.on{background:var(--white);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.hlp-body{overflow-y:auto;padding:18px 22px 26px;flex:1}
+.hlp-guide{display:grid;grid-template-columns:210px 1fr;gap:24px}
+.hlp-rail{position:sticky;top:0;align-self:start;display:flex;flex-direction:column;gap:2px}
+.hlp-rail b,.hlp-gh{font:600 12px 'JetBrains Mono',monospace;color:var(--ink-soft);margin:14px 0 4px}
+.hlp-rail b:first-child{margin-top:0}
+.hlp-rail button{text-align:left;background:none;border:0;border-radius:8px;padding:7px 10px;font-size:13.5px;color:var(--ink)}
+.hlp-rail button.on{background:var(--forest-pale);color:var(--gold);font-weight:600}
+.hlp-sel{display:none;width:100%;padding:10px;border:1px solid var(--paper-line);border-radius:10px;background:var(--paper);color:var(--ink);font-size:14px;margin-bottom:14px}
+.hlp-art h4{font-size:21px}.hlp-art .sum{color:var(--ink-soft);margin:4px 0 14px;font-size:14px}
+.hlp-art ol{margin:0 0 16px;padding-left:22px}.hlp-art li{margin:0 0 9px;line-height:1.55;font-size:14.5px}
+.hlp-art ol li::marker{color:var(--gold);font-weight:700}
+.hlp-note{background:var(--forest-pale);border-radius:12px;padding:12px 16px;font-size:14px}
+.hlp-note ul{margin:8px 0 0;padding-left:18px}.hlp-note li{margin:0 0 6px;line-height:1.55}
+.hlp-faq details{border:1px solid var(--paper-line);border-radius:12px;margin:0 0 8px;background:var(--paper)}
+.hlp-faq summary{cursor:pointer;padding:12px 14px;font-weight:600;font-size:14.5px}
+.hlp-faq details div{padding:0 14px 14px;font-size:14px;line-height:1.6}
+.hlp-res button{display:block;width:100%;text-align:left;border:1px solid var(--paper-line);border-radius:12px;background:var(--paper);padding:11px 14px;margin-bottom:8px;color:var(--ink);font-size:14.5px}
+.hlp-res small{display:block;color:var(--ink-soft);margin-top:3px;font-size:12.5px}
+.hlp-empty{color:var(--ink-soft);text-align:center;padding:30px 0}
+.landing-actions{display:flex;align-items:center;gap:8px}
+.landing-btn-help{background:none;border:1px solid #CBD5E1;color:#0F172A;border-radius:8px;padding:8px 16px;font-size:14px;font-weight:600;cursor:pointer}
+.sidebar.collapsed .js-help-btn span:not(.ico){display:none}
+@media(max-width:760px){.hlp-overlay{padding:0}.hlp-panel{height:100%;border-radius:0;border:0}.hlp-guide{grid-template-columns:1fr}.hlp-rail{display:none}.hlp-sel{display:block}}
+
+.user-badge{position:relative}
+.user-badge .sb-chev{display:flex;align-items:center;justify-content:center;margin-left:auto;width:28px;height:28px;padding:0;background:none;border:0;border-radius:6px;color:rgba(251,249,241,.7);cursor:pointer;flex-shrink:0}
+.user-badge .sb-chev:hover{background:rgba(251,249,241,.1);color:#fff}
+.sb-chev svg{transition:transform .2s}.sb-chev.open svg{transform:rotate(180deg)}
+.sb-menu{display:none;position:fixed;z-index:200;min-width:180px;padding:6px;background:#1E293B;border:1px solid rgba(148,163,184,.25);border-radius:12px;box-shadow:0 -8px 28px rgba(0,0,0,.4)}
+.sb-menu.open{display:block}
+.sb-menu button{display:block;width:100%;margin:0;padding:10px 12px;background:none;border:0;border-radius:8px;color:rgba(251,249,241,.9);font-size:13px;text-align:left;cursor:pointer}
+.sb-menu button:hover{background:rgba(148,163,184,.16)}
+.sb-menu button+button{margin-top:2px}
+.sb-menu button:last-child{margin-top:6px;border-top:1px solid rgba(148,163,184,.2);border-radius:0 0 8px 8px;padding-top:12px;color:#FCA5A5}
+.sidebar:has(.sb-menu.open){z-index:40}
+.sidebar.collapsed .user-badge{display:flex;justify-content:center;padding:8px 0}
+.sidebar.collapsed .user-badge .dot,.sidebar.collapsed .user-badge b{display:none}
+.sidebar.collapsed .user-badge .sb-chev{margin-left:0}
 </style>
 </head>
 <body>
@@ -1236,7 +1286,7 @@ body.theme-dark .gx-crumb.current, body.theme-dark .gx-avg .v, body.theme-dark .
       <div class="landing-logo">B</div>
       <span class="landing-brand-name">Balance</span>
     </div>
-    <button type="button" class="landing-btn-login" id="btnLandingLogin">Entrar</button>
+    <div class="landing-actions"><button type="button" class="landing-btn-help js-help-btn" data-no-undo>Ajuda</button><button type="button" class="landing-btn-login" id="btnLandingLogin">Entrar</button></div>
   </header>
 
   <main class="landing-main">
@@ -1343,6 +1393,7 @@ body.theme-dark .gx-crumb.current, body.theme-dark .gx-avg .v, body.theme-dark .
     </form>
 
     <div class="auth-note" id="authNote">Seus dados ficam salvos com segurança na sua conta e acompanham você em qualquer navegador ou aparelho.</div>
+    <button type="button" class="btn link js-help-btn" data-no-undo style="margin-top:8px;">Precisa de ajuda?</button>
   </div>
 </div>
 
@@ -1366,7 +1417,7 @@ body.theme-dark .gx-crumb.current, body.theme-dark .gx-avg .v, body.theme-dark .
       </div>
     </div>
     <div class="nav" id="navList"></div>
-    <div class="user-badge"><span class="dot"></span> <b id="currentUserLabel"></b></div>
+    <div class="user-badge"><span class="dot"></span> <b id="currentUserLabel"></b><button type="button" class="sb-chev" data-no-undo aria-expanded="false" title="Mais opções" aria-label="Mais opções"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button><div class="sb-menu" data-no-undo><button type="button" id="btnSettingsDesktop"><span>Configurações</span></button><button type="button" class="js-help-btn" data-no-undo><span>Ajuda</span></button><button type="button" id="btnExport"><span>Exportar backup</span></button><button type="button" id="btnImport"><span>Importar backup</span></button><button type="button" id="btnLogout"><span>Sair</span></button></div></div>
     <div class="sidebar-footer">
       <div class="quick-actions quick-actions-footer" style="padding-bottom:0; margin-bottom:6px;">
         <button class="qa-btn js-undo-btn" id="btnUndoDesktop" title="Desfazer última alteração" disabled><span class="ico">↶</span><span>desfazer</span></button>
@@ -1374,14 +1425,9 @@ body.theme-dark .gx-crumb.current, body.theme-dark .gx-avg .v, body.theme-dark .
       </div>
       <div class="quick-actions quick-actions-footer">
         <button class="qa-btn js-save-btn" id="btnSaveDesktop" title="Salvar alterações"><span class="ico">💾</span><span class="js-save-label">salvar</span></button>
-        <button class="qa-btn" id="btnSettingsDesktop" title="Configurações"><span class="ico">⚙️</span><span>ajustes</span></button>
-      </div>
+        </div>
       <div class="sidebar-footer-note">Dados salvos na sua conta</div>
-      <div class="sidebar-footer-actions">
-        <button id="btnExport">Exportar backup</button>
-        <button id="btnImport">Importar</button>
-        <button id="btnLogout">Sair</button>
-      </div>
+      
       <input type="file" id="importFile" accept="application/json" style="display:none;">
     </div>
   </div>
@@ -1422,7 +1468,7 @@ body.theme-dark .gx-crumb.current, body.theme-dark .gx-avg .v, body.theme-dark .
       </div>
     </div>
     <div class="nav" id="navListDrawer"></div>
-    <div class="user-badge"><span class="dot"></span> <b id="currentUserLabelDrawer"></b></div>
+    <div class="user-badge"><span class="dot"></span> <b id="currentUserLabelDrawer"></b><button type="button" class="sb-chev" data-no-undo aria-expanded="false" title="Mais opções" aria-label="Mais opções"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button><div class="sb-menu" data-no-undo><button type="button" id="btnSettingsDrawer"><span>Configurações</span></button><button type="button" class="js-help-btn" data-no-undo><span>Ajuda</span></button><button type="button" id="btnExportDrawer"><span>Exportar backup</span></button><button type="button" id="btnImportDrawer"><span>Importar backup</span></button><button type="button" id="btnLogoutDrawer"><span>Sair</span></button></div></div>
     <div class="sidebar-footer">
       <div class="quick-actions quick-actions-footer" style="padding-bottom:0; margin-bottom:6px;">
         <button class="qa-btn js-undo-btn" id="btnUndoDrawer" title="Desfazer última alteração" disabled><span class="ico">↶</span><span>desfazer</span></button>
@@ -1430,14 +1476,9 @@ body.theme-dark .gx-crumb.current, body.theme-dark .gx-avg .v, body.theme-dark .
       </div>
       <div class="quick-actions quick-actions-footer">
         <button class="qa-btn js-save-btn" id="btnSaveDrawer" title="Salvar alterações"><span class="ico">💾</span><span class="js-save-label">salvar</span></button>
-        <button class="qa-btn" id="btnSettingsDrawer" title="Configurações"><span class="ico">⚙️</span><span>ajustes</span></button>
-      </div>
+        </div>
       Dados salvos na sua conta
-      <div>
-        <button id="btnExportDrawer">Exportar backup</button>
-        <button id="btnImportDrawer">Importar</button>
-        <button id="btnLogoutDrawer">Sair</button>
-      </div>
+      
     </div>
   </div>
 
@@ -1485,6 +1526,14 @@ body.theme-dark .gx-crumb.current, body.theme-dark .gx-avg .v, body.theme-dark .
         <button class="btn secondary small" id="btnImportSettings" type="button">Importar backup</button>
       </div>
     </section>
+  </div>
+</div>
+
+<div class="hlp-overlay" id="hlpOverlay" data-no-undo>
+  <div class="hlp-panel" role="dialog" aria-modal="true" aria-labelledby="hlpTitle">
+    <div class="hlp-head"><div><h3 id="hlpTitle">Ajuda</h3><p>Como usar o Balance, passo a passo, e respostas para as dúvidas mais comuns.</p></div><button type="button" id="hlpClose" aria-label="Fechar ajuda">✕</button></div>
+    <div class="hlp-bar"><input type="search" id="hlpSearch" placeholder="Buscar: parcelas, senha, backup…" autocomplete="off" aria-label="Buscar na ajuda"><div class="hlp-tabs"><button type="button" data-tab="guide" class="on">Como usar</button><button type="button" data-tab="faq">Dúvidas</button></div></div>
+    <div class="hlp-body" id="hlpBody"></div>
   </div>
 </div>
 
@@ -6262,6 +6311,187 @@ function stopNotificationWatcher(){
   document.removeEventListener('visibilitychange', onNotifVisibility);
   window.removeEventListener('online', notificationTick);
 }
+
+/* =========================================================
+   AJUDA — guia "Como usar" + dúvidas frequentes + busca
+========================================================= */
+(function(){
+const TOPICS = [
+{id:"roteiro",g:"Primeiros passos",t:"Comece por aqui",d:"Roteiro rápido para deixar o app funcionando em poucos minutos.",
+ s:["Crie sua conta (ou entre) e, se o app pedir, confirme o e-mail.","Abra **Gastos Mensais**, toque em **+ novo mês** e digite o mês com ano, por exemplo **Novembro / 2026**.","Toque em **+ Adicionar**, preencha descrição, valor, data e categoria e toque em **Adicionar**. Repita para cada gasto.","Abra **Salários**, escolha o mês e toque em **criar salário deste mês**. Informe seu salário (e extras, se houver).","Se tem contas que se repetem todo mês, cadastre em **Gastos Fixos** e, dentro do mês, toque em **aplicar gastos fixos**.","Veja o resultado em **Início**: receita, gastos e quanto sobrou.","Toque em **salvar** (💾). O app não salva sozinho."],
+ n:["O botão salvar pulsa em verde quando há algo por salvar."]},
+{id:"conta",g:"Primeiros passos",t:"Conta, login e senha",d:"Criar conta, entrar, recuperar a senha e sair.",
+ s:["Na tela inicial, toque em **Entrar** ou **Começar agora**.","Para criar conta, use a aba **Criar conta**: nome, e-mail e senha (mínimo 6 caracteres) duas vezes.","Se o app avisar que enviou um link, abra seu e-mail e confirme antes de entrar.","Para entrar, use a aba **Entrar** com e-mail e senha.","Esqueceu a senha? Toque em **Esqueci minha senha**, informe o e-mail, abra o link recebido e defina a nova senha."],
+ n:["Seus dados ficam na sua conta e acompanham você em qualquer navegador ou aparelho.","Para sair, use **Sair** no menu. Se houver alterações sem salvar, o app avisa."]},
+{id:"navegacao",g:"Primeiros passos",t:"Menu e navegação",d:"Onde fica cada coisa no computador e no celular.",
+ n:["**Computador:** o menu fica à esquerda. A seta ‹ no topo recolhe o menu (o app lembra sua escolha).","**Celular:** a barra de baixo mostra as primeiras abas e um atalho para a Carteira. Toque em ☰ para abrir o menu completo.","No menu ficam também: 🔔 avisos, ↶ desfazer, ↷ refazer, 💾 salvar, ⚙️ ajustes, ❓ ajuda, exportar/importar backup e sair."]},
+{id:"inicio",g:"Controle do mês",t:"Início",d:"Painel que compara receita e gastos de um mês.",
+ s:["Escolha o mês na lista no topo.","Leia os quadros: **Receita** (total de Salários do mês), **Gastos** (total de Gastos Mensais) e **Sobra do mês** (receita − gastos).","Veja o gráfico **Receita × Gastos por mês**. Toque em Receita ou Gastos para trocar a cor das barras.","Confira o **Resumo geral**: a receber pendente, Carteira, gastos fixos e empréstimos em aberto.","A tabela **Todos os meses** lista cada mês."],
+ n:["Tudo vem das outras abas: para mudar um número, edite na aba de origem.","O gráfico só aparece quando há gastos ou salário lançados.","“Atualizado” mostra a data do último salvamento."]},
+{id:"gastos",g:"Controle do mês",t:"Gastos Mensais: os meses",d:"Cada mês tem seu próprio conjunto de despesas.",
+ s:["Toque em **+ novo mês** e digite **Mês / Ano** (ex.: Novembro / 2026).","Troque de mês pelas setas ‹ › ou pela lista.","**duplicar mês atual** copia categorias e despesas para um novo mês.","**aplicar gastos fixos** traz os itens da aba Gastos Fixos para a categoria Gastos Fixos do mês, sem repetir os que já estão lá.","**excluir mês** remove o mês, as despesas dele e o salário lançado para ele."],
+ n:["Use sempre mês e ano no nome: é por ele que o app ordena, acha o mês atual e lança parcelas.","Crie os meses em ordem cronológica, pois um novo mês entra no fim da lista.","Ao abrir o app, aparece o mês atual do calendário, se estiver cadastrado.","O topo mostra o total gasto, o gráfico por categoria, o nº de transações, a maior categoria e a variação contra o mês anterior."]},
+{id:"lancar",g:"Controle do mês",t:"Lançar, editar e excluir despesas",d:"Na aba Todas de Gastos Mensais.",
+ s:["Toque em **+ Adicionar**.","Preencha **Descrição**, **Valor**, **Data**, **Categoria** e, se quiser, **Banco** (escolha uma sugestão ou digite).","Toque em **Adicionar** ou pressione Enter. O painel continua aberto para o próximo lançamento.","Para corrigir, toque na despesa: edite tudo (inclusive a categoria) e toque em **Salvar**, ou em **Excluir**.","A lixeira no fim da linha também exclui."],
+ n:["A lista de categorias mostra só as já existentes. Crie novas em Categorias › + Nova categoria.","Decimais com vírgula (12,50). Um ponto sozinho conta como decimal: 1.500 vira R$ 1,50. Use 1500 ou 1.500,00.","Para registrar um estorno, use **Editar categorias** e digite o valor com sinal de menos.","Errou? Use ↶ desfazer."]},
+{id:"parcelas",g:"Controle do mês",t:"Compras parceladas",d:"Lance uma vez e o app preenche os meses seguintes.",
+ s:["Em **+ Adicionar**, mude **Tipo** para **Parcelas**.","Digite o valor **de cada parcela** e o **nº de parcelas** (2 a 48).","Confira o aviso, por exemplo “3x de R$ 100,00 = R$ 300,00”.","Toque em **Adicionar**: o app lança “descrição (1/3)”, “(2/3)”… nos meses seguintes, criando os que faltarem."],
+ n:["O mês atual precisa ter mês e ano no nome (ex.: Novembro / 2026).","Cada parcela é um lançamento independente: edite ou exclua uma por vez (busque “(1/3)” no período Todo o histórico).","As parcelas seguintes usam o mesmo dia da data escolhida."]},
+{id:"buscar",g:"Controle do mês",t:"Buscar, filtrar e ordenar",d:"Encontre qualquer despesa rapidamente.",
+ s:["Na aba **Todas**, digite na caixa **Buscar transação**.","Escolha o **período**: mês, últimos 3 ou 6 meses, ano ou todo o histórico.","Toque em **Filtros** para marcar categorias e definir valor mínimo e máximo.","Remova um filtro pelo × do chip ou toque em **Limpar filtros**.","Ordene por data, valor, descrição ou banco em **Ordenado por**."],
+ n:["Despesa sumiu? Quase sempre há um filtro ativo (veja os chips).","A lista mostra 60 itens por vez; use **Mostrar mais**."]},
+{id:"categorias",g:"Controle do mês",t:"Categorias e orçamento",d:"Organize, personalize e controle o limite de cada categoria.",
+ s:["Abra a aba **Categorias** e escolha o período.","Toque em **+ Nova categoria** para criar.","Toque no cartão para ver as despesas, o gráfico dos últimos 6 meses e a média mensal.","Nos três pontos (⋯) você pode definir **orçamento**, editar descrição, alterar ícone ou emoji, alterar cor, renomear ou remover.","Em **Definir orçamento**, informe o valor mensal. A barra mostra quanto foi usado (amarela a partir de 85%, vermelha acima de 100%)."],
+ n:["Renomear vale para todos os meses.","Remover pergunta se vale só para o mês atual ou para todos; as despesas da categoria saem junto.","**Negativas** são categorias com gasto no período; **Zeradas** não tiveram gasto.","**Editar categorias** (ao lado de Lista) abre o editor clássico: nome, cor e itens em linha."]},
+{id:"fixos",g:"Controle do mês",t:"Gastos Fixos",d:"Modelo das contas que se repetem todo mês.",
+ s:["Toque em **+ novo gasto fixo**.","Digite a descrição e o valor mensal. O total soma sozinho.","Em **Gastos Mensais**, dentro do mês, toque em **aplicar gastos fixos**."],
+ n:["Alterar o modelo não muda meses já aplicados.","Remova um item com ✕."]},
+{id:"salarios",g:"Controle do mês",t:"Salários e horas extras",d:"A receita do mês vem daqui.",
+ s:["Escolha o mês (ele precisa existir em Gastos Mensais).","Toque em **criar salário deste mês**.","Para valor normal, digite em **Valor**.","Para hora extra, preencha **Valor h.e.** (valor da hora) e **Horas**: o valor é calculado.","Use **+ novo item** para bônus, 13º, freelas etc."],
+ n:["A soma dos itens do mês é a **Receita** do Início.","Excluir um mês em Gastos Mensais apaga o salário dele."]},
+{id:"receber",g:"Controle do mês",t:"Dinheiro a Receber e empréstimos",d:"O que devem a você e empréstimos parcelados que você fez.",
+ s:["Em **A receber de terceiros**, toque em **+ novo registro**: data, devedor, descrição e valor.","Quando receber, mude **Status** para **Recebido**.","Em **Empréstimos parcelados**, toque em **+ novo empréstimo**: nome, valor total, nº de parcelas e valor por parcela.","A cada parcela paga, aumente o campo **Pagas**."],
+ n:["Restante = (parcelas − pagas) × valor por parcela. O **Valor total** é só informativo.","Valores recebidos não entram na Receita. Lance também em Salários se quiser contá-los."]},
+{id:"investimentos",g:"Investimentos",t:"Investimentos (projeção)",d:"Quanto seu dinheiro pode render no futuro.",
+ s:["Toque em **+ novo item**.","Escolha **Rende juros** ou **Valor fixo**.","Em Rende juros, informe valor inicial, aporte mensal, anos e duas taxas anuais (baixa e alta).","Leia o valor projetado nos dois cenários e os totais no topo."],
+ n:["A taxa anual vira taxa mensal e o cálculo usa juros compostos.","Duplique a aba (⧉ no menu) para simular outro plano."]},
+{id:"realinvest",g:"Investimentos",t:"Investimento Real",d:"Simulação mês a mês com aporte e taxa de cada mês.",
+ s:["Informe o **Valor inicial**.","Toque em **+ Adicionar mês** e escolha o mês, o **aporte** e a **taxa** (a.a. ou a.m.).","Repita para cada mês: o saldo inicial vem do mês anterior.","Acompanhe Total aportado, Rendimento total, Montante atual e o gráfico."],
+ n:["Editar qualquer mês recalcula os seguintes.","O rendimento do mês incide sobre o saldo inicial; o aporte passa a render no mês seguinte."]},
+{id:"carteira",g:"Investimentos",t:"Carteira de Investimentos",d:"Seus saldos reais, aportes, retiradas e meta mensal.",
+ s:["Toque em **+ novo item**, dê um nome e escolha investimento ou reserva.","Abra o item e informe a **Taxa mensal (%)** do mês.","Registre **Aporte** ou **Retirada** (valor, data e nota) e toque em **OK**.","Se preferir, use **Atualizar saldo** para informar o saldo atual.","Defina a **Meta de investimento** do mês no ✎ e acompanhe a barra.","Teste ideias em **Simular cenário hipotético** (não altera a carteira)."],
+ n:["O saldo soma aportes e rendimento mês a mês; dinheiro novo rende a partir do mês seguinte.","Mês sem taxa usa a última taxa informada.","Apagar uma movimentação do histórico desfaz o efeito no saldo."]},
+{id:"notas",g:"Ferramentas",t:"Bloco de Notas",d:"Anotações livres, no estilo do app Notas.",
+ s:["Toque em **+ nova nota**.","Digite título (opcional) e texto. Sem título, a primeira linha vira o título.","Volte em **todas as notas** e toque numa nota para reabrir.","A lixeira exclui a nota (pede confirmação e salva na hora)."]},
+{id:"menu",g:"Ferramentas",t:"Personalizar o menu",d:"Renomear, ocultar, criar e duplicar seções.",
+ s:["Em cada item do menu aparecem ⧉ duplicar, ✎ renomear e ✕ excluir (no computador, ao passar o mouse).","**+ adicionar item** cria uma seção em branco (descrição e valor) ou duplica uma criada por você.","✕ numa aba padrão apenas **oculta**: ela vai para **seções ocultas**, de onde dá para **restaurar**.","Para apagar de vez, use a lixeira 🗑 em seções ocultas (irreversível, salva na hora)."],
+ n:["Só Investimentos, Investimento Real e seções suas podem ser duplicadas.","Seções criadas por você são apagadas, com os dados, ao excluir.","Sempre deve sobrar ao menos um item no menu."]},
+{id:"salvar",g:"Ferramentas",t:"Salvar, desfazer e refazer",d:"O app só grava quando você manda.",
+ s:["Faça suas alterações.","Toque em **salvar** (💾). Ele pulsa em verde quando há algo pendente e mostra **salvo** depois.","Errou? **↶ desfazer** volta até 50 passos e **↷ refazer** reaplica."],
+ n:["O app **não salva sozinho**. Fechar a aba com pendências gera um aviso.","Depois de desfazer, salve de novo.","O histórico de desfazer zera ao recarregar, sair ou quando chegam dados de outro aparelho.","Exclusão permanente, apagar nota e importar backup salvam na hora."]},
+{id:"aparelhos",g:"Ferramentas",t:"Usar em mais de um aparelho",d:"Celular e computador com os mesmos dados.",
+ n:["Entre com a mesma conta: os dados salvos aparecem em todos os aparelhos.","Quando você salva, os outros aparelhos abertos se atualizam sozinhos.","Se você tem alterações sem salvar, aparece “Há dados novos em outro aparelho”: salve ou recarregue.","Ao salvar tendo dados mais novos em outro lugar, o app pergunta se quer sobrescrever."]},
+{id:"privado",g:"Ferramentas",t:"Modo privado (olhinho)",d:"Esconda valores sensíveis quando outras pessoas estiverem olhando.",
+ s:["Toque no olho 👁 ao lado de Receita, Salários, Investimentos ou Carteira.","Os valores viram ••••••. Toque de novo para mostrar."],
+ n:["Oculta receita e sobra, salários, Investimentos, Carteira e o gráfico do Início.","Gastos, A receber e Investimento Real continuam visíveis.","Vale só neste aparelho e fica lembrado.","Ao tocar num campo, o valor real aparece para você editar."]},
+{id:"avisos",g:"Ferramentas",t:"Notificações (sino)",d:"Alertas calculados com os seus dados.",
+ s:["Toque no sino 🔔. O ponto indica alertas.","Para receber no aparelho, toque em **ativar avisos** e permita no navegador."],
+ n:["Alertas do mês atual: gastos 15% acima ou abaixo da média, 80% ou mais da renda gasta, saldo negativo, categoria com 40%+ dos gastos, fixos acima de 50% da renda, salário ou gastos sem lançar, valores a receber, empréstimos, meta de aporte e dados parados há 10+ dias.","O app precisa estar aberto (pode ficar em segundo plano). São no máximo 2 avisos novos por dia.","Se estiver bloqueado, libere nas configurações do site. Abra o app em aba própria ou pelo ícone na tela de início."]},
+{id:"ajustes",g:"Ferramentas",t:"Ajustes e backup",d:"Tema, nome, senha e cópia de segurança.",
+ s:["Toque em ⚙️ **ajustes**.","**Aparência:** claro ou escuro.","**Dados pessoais:** altere o nome (o e-mail não muda).","**Segurança:** defina uma nova senha (mínimo 6 caracteres).","**Dados do app:** exporte um backup (arquivo .json) ou importe um."],
+ n:["Nome e senha são salvos na hora.","**Importar substitui todos os seus dados atuais** e salva imediatamente. Exporte um backup antes."]}
+];
+const FAQ = [
+["Salvar e dados","Perdi o que digitei","O app só grava quando você toca em salvar (💾). O que ficou pendente ao fechar sem salvar se perde. O navegador avisa antes de fechar."],
+["Salvar e dados","Apaguei algo sem querer","Toque em ↶ desfazer logo em seguida (até 50 passos) e salve. Abas ocultas voltam em seções ocultas › restaurar. Exclusão permanente e backup importado não têm volta."],
+["Salvar e dados","O que significa “Os dados foram alterados em outro aparelho”?","Outro aparelho salvou depois da última vez que este sincronizou. OK sobrescreve tudo com o que está nesta tela; Cancelar mantém suas alterações sem salvar, e você recarrega para ver as novas."],
+["Salvar e dados","Deu erro ao salvar","Em geral é falta de conexão. Suas alterações continuam na tela: confira a internet e toque em salvar de novo."],
+["Salvar e dados","Como faço backup e restauro?","Em ajustes (ou no menu), toque em Exportar backup. Para restaurar, toque em Importar: isso substitui todos os dados atuais e salva na hora, sem pedir confirmação."],
+["Gastos e valores","Digitei 1.500 e virou R$ 1,50","Ponto sozinho é decimal. Digite 1500, 1.500,00 ou 1500,00."],
+["Gastos e valores","Que nome dar ao mês?","Mês e ano, como Novembro / 2026 (nov/26 também funciona). Sem um mês reconhecível, parcelas, comparações e alertas não funcionam direito."],
+["Gastos e valores","A Receita aparece zerada","Falta lançar o salário do mês em Salários (criar salário deste mês) ou o valor está em branco."],
+["Gastos e valores","Minha despesa não aparece na lista","Veja os chips de filtro e o período (por padrão só o mês selecionado). Toque em Limpar filtros."],
+["Gastos e valores","Excluir um mês apaga o salário?","Sim. Apaga o mês, as despesas dele e o salário daquele mês."],
+["Gastos e valores","Como cancelo uma compra parcelada?","Cada parcela é um lançamento. Busque “(1/3)” com o período Todo o histórico e exclua uma a uma."],
+["Gastos e valores","O que o duplicar mês copia?","Categorias, despesas e valores, com as datas originais. Ajuste o que precisar."],
+["Gastos e valores","Como funciona o orçamento?","É um valor mensal por categoria, comparado ao gasto do período escolhido (em 3 meses, o limite é 3 vezes o orçamento)."],
+["Investimentos","Qual a diferença entre Investimentos, Investimento Real e Carteira?","**Investimentos** projeta o futuro (anos e duas taxas). **Investimento Real** simula mês a mês com aporte e taxa de cada mês. **Carteira** guarda seus saldos reais, aportes, retiradas e meta; é ela que aparece no Início."],
+["Investimentos","Atualizar saldo ou registrar aporte?","Aporte e retirada somam ou subtraem e ficam no histórico. Atualizar saldo define o novo valor e registra um ajuste."],
+["Investimentos","Taxa anual ou mensal?","Investimentos usa taxa anual. Carteira e o simulador usam taxa mensal. No Investimento Real você escolhe a.a. ou a.m. em cada mês."],
+["Privacidade e avisos","O olhinho esconde tudo?","Esconde receita, sobra, salários, Investimentos e Carteira. Não esconde gastos, A receber nem Investimento Real."],
+["Privacidade e avisos","Não aparece nenhum alerta","Os alertas olham o mês atual do calendário, que precisa estar cadastrado. Comparações pedem 2 ou mais meses anteriores com gastos."],
+["Privacidade e avisos","Os avisos no celular não chegam","Toque no sino › ativar avisos e permita. Se bloqueou, libere nas configurações do site. O app precisa estar aberto, ainda que em segundo plano."],
+["Conta e acesso","Esqueci minha senha","Na tela de login, toque em Esqueci minha senha, informe o e-mail, abra o link recebido e crie a nova. Se der erro, aguarde cerca de 1 minuto antes de pedir outro link."],
+["Conta e acesso","O e-mail de confirmação não chegou","Aguarde alguns minutos e olhe o spam e as promoções. Confira se o e-mail foi digitado certo."],
+["Conta e acesso","Posso trocar o e-mail?","Não. O e-mail aparece em ajustes, mas não é editável. Nome e senha podem ser trocados."],
+["Conta e acesso","O gráfico não aparece","É preciso ter gastos ou salário lançados, internet para carregar o gráfico e o modo privado desligado."],
+["Conta e acesso","No celular não acho ✎ e ✕ do menu","Eles ficam sempre visíveis dentro do menu ☰."]
+];
+const KIND = {dashboard:"inicio",gastos:"gastos",fixos:"fixos",salarios:"salarios",receber:"receber",investimentos:"investimentos",realInvest:"realinvest",carteira:"carteira",notas:"notas",custom:"menu"};
+const ov = document.getElementById("hlpOverlay"), body = document.getElementById("hlpBody"), inp = document.getElementById("hlpSearch");
+let tab = "guide", cur = "roteiro";
+const nz = s => String(s).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+const fx = s => escapeHtml(s).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>");
+const plain = s => String(s).replace(/\*\*/g,"");
+
+function guideHTML(){
+  const gs = [...new Set(TOPICS.map(x=>x.g))];
+  const rail = gs.map(g=>"<b>"+escapeHtml(g)+"</b>"+TOPICS.filter(x=>x.g===g).map(x=>'<button type="button" data-t="'+x.id+'" class="'+(x.id===cur?"on":"")+'">'+escapeHtml(x.t)+"</button>").join("")).join("");
+  const sel = '<select class="hlp-sel" id="hlpSel" aria-label="Tópico">'+TOPICS.map(x=>'<option value="'+x.id+'"'+(x.id===cur?" selected":"")+">"+escapeHtml(x.t)+"</option>").join("")+"</select>";
+  const t = TOPICS.find(x=>x.id===cur)||TOPICS[0];
+  const art = '<div class="hlp-art"><h4>'+escapeHtml(t.t)+'</h4><p class="sum">'+escapeHtml(t.d||"")+"</p>"
+    +(t.s?"<ol>"+t.s.map(x=>"<li>"+fx(x)+"</li>").join("")+"</ol>":"")
+    +(t.n?'<div class="hlp-note"><b>Bom saber</b><ul>'+t.n.map(x=>"<li>"+fx(x)+"</li>").join("")+"</ul></div>":"")+"</div>";
+  return '<div class="hlp-guide"><nav class="hlp-rail">'+rail+"</nav><div>"+sel+art+"</div></div>";
+}
+function faqHTML(){
+  let last = "", h = '<div class="hlp-faq">';
+  FAQ.forEach((f,i)=>{
+    if(f[0]!==last){ last = f[0]; h += '<div class="hlp-gh">'+escapeHtml(f[0])+"</div>"; }
+    h += '<details id="hf-'+i+'"><summary>'+escapeHtml(f[1])+"</summary><div>"+fx(f[2])+"</div></details>";
+  });
+  return h+"</div>";
+}
+function searchHTML(q){
+  const words = q.split(/\s+/).filter(Boolean);
+  const items = TOPICS.map(t=>({k:"t",id:t.id,title:t.t,text:plain([t.d].concat(t.s||[],t.n||[]).join(" "))}))
+    .concat(FAQ.map((f,i)=>({k:"f",id:i,title:f[1],text:plain(f[2])})));
+  const hits = items.filter(it=>{ const hay = nz(it.title+" "+it.text); return words.every(w=>hay.includes(w)); }).slice(0,15);
+  if(!hits.length) return '<div class="hlp-empty">Nada encontrado para essa busca. Tente outra palavra, como “salvar”, “parcela” ou “senha”.</div>';
+  return '<div class="hlp-res">'+hits.map(it=>'<button type="button" data-go="'+it.k+":"+it.id+'"><b>'+escapeHtml(it.title)+"</b><small>"+(it.k==="t"?"Como usar":"Dúvida")+" · "+escapeHtml(it.text.slice(0,110))+"…</small></button>").join("")+"</div>";
+}
+function render(){
+  ov.querySelectorAll(".hlp-tabs button").forEach(b=>b.classList.toggle("on", b.dataset.tab===tab));
+  const q = nz(inp.value.trim());
+  body.innerHTML = q ? searchHTML(q) : (tab==="guide" ? guideHTML() : faqHTML());
+  if(!q) body.scrollTop = 0;
+}
+function curTopic(){
+  try{
+    if(!state) return "roteiro";
+    const c = state.navConfig.find(n=>n.id===activeSection);
+    return KIND[(c&&c.kind)||activeSection]||"roteiro";
+  }catch(e){ return "roteiro"; }
+}
+function openHelp(){ cur = curTopic(); tab = "guide"; inp.value = ""; render(); ov.classList.add("open"); }
+function closeHelp(){ ov.classList.remove("open"); }
+
+ov.addEventListener("click", e=>{
+  if(e.target===ov || e.target.closest("#hlpClose")) return closeHelp();
+  const tb = e.target.closest(".hlp-tabs button");
+  if(tb){ tab = tb.dataset.tab; inp.value = ""; return render(); }
+  const tt = e.target.closest("[data-t]");
+  if(tt){ cur = tt.dataset.t; return render(); }
+  const go = e.target.closest("[data-go]");
+  if(go){
+    const p = go.dataset.go.split(":"); inp.value = "";
+    if(p[0]==="t"){ tab = "guide"; cur = p[1]; render(); }
+    else { tab = "faq"; render(); const d = document.getElementById("hf-"+p[1]); if(d){ d.open = true; d.scrollIntoView({block:"center"}); } }
+  }
+});
+ov.addEventListener("change", e=>{ if(e.target.id==="hlpSel"){ cur = e.target.value; render(); } });
+inp.addEventListener("input", render);
+document.addEventListener("keydown", e=>{ if(e.key==="Escape" && ov.classList.contains("open")) closeHelp(); });
+document.querySelectorAll(".js-help-btn").forEach(b=>b.addEventListener("click", ()=>{ if(typeof closeDrawer==="function") closeDrawer(); openHelp(); }));
+})();
+
+document.addEventListener("click",function(e){
+  function setMenu(b,o){b.classList.toggle("open",o);b.nextElementSibling.classList.toggle("open",o);b.setAttribute("aria-expanded",o);}
+  var b=e.target.closest(".sb-chev");
+  if(b){
+    var o=!b.classList.contains("open");
+    document.querySelectorAll(".sb-chev.open").forEach(function(c){if(c!==b)setMenu(c,false);});
+    setMenu(b,o);
+    if(o){
+      var m=b.nextElementSibling,box=b.closest(".sidebar,.drawer").getBoundingClientRect(),r=b.getBoundingClientRect(),col=b.closest(".sidebar.collapsed");
+      m.style.left=(box.left+(col?8:12))+"px";
+      m.style.width=col?"190px":(box.width-24)+"px";
+      m.style.bottom=(window.innerHeight-r.top+8)+"px";
+    }
+    return;
+  }
+  document.querySelectorAll(".sb-chev.open").forEach(function(c){setMenu(c,false);});
+});
 </script>
 </body>
 </html>
