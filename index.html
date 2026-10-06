@@ -197,6 +197,9 @@ input,select{font-family:inherit;}
 .hdr-icon-btn.js-save-btn.is-dirty .save-dot{display:block;}
 .qa-btn:disabled, .hdr-icon-btn:disabled{opacity:0.32; cursor:default; pointer-events:none;}
 
+/* Desfazer/Refazer só aparecem quando há alteração não salva */
+.js-undo-btn.is-hidden, .js-redo-btn.is-hidden, .quick-actions.is-hidden{display:none !important;}
+
 /* modal de configurações */
 .modal-overlay{
   position:fixed; inset:0; background:rgba(20,20,22,0.45); z-index:90; display:none;
@@ -1770,8 +1773,22 @@ function performRedo(){
 }
 
 function updateUndoRedoButtons(){
-  document.querySelectorAll('.js-undo-btn').forEach(b=>{ b.disabled = undoStack.length===0; });
-  document.querySelectorAll('.js-redo-btn').forEach(b=>{ b.disabled = redoStack.length===0; });
+  // só mostra desfazer/refazer se há alteração pendente (não salva); depois de salvar somem até a próxima alteração
+  const showUndo = dirty && undoStack.length>0;
+  const showRedo = dirty && (undoStack.length>0 || redoStack.length>0); // refazer acompanha o desfazer (apagado até haver o que refazer)
+  document.querySelectorAll('.js-undo-btn').forEach(b=>{
+    b.classList.toggle('is-hidden', !showUndo);
+    b.disabled = !showUndo;
+  });
+  document.querySelectorAll('.js-redo-btn').forEach(b=>{
+    b.classList.toggle('is-hidden', !showRedo);
+    b.disabled = redoStack.length===0;
+  });
+  // esconde a linha inteira (sidebar/drawer) quando não há nem desfazer nem refazer
+  document.querySelectorAll('.quick-actions').forEach(row=>{
+    const btns = row.querySelectorAll('.js-undo-btn, .js-redo-btn');
+    if(btns.length) row.classList.toggle('is-hidden', !showUndo && !showRedo);
+  });
 }
 
 // captura o estado ANTES de qualquer clique/digitação/mudança mexer nele
@@ -1955,6 +1972,7 @@ function updateSaveIndicators(){
     const label = btn.querySelector('.js-save-label');
     if(label) label.textContent = saving ? 'salvando…' : (dirty ? 'salvar' : 'salvo');
   });
+  updateUndoRedoButtons();
 }
 
 // avisa antes de fechar/recarregar a aba se houver alterações não salvas
