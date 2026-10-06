@@ -481,9 +481,9 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
   }
   .drawer-overlay.open{opacity:1; pointer-events:auto;}
   .drawer{
-    display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; width:84%; max-width:310px;
+    display:flex; flex-direction:column; position:fixed; top:0; right:0; bottom:0; width:84%; max-width:310px;
     background:var(--forest); color:var(--on-dark); z-index:70; overflow-y:auto;
-    transform:translateX(-105%); transition:transform .25s ease;
+    transform:translateX(105%); transition:transform .25s ease;
   }
   .drawer.open{transform:translateX(0);}
   .drawer .brand{padding:22px 20px 16px; border-bottom:1px solid rgba(251,249,241,0.15);}
@@ -586,6 +586,7 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
 .auth-tabs{display:flex; border-bottom:1px solid var(--paper-line); margin-bottom:20px;}
 .auth-tab{flex:1; text-align:center; padding:9px 0; font-size:12.5px; font-family:'JetBrains Mono',monospace; color:var(--ink-soft); cursor:pointer; border-bottom:2px solid transparent; text-transform:uppercase; letter-spacing:0.03em;}
 .auth-tab.active{color:var(--forest); border-bottom-color:var(--gold); font-weight:600;}
+.auth-invite-note{margin:16px 0 0; text-align:center; font-size:12.5px; line-height:1.5; color:var(--ink-soft);}
 .auth-field{margin-bottom:14px;}
 .auth-field label{display:block; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-soft); font-family:'JetBrains Mono',monospace; margin-bottom:5px;}
 .auth-field input{width:100%; padding:11px; border:1px solid var(--paper-line); border-radius:2px; font-size:14.5px; background:var(--paper); font-family:'DM Sans',sans-serif;}
@@ -646,6 +647,7 @@ body.theme-dark .bottom-tab.active .bt-icon{background:var(--gold); border-color
 
 /* Sidebar / navegação */
 .sidebar, .drawer{background:linear-gradient(180deg,#0F172A 0%,#131F35 100%); border-right:1px solid rgba(148,163,184,0.12);}
+@media(max-width:880px){ .drawer{border-right:none; border-left:1px solid rgba(148,163,184,0.12); box-shadow:-12px 0 32px -12px rgba(0,0,0,0.45);} }
 .brand{padding:24px 20px 18px; border-bottom:1px solid rgba(148,163,184,0.14);}
 .brand .mark{border-radius:12px; border:none; background:linear-gradient(135deg,#3B82F6,#60A5FA); color:#fff; box-shadow:0 8px 20px -8px rgba(59,130,246,0.9);}
 .brand .sub{color:#7DB0FA; letter-spacing:0.14em;}
@@ -1308,7 +1310,7 @@ body.theme-dark .gx-crumb.current, body.theme-dark .gx-avg .v, body.theme-dark .
       <span class="landing-badge">CONTROLE FINANCEIRO PESSOAL</span>
       <h1 class="landing-title">Seu dinheiro organizado do primeiro gasto ao fechamento do mês</h1>
       <p class="landing-subtitle">Lance despesas em poucos toques, acompanhe cartões com parcelas automáticas, defina limites por categoria e veja quanto sobra até o fim do mês.</p>
-      <button type="button" class="landing-btn-cta" id="btnLandingCta">Começar agora</button>
+      <button type="button" class="landing-btn-cta" id="btnLandingCta">Acessar minha conta</button>
     </section>
 
     <section class="landing-features">
@@ -1372,10 +1374,7 @@ body.theme-dark .gx-crumb.current, body.theme-dark .gx-avg .v, body.theme-dark .
     <div id="configWarning" class="config-warning" style="display:none;">
       Este site ainda não foi conectado a um banco de dados. Configure SUPABASE_URL e SUPABASE_ANON_KEY no início do arquivo antes de publicar.
     </div>
-    <div class="auth-tabs" id="authTabs">
-      <div class="auth-tab active" data-tab="login">Entrar</div>
-      <div class="auth-tab" data-tab="register">Criar conta</div>
-    </div>
+    <div class="auth-tabs" id="authTabs" style="display:none;"></div>
     <div class="auth-error" id="authError"></div>
     <div class="auth-success" id="authSuccess"></div>
 
@@ -1384,15 +1383,9 @@ body.theme-dark .gx-crumb.current, body.theme-dark .gx-avg .v, body.theme-dark .
       <div class="auth-field"><label>Senha</label><input type="password" id="loginPass" autocomplete="current-password" required></div>
       <button type="submit" class="btn auth-submit" id="loginSubmitBtn">Entrar</button>
       <div class="auth-links"><button type="button" class="btn link" id="btnForgotOpen">Esqueci minha senha</button></div>
+      <p class="auth-invite-note">O acesso ao Balance é feito por convite.</p>
     </form>
 
-    <form class="auth-form" id="registerForm">
-      <div class="auth-field"><label>Seu nome</label><input type="text" id="regName" autocomplete="name" required></div>
-      <div class="auth-field"><label>E-mail</label><input type="email" id="regEmail" autocomplete="email" required></div>
-      <div class="auth-field"><label>Senha</label><input type="password" id="regPass" autocomplete="new-password" required minlength="6"></div>
-      <div class="auth-field"><label>Confirme a senha</label><input type="password" id="regPass2" autocomplete="new-password" required minlength="6"></div>
-      <button type="submit" class="btn gold auth-submit" id="registerSubmitBtn">Criar minha conta</button>
-    </form>
 
     <form class="auth-form" id="forgotForm">
       <div class="auth-field"><label>E-mail da sua conta</label><input type="email" id="forgotEmail" autocomplete="email" required></div>
@@ -1430,7 +1423,7 @@ body.theme-dark .gx-crumb.current, body.theme-dark .gx-avg .v, body.theme-dark .
       </div>
     </div>
     <div class="nav" id="navList"></div>
-    <div class="user-badge"><span class="dot"></span> <b id="currentUserLabel"></b><button type="button" class="sb-chev" data-no-undo aria-expanded="false" title="Mais opções" aria-label="Mais opções"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button><div class="sb-menu" data-no-undo><button type="button" id="btnSettingsDesktop"><span>Configurações</span></button><button type="button" class="js-help-btn" data-no-undo><span>Ajuda</span></button><button type="button" id="btnExport"><span>Exportar backup</span></button><button type="button" id="btnImport"><span>Importar backup</span></button><button type="button" id="btnLogout"><span>Sair</span></button></div></div>
+    <div class="user-badge"><span class="dot"></span> <b id="currentUserLabel"></b><button type="button" class="sb-chev" data-no-undo aria-expanded="false" title="Mais opções" aria-label="Mais opções"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button><div class="sb-menu" data-no-undo><button type="button" id="btnSettingsDesktop"><span>Configurações</span></button><button type="button" class="js-help-btn" data-no-undo><span>Ajuda</span></button><button type="button" id="btnLogout"><span>Sair</span></button></div></div>
     <div class="sidebar-footer">
       <div class="quick-actions quick-actions-footer" style="padding-bottom:0; margin-bottom:6px;">
         <button class="qa-btn js-undo-btn" id="btnUndoDesktop" title="Desfazer última alteração" disabled><span class="ico">↶</span><span>desfazer</span></button>
@@ -1481,7 +1474,7 @@ body.theme-dark .gx-crumb.current, body.theme-dark .gx-avg .v, body.theme-dark .
       </div>
     </div>
     <div class="nav" id="navListDrawer"></div>
-    <div class="user-badge"><span class="dot"></span> <b id="currentUserLabelDrawer"></b><button type="button" class="sb-chev" data-no-undo aria-expanded="false" title="Mais opções" aria-label="Mais opções"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button><div class="sb-menu" data-no-undo><button type="button" id="btnSettingsDrawer"><span>Configurações</span></button><button type="button" class="js-help-btn" data-no-undo><span>Ajuda</span></button><button type="button" id="btnExportDrawer"><span>Exportar backup</span></button><button type="button" id="btnImportDrawer"><span>Importar backup</span></button><button type="button" id="btnLogoutDrawer"><span>Sair</span></button></div></div>
+    <div class="user-badge"><span class="dot"></span> <b id="currentUserLabelDrawer"></b><button type="button" class="sb-chev" data-no-undo aria-expanded="false" title="Mais opções" aria-label="Mais opções"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button><div class="sb-menu" data-no-undo><button type="button" id="btnSettingsDrawer"><span>Configurações</span></button><button type="button" class="js-help-btn" data-no-undo><span>Ajuda</span></button><button type="button" id="btnLogoutDrawer"><span>Sair</span></button></div></div>
     <div class="sidebar-footer">
       <div class="quick-actions quick-actions-footer" style="padding-bottom:0; margin-bottom:6px;">
         <button class="qa-btn js-undo-btn" id="btnUndoDrawer" title="Desfazer última alteração" disabled><span class="ico">↶</span><span>desfazer</span></button>
@@ -5896,7 +5889,7 @@ function setAuthForm(name){
   if(form) form.classList.add('active');
   clearAuthError(); hideAuthSuccess();
   const tabs = document.getElementById('authTabs');
-  tabs.style.display = (name==='login'||name==='register') ? 'flex' : 'none';
+  if(tabs) tabs.style.display = 'none';
   document.querySelectorAll('.auth-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===name));
 }
 
@@ -5967,7 +5960,7 @@ function wireAuthForm(){
   }
 
   if(btnLandingLogin) btnLandingLogin.addEventListener('click', function(){ openAuthScreen('login'); });
-  if(btnLandingCta) btnLandingCta.addEventListener('click', function(){ openAuthScreen('register'); });
+  if(btnLandingCta) btnLandingCta.addEventListener('click', function(){ openAuthScreen('login'); });
   if(btnBackToLanding) btnBackToLanding.addEventListener('click', backToLanding);
 
   document.querySelectorAll('.auth-tab').forEach(tab=>{
@@ -5990,33 +5983,6 @@ function wireAuthForm(){
     await enterApp(data.session);
   });
 
-  document.getElementById('registerForm').addEventListener('submit', async (e)=>{
-    e.preventDefault();
-    if(!supabaseReady) return showAuthError(supabaseUnavailableMsg());
-    clearAuthError();
-    const name = document.getElementById('regName').value.trim();
-    const email = document.getElementById('regEmail').value.trim();
-    const pass = document.getElementById('regPass').value;
-    const pass2 = document.getElementById('regPass2').value;
-    if(pass !== pass2){ showAuthError('As senhas não coincidem.'); return; }
-    if(pass.length < 6){ showAuthError('Use pelo menos 6 caracteres na senha.'); return; }
-    const btn = document.getElementById('registerSubmitBtn');
-    btn.disabled = true; btn.textContent = 'Criando…';
-    const { data, error } = await sb.auth.signUp({
-      email, password: pass,
-      options: { data: { full_name: name }, emailRedirectTo: window.location.origin + window.location.pathname }
-    });
-    btn.disabled = false; btn.textContent = 'Criar minha conta';
-    if(error){ showAuthError(traduzErro(error)); return; }
-    if(data.session){
-      // confirmação de e-mail desabilitada no projeto: entra direto
-      await enterApp(data.session);
-    } else {
-      showAuthSuccess('Conta criada! Enviamos um link de confirmação para ' + email + '. Abra seu e-mail e clique no link para poder entrar.');
-      setAuthForm('login');
-      document.getElementById('authSuccess').classList.add('show');
-    }
-  });
 
   document.getElementById('forgotForm').addEventListener('submit', async (e)=>{
     e.preventDefault();
@@ -6261,16 +6227,11 @@ function wireAppButtons(){
     closeDrawer();
     document.getElementById('app').style.display = 'none';
     document.getElementById('loginForm').reset();
-    document.getElementById('registerForm').reset();
     setAuthForm('login');
     document.getElementById('landingScreen').style.display = 'flex';
   };
 
-  document.getElementById('btnExport').onclick = doExport;
-  document.getElementById('btnExportDrawer').onclick = doExport;
   document.getElementById('btnExportSettings').onclick = doExport;
-  document.getElementById('btnImport').onclick = doImportClick;
-  document.getElementById('btnImportDrawer').onclick = doImportClick;
   document.getElementById('btnImportSettings').onclick = doImportClick;
   document.getElementById('btnLogout').onclick = doLogout;
   document.getElementById('btnLogoutDrawer').onclick = doLogout;
@@ -6374,13 +6335,13 @@ function stopNotificationWatcher(){
 (function(){
 const TOPICS = [
 {id:"roteiro",g:"Primeiros passos",t:"Comece por aqui",d:"Roteiro rápido para deixar o app funcionando em poucos minutos.",
- s:["Crie sua conta (ou entre) e, se o app pedir, confirme o e-mail.","Abra **Despesas**, toque em **+ novo mês** e digite o mês com ano, por exemplo **Novembro / 2026**.","Toque em **+ Adicionar**, preencha descrição, valor, data e categoria e toque em **Adicionar**. Repita para cada gasto.","Abra **Salários**, escolha o mês e toque em **criar salário deste mês**. Informe seu salário (e extras, se houver).","Se tem contas que se repetem todo mês, cadastre em **Gastos Fixos** e, dentro do mês, toque em **aplicar gastos fixos**.","Veja o resultado em **Início**: receita, gastos e quanto sobrou.","Toque em **salvar** (💾). O app não salva sozinho."],
+ s:["Entre com o e-mail e a senha que você recebeu no convite.","Abra **Despesas**, toque em **+ novo mês** e digite o mês com ano, por exemplo **Novembro / 2026**.","Toque em **+ Adicionar**, preencha descrição, valor, data e categoria e toque em **Adicionar**. Repita para cada gasto.","Abra **Salários**, escolha o mês e toque em **criar salário deste mês**. Informe seu salário (e extras, se houver).","Se tem contas que se repetem todo mês, cadastre em **Gastos Fixos** e, dentro do mês, toque em **aplicar gastos fixos**.","Veja o resultado em **Início**: receita, gastos e quanto sobrou.","Toque em **salvar** (💾). O app não salva sozinho."],
  n:["O botão salvar pulsa em verde quando há algo por salvar."]},
-{id:"conta",g:"Primeiros passos",t:"Conta, login e senha",d:"Criar conta, entrar, recuperar a senha e sair.",
- s:["Na tela inicial, toque em **Entrar** ou **Começar agora**.","Para criar conta, use a aba **Criar conta**: nome, e-mail e senha (mínimo 6 caracteres) duas vezes.","Se o app avisar que enviou um link, abra seu e-mail e confirme antes de entrar.","Para entrar, use a aba **Entrar** com e-mail e senha.","Esqueceu a senha? Toque em **Esqueci minha senha**, informe o e-mail, abra o link recebido e defina a nova senha."],
+{id:"conta",g:"Primeiros passos",t:"Conta, login e senha",d:"Entrar, recuperar a senha e sair.",
+ s:["Na tela inicial, toque em **Entrar** ou **Acessar minha conta**.","O acesso ao Balance é feito por convite: use o e-mail e a senha que você recebeu de quem te convidou.","Se o app avisar que enviou um link, abra seu e-mail e confirme antes de entrar.","Esqueceu a senha? Toque em **Esqueci minha senha**, informe o e-mail, abra o link recebido e defina a nova senha."],
  n:["Seus dados ficam na sua conta e acompanham você em qualquer navegador ou aparelho.","Para sair, use **Sair** no menu. Se houver alterações sem salvar, o app avisa."]},
 {id:"navegacao",g:"Primeiros passos",t:"Menu e navegação",d:"Onde fica cada coisa no computador e no celular.",
- n:["**Computador:** o menu fica à esquerda. A seta ‹ no topo recolhe o menu (o app lembra sua escolha).","**Celular:** a barra de baixo mostra as primeiras abas e um atalho para a Carteira. Toque em ☰ para abrir o menu completo.","No menu ficam também: 🔔 avisos, ↶ desfazer, ↷ refazer, 💾 salvar, ⚙️ ajustes, ❓ ajuda, exportar/importar backup e sair."]},
+ n:["**Computador:** o menu fica à esquerda. A seta ‹ no topo recolhe o menu (o app lembra sua escolha).","**Celular:** a barra de baixo mostra as primeiras abas e um atalho para a Carteira. Toque em ☰ para abrir o menu completo.","No menu ficam também: 🔔 avisos, ↶ desfazer, ↷ refazer, 💾 salvar, ⚙️ ajustes, ❓ ajuda e sair."]},
 {id:"inicio",g:"Controle do mês",t:"Início",d:"Painel que compara receita e gastos de um mês.",
  s:["Escolha o mês na lista no topo.","Leia os quadros: **Receita** (total de Salários do mês), **Gastos** (total de Despesas) e **Sobra do mês** (receita − gastos).","Veja o gráfico **Receita × Gastos por mês**. Toque em Receita ou Gastos para trocar a cor das barras.","Confira o **Resumo geral**: a receber pendente, Carteira, gastos fixos e empréstimos em aberto.","A tabela **Todos os meses** lista cada mês."],
  n:["Tudo vem das outras abas: para mudar um número, edite na aba de origem.","O gráfico só aparece quando há gastos ou salário lançados.","“Atualizado” mostra a data do último salvamento."]},
@@ -6434,7 +6395,7 @@ const TOPICS = [
  s:["Toque no sino 🔔. O ponto indica alertas.","Para receber no aparelho, toque em **ativar avisos** e permita no navegador."],
  n:["Alertas do mês atual: gastos 15% acima ou abaixo da média, 80% ou mais da renda gasta, saldo negativo, categoria com 40%+ dos gastos, fixos acima de 50% da renda, salário ou gastos sem lançar, valores a receber, empréstimos, meta de aporte e dados parados há 10+ dias.","O app precisa estar aberto (pode ficar em segundo plano). São no máximo 2 avisos novos por dia.","Se estiver bloqueado, libere nas configurações do site. Abra o app em aba própria ou pelo ícone na tela de início."]},
 {id:"ajustes",g:"Ferramentas",t:"Ajustes e backup",d:"Tema, nome, senha e cópia de segurança.",
- s:["Toque em ⚙️ **ajustes**.","**Aparência:** claro ou escuro.","**Dados pessoais:** altere o nome (o e-mail não muda).","**Segurança:** defina uma nova senha (mínimo 6 caracteres).","**Dados do app:** exporte um backup (arquivo .json) ou importe um."],
+ s:["Toque em ⚙️ **ajustes**.","**Aparência:** claro ou escuro.","**Dados pessoais:** altere o nome (o e-mail não muda).","**Segurança:** defina uma nova senha (mínimo 6 caracteres).","**Dados do app:** é aqui que ficam **Exportar backup** (arquivo .json) e **Importar backup**."],
  n:["Nome e senha são salvos na hora.","**Importar substitui todos os seus dados atuais** e salva imediatamente. Exporte um backup antes."]}
 ];
 const FAQ = [
@@ -6442,7 +6403,7 @@ const FAQ = [
 ["Salvar e dados","Apaguei algo sem querer","Toque em ↶ desfazer logo em seguida (até 50 passos) e salve. Abas ocultas voltam em seções ocultas › restaurar. Exclusão permanente e backup importado não têm volta."],
 ["Salvar e dados","O que significa “Os dados foram alterados em outro aparelho”?","Outro aparelho salvou depois da última vez que este sincronizou. OK sobrescreve tudo com o que está nesta tela; Cancelar mantém suas alterações sem salvar, e você recarrega para ver as novas."],
 ["Salvar e dados","Deu erro ao salvar","Em geral é falta de conexão. Suas alterações continuam na tela: confira a internet e toque em salvar de novo."],
-["Salvar e dados","Como faço backup e restauro?","Em ajustes (ou no menu), toque em Exportar backup. Para restaurar, toque em Importar: isso substitui todos os dados atuais e salva na hora, sem pedir confirmação."],
+["Salvar e dados","Como faço backup e restauro?","Abra ⚙️ ajustes e, em Dados do app, toque em Exportar backup. Para restaurar, toque em Importar: isso substitui todos os dados atuais e salva na hora, sem pedir confirmação."],
 ["Gastos e valores","Digitei 1.500 e virou R$ 1,50","Ponto sozinho é decimal. Digite 1500, 1.500,00 ou 1500,00."],
 ["Gastos e valores","Que nome dar ao mês?","Mês e ano, como Novembro / 2026 (nov/26 também funciona). Sem um mês reconhecível, parcelas, comparações e alertas não funcionam direito."],
 ["Gastos e valores","A Receita aparece zerada","Falta lançar o salário do mês em Salários (criar salário deste mês) ou o valor está em branco."],
