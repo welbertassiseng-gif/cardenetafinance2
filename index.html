@@ -3086,7 +3086,7 @@ const GX = {
   catKey:null,
   filters:{ search:'', period:'month', cats:[], min:null, max:null },
   sort:'recent',
-  addOpen:false, focusAdd:false, filtersOpen:false, legacy:false,
+  addOpen:false, focusAdd:false, filtersOpen:false,
   limit:60, flash:null, lastAdd:{ date:'', cat:'' }, _rows:[]
 };
 
@@ -3523,7 +3523,7 @@ function gxOpenMenu(anchor, key){
 function gxOpenCategory(key){
   GX.view = 'detail'; GX.catKey = key; GX.filters.cats = [key];
   GX.filters.search = ''; GX.filters.min = null; GX.filters.max = null;
-  GX.legacy = false; GX.limit = 60; GX.filtersOpen = false;
+  GX.limit = 60; GX.filtersOpen = false;
   renderSection();
   window.scrollTo({top:0, behavior:'smooth'});
 }
@@ -3778,7 +3778,7 @@ function gxOpenTxEditor(tx){
   const save = ()=>{
     const desc = dI.value.trim(), valor = parseMoney(vI.value);
     if(!desc){ gxSetErr(m, 'Informe a descrição do gasto.'); return; }
-    if(!valor || valor<=0){ gxSetErr(m, 'Informe um valor válido.'); return; }
+    if(!valor){ gxSetErr(m, 'Informe um valor válido (use sinal de menos para estorno).'); return; }
     tx.item.desc = desc; tx.item.value = valor; tx.item.date = tI.value || '';
     const bn = bI.value.trim(); if(bn) tx.item.banco = bn; else delete tx.item.banco;
     const nk = gxKey(cS.value);
@@ -3903,7 +3903,7 @@ function gxWireAddPanel(wrap, month){
     const data = tI.value || new Date().toISOString().slice(0,10);
     const catName = cS.value || 'Sem categoria';
     if(!desc){ err.textContent = 'Informe a descrição do gasto.'; dI.focus(); return; }
-    if(!valor || valor<=0){ err.textContent = 'Informe um valor válido.'; vI.focus(); return; }
+    if(!valor){ err.textContent = 'Informe um valor válido (use sinal de menos para estorno).'; vI.focus(); return; }
     const banco = bI.value.trim();
     const isParc = tipoS.value==='parcelas';
     const total = parseInt(pI.value,10);
@@ -3927,7 +3927,7 @@ function gxWireAddPanel(wrap, month){
     renderSection();
     setTimeout(()=>{
       const shown = document.querySelector('.gx-tx.is-new');
-      showToast(isParc ? msg : (shown || GX.legacy ? msg : msg+' (fora dos filtros atuais)'), false);
+      showToast(isParc ? msg : (shown ? msg : msg+' (fora dos filtros atuais)'), false);
       GX.flash = null;
     }, 30);
   };
@@ -4126,143 +4126,24 @@ function gxBuildAll(body, month){
   const wrap = document.createElement('div');
   wrap.className = 'gx-view';
   wrap.innerHTML = `
-    ${GX.legacy ? '' : gxFilterBarHTML('all')}
-    ${GX.legacy ? '' : '<div class="gx-chips" id="gxChips" data-no-undo></div>'}
+    ${gxFilterBarHTML('all')}
+    <div class="gx-chips" id="gxChips" data-no-undo></div>
     <div class="gx-actions-row">
       <button type="button" class="btn" id="gxBtnAdd">+ Adicionar</button>
-      <div class="gx-seg" role="group" aria-label="Modo de exibição" data-no-undo>
-        <button type="button" data-legacy="0" class="${GX.legacy?'':'active'}">Lista</button>
-        <button type="button" data-legacy="1" class="${GX.legacy?'active':''}">Editar categorias</button>
-      </div>
     </div>
     ${gxAddPanelHTML(month)}
-    ${GX.legacy ? '<div id="gxLegacy"></div>' : gxListHeadHTML() + '<div id="gxResults"></div>'}`;
+    ${gxListHeadHTML()}<div id="gxResults"></div>`;
   body.appendChild(wrap);
-  wrap.querySelectorAll('[data-legacy]').forEach(b=>b.addEventListener('click', ()=>{ GX.legacy = b.dataset.legacy==='1'; renderSection(); }));
   gxWireAddPanel(wrap, month);
-  if(GX.legacy) gxLegacyEditor(wrap.querySelector('#gxLegacy'), month);
-  else gxWireList(wrap);
+  gxWireList(wrap);
 }
 
-/* editor por categoria (o editor original, preservado: renomear, cor, itens em linha, excluir) */
 function gxMigrateMetaKey(oldKey, newKey){
   if(oldKey===newKey || !state.categoryMeta || !state.categoryMeta[oldKey] || state.categoryMeta[newKey]) return;
   if(gxUniverse().has(oldKey)) return; // outro mês ainda usa o nome antigo
   state.categoryMeta[newKey] = state.categoryMeta[oldKey];
   delete state.categoryMeta[oldKey];
 }
-function gxLegacyEditor(host, month){
-  const catsCard = document.createElement('div');
-  catsCard.className = 'card cats-card';
-  catsCard.innerHTML = `<div class="cats-card-label">Categorias</div><div id="catsListWrap"></div>`;
-  host.appendChild(catsCard);
-  const catsWrap = catsCard.querySelector('#catsListWrap');
-  if(!month.categories.length) catsWrap.innerHTML = `<div class="empty-state">Nenhuma categoria neste mês ainda.</div>`;
-
-  month.categories.forEach((cat, ci)=>{
-    const catTotal = categoryTotal(cat);
-    const color = catColor(cat, ci);
-    const collapsed = gastosCollapsedCats.has(cat.name);
-    const block = document.createElement('div');
-    block.className = 'cat-block';
-    block.innerHTML = `
-      <div class="cat-row">
-        <button class="cat-chevron ${collapsed?'':'is-open'}" data-role="toggle" title="expandir/recolher">›</button>
-        <button type="button" class="cat-badge" data-role="colorBtn" style="background:${color};" title="clique para trocar a cor">${ci+1}</button>
-        <input type="text" value="${escAttr(cat.name)}" data-role="catname" class="cat-name-input" placeholder="nome da categoria">
-        <span class="cat-row-total mono" id="cat-total-${ci}">${fmt(catTotal)}</span>
-        <button class="cat-remove-btn" data-role="delCat" title="remover categoria">🗑</button>
-      </div>
-      <div class="cat-items" data-role="items" style="display:${collapsed?'none':'block'};">
-        <div data-role="itemsList"></div>
-        <div class="cat-add-row"><button class="pill-add-btn" data-role="addItem">+ item em "${escAttr(cat.name)}"</button></div>
-      </div>
-    `;
-    catsWrap.appendChild(block);
-
-    const colorBtn = block.querySelector('[data-role=colorBtn]');
-    colorBtn.addEventListener('click', (e)=>{
-      e.stopPropagation();
-      openColorPopover(colorBtn, cat, (newColor)=>{
-        cat.color = newColor;
-        colorBtn.style.background = newColor;
-        scheduleSave();
-        gxRefreshSummary();
-      });
-    });
-
-    const catNameInput = block.querySelector('[data-role=catname]');
-    catNameInput.addEventListener('input', e=>{
-      const oldName = cat.name;
-      cat.name = e.target.value;
-      if(gastosCollapsedCats.has(oldName)){ gastosCollapsedCats.delete(oldName); gastosCollapsedCats.add(cat.name); }
-      gxMigrateMetaKey(gxKey(oldName), gxKey(cat.name));
-      const addBtn = block.querySelector('[data-role=addItem]');
-      if(addBtn) addBtn.textContent = `+ item em "${cat.name}"`;
-      scheduleSave();
-    });
-
-    gxEnsureBankList();
-    const itemsList = block.querySelector('[data-role=itemsList]');
-    const sortedItems = cat.items.slice().sort((a,b)=>{
-      const da = a.date || '', db = b.date || '';
-      if(!da && !db) return 0;
-      if(!da) return 1;
-      if(!db) return -1;
-      return da < db ? -1 : (da > db ? 1 : 0);
-    });
-    sortedItems.forEach((item)=>{
-      const row = document.createElement('div');
-      row.className = 'item-row';
-      row.innerHTML = `
-        <span class="item-dot"></span>
-        <input type="text" value="${escAttr(item.desc)}" data-role="desc" class="item-desc-input" placeholder="descrição">
-        <input type="text" value="${escAttr(item.banco||'')}" data-role="banco" class="item-banco-input" list="gxBancosDL" placeholder="banco" maxlength="30" title="banco desta despesa" autocomplete="off">
-        <input type="date" value="${escAttr(item.date||'')}" data-role="date" class="item-date-input" title="data do gasto">
-        <input type="text" inputmode="decimal" class="money item-value-input" data-role="value">
-        <button class="icon-btn" data-role="delItem" title="remover item">✕</button>
-      `;
-      row.querySelector('[data-role=desc]').addEventListener('input', e=>{ item.desc=e.target.value; scheduleSave(); });
-      row.querySelector('[data-role=banco]').addEventListener('change', e=>{ const b = e.target.value.trim(); if(b) item.banco=b; else delete item.banco; scheduleSave(); gxEnsureBankList(); });
-      row.querySelector('[data-role=date]').addEventListener('change', e=>{ item.date=e.target.value; scheduleSave(); renderSection(); });
-      bindMoneyInput(row.querySelector('[data-role=value]'), ()=>item.value, v=>item.value=v, ()=>recalcGastos(month, ci));
-      row.querySelector('[data-role=delItem]').addEventListener('click', ()=>{
-        const idx = cat.items.indexOf(item);
-        if(idx>-1) cat.items.splice(idx,1);
-        scheduleSave(); renderSection();
-      });
-      itemsList.appendChild(row);
-    });
-
-    block.querySelector('[data-role=addItem]').addEventListener('click', ()=>{
-      cat.items.push({desc:'', value:0, date:''}); scheduleSave(); renderSection();
-    });
-    block.querySelector('[data-role=delCat]').addEventListener('click', ()=>{
-      if(!confirm(`Remover categoria "${cat.name}"?`)) return;
-      gastosCollapsedCats.delete(cat.name);
-      month.categories.splice(ci,1); scheduleSave(); renderSection();
-    });
-    block.querySelector('[data-role=toggle]').addEventListener('click', ()=>{
-      const itemsEl = block.querySelector('[data-role=items]');
-      const chevron = block.querySelector('[data-role=toggle]');
-      const willCollapse = itemsEl.style.display !== 'none';
-      itemsEl.style.display = willCollapse ? 'none' : 'block';
-      chevron.classList.toggle('is-open', !willCollapse);
-      if(willCollapse) gastosCollapsedCats.add(cat.name); else gastosCollapsedCats.delete(cat.name);
-    });
-  });
-
-  const addCatBtn = document.createElement('button');
-  addCatBtn.className = 'btn secondary small';
-  addCatBtn.style.marginTop = '2px';
-  addCatBtn.textContent = '+ nova categoria';
-  addCatBtn.addEventListener('click', ()=>{
-    month.categories.push({name:'Nova categoria', items:[{desc:'', value:0, date:''}]});
-    scheduleSave(); renderSection();
-  });
-  host.appendChild(addCatBtn);
-}
-
 /* ---------- visão: CATEGORIAS (cartões) ---------- */
 function gxCardHTML(s, nMonths, idx){
   const color = gxColorFor(s.key);
@@ -6375,7 +6256,7 @@ const TOPICS = [
  n:["Use sempre mês e ano no nome: é por ele que o app ordena, acha o mês atual e lança parcelas.","Crie os meses em ordem cronológica, pois um novo mês entra no fim da lista.","Ao abrir o app, aparece o mês atual do calendário, se estiver cadastrado.","O topo mostra o total gasto, o gráfico por categoria, o nº de transações, a maior categoria e a variação contra o mês anterior."]},
 {id:"lancar",g:"Controle do mês",t:"Lançar, editar e excluir despesas",d:"Na aba Todas de Despesas.",
  s:["Toque em **+ Adicionar**.","Preencha **Descrição**, **Valor**, **Data**, **Categoria** e, se quiser, **Banco** (escolha uma sugestão ou digite).","Toque em **Adicionar** ou pressione Enter. O painel continua aberto para o próximo lançamento.","Para corrigir, toque na despesa: edite tudo (inclusive a categoria) e toque em **Salvar**, ou em **Excluir**.","A lixeira no fim da linha também exclui."],
- n:["A lista de categorias mostra só as já existentes. Crie novas em Categorias › + Nova categoria.","Decimais com vírgula (12,50). Um ponto sozinho conta como decimal: 1.500 vira R$ 1,50. Use 1500 ou 1.500,00.","Para registrar um estorno, use **Editar categorias** e digite o valor com sinal de menos.","Errou? Use ↶ desfazer (antes de salvar)."]},
+ n:["A lista de categorias mostra só as já existentes. Crie novas em Categorias › + Nova categoria.","Decimais com vírgula (12,50). Um ponto sozinho conta como decimal: 1.500 vira R$ 1,50. Use 1500 ou 1.500,00.","Para registrar um estorno, lance a despesa com o valor em sinal de menos (ex.: -50,00).","Errou? Use ↶ desfazer (antes de salvar)."]},
 {id:"parcelas",g:"Controle do mês",t:"Compras parceladas",d:"Lance uma vez e o app preenche os meses seguintes.",
  s:["Em **+ Adicionar**, mude **Tipo** para **Parcelas**.","Digite o valor **de cada parcela** e o **nº de parcelas** (2 a 48).","Confira o aviso, por exemplo “3x de R$ 100,00 = R$ 300,00”.","Toque em **Adicionar**: o app lança “descrição (1/3)”, “(2/3)”… nos meses seguintes, criando os que faltarem."],
  n:["O mês atual precisa ter mês e ano no nome (ex.: Novembro / 2026).","Cada parcela é um lançamento independente: edite ou exclua uma por vez (busque “(1/3)” no período Todo o histórico).","As parcelas seguintes usam o mesmo dia da data escolhida."]},
@@ -6384,7 +6265,7 @@ const TOPICS = [
  n:["Despesa sumiu? Quase sempre há um filtro ativo (veja os chips).","A lista mostra 60 itens por vez; use **Mostrar mais**."]},
 {id:"categorias",g:"Controle do mês",t:"Categorias e orçamento",d:"Organize, personalize e controle o limite de cada categoria.",
  s:["Abra a aba **Categorias** e escolha o período.","Toque em **+ Nova categoria** para criar.","Toque no cartão para ver as despesas, o gráfico dos últimos 6 meses e a média mensal.","Nos três pontos (⋯) você pode definir **orçamento**, editar descrição, alterar ícone ou emoji, alterar cor, renomear ou remover.","Em **Definir orçamento**, informe o valor mensal. A barra mostra quanto foi usado (amarela a partir de 85%, vermelha acima de 100%)."],
- n:["Renomear vale para todos os meses.","Remover pergunta se vale só para o mês atual ou para todos; as despesas da categoria saem junto.","**Negativas** são categorias com gasto no período; **Zeradas** não tiveram gasto.","**Editar categorias** (ao lado de Lista) abre o editor clássico: nome, cor e itens em linha."]},
+ n:["Renomear vale para todos os meses.","Remover pergunta se vale só para o mês atual ou para todos; as despesas da categoria saem junto.","**Negativas** são categorias com gasto no período; **Zeradas** não tiveram gasto."]},
 {id:"fixos",g:"Controle do mês",t:"Gastos Fixos",d:"Modelo das contas que se repetem todo mês.",
  s:["Toque em **+ novo gasto fixo**.","Digite a descrição e o valor mensal. O total soma sozinho.","Em **Despesas**, dentro do mês, toque em **aplicar gastos fixos**."],
  n:["Alterar o modelo não muda meses já aplicados.","Remova um item com ✕."]},
