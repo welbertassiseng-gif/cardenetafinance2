@@ -293,7 +293,21 @@ tr.total-row td{font-weight:700; background:var(--forest); color:var(--on-dark);
 .summary-total-row{display:flex; align-items:center; justify-content:space-between; gap:18px;}
 .summary-total-value{font-size:clamp(22px,7vw,32px); font-weight:700; color:var(--forest); white-space:nowrap; overflow:hidden;}
 .summary-total-label{font-size:13px; color:var(--ink-soft); margin-top:2px;}
-.summary-ring{width:88px; height:88px; flex-shrink:0;}
+.summary-ring{width:88px; height:88px; flex-shrink:0; cursor:pointer; transition:transform .15s ease;}
+.summary-ring:hover{transform:scale(1.05);}
+.summary-ring:focus-visible{outline:2px solid var(--gold); outline-offset:3px; border-radius:50%;}
+.ring-modal{max-width:420px;}
+.ring-big{display:block; width:240px; height:240px; margin:6px auto 14px; max-width:100%;}
+.ring-big .rb-pct{font-family:'JetBrains Mono',monospace; font-weight:700; font-size:9px; fill:#fff; pointer-events:none;}
+.ring-big .rb-total{font-family:'JetBrains Mono',monospace; font-weight:700; font-size:11px; fill:var(--ink);}
+.ring-big .rb-sub{font-size:6.5px; fill:var(--ink-soft);}
+.ring-legend{display:grid; gap:2px; max-height:240px; overflow-y:auto;}
+.ring-leg-row{display:flex; align-items:center; gap:10px; padding:8px 4px; border-bottom:1px solid var(--paper-line); font-size:13.5px;}
+.ring-leg-row:last-child{border-bottom:none;}
+.ring-leg-dot{width:12px; height:12px; border-radius:4px; flex-shrink:0;}
+.ring-leg-name{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:600;}
+.ring-leg-val{font-family:'JetBrains Mono',monospace; color:var(--ink-soft); font-size:12px;}
+.ring-leg-pct{font-family:'JetBrains Mono',monospace; font-weight:700; min-width:48px; text-align:right;}
 
 .cats-card-label{font-family:'JetBrains Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:var(--ink-soft); margin-bottom:6px;}
 .eye-toggle-btn{
@@ -1408,7 +1422,7 @@ body.theme-dark .gx-crumb.current, body.theme-dark .gx-avg .v, body.theme-dark .
       </div>
       <div class="brand-actions" style="display:flex; align-items:center; gap:6px;">
         <button class="bell-btn" id="btnBellDesktop" title="Notificações" style="border-color:rgba(251,249,241,0.3); color:var(--on-dark);">
-          🔔<span class="bell-dot" id="bellDotDesktop"></span>
+          <svg class="bell-ico" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span class="bell-dot" id="bellDotDesktop"></span>
         </button>
         <button class="sidebar-collapse-btn" id="btnSidebarCollapse" type="button" title="Recolher menu" aria-label="Recolher menu" aria-expanded="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
@@ -1441,7 +1455,7 @@ body.theme-dark .gx-crumb.current, body.theme-dark .gx-avg .v, body.theme-dark .
         💾<span class="js-save-label">salvar</span><span class="save-dot"></span>
       </button>
       <button class="bell-btn" id="btnBellMobile" title="Notificações" style="border-color:rgba(251,249,241,0.3); color:var(--on-dark);">
-        🔔<span class="bell-dot" id="bellDotMobile"></span>
+        <svg class="bell-ico" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span class="bell-dot" id="bellDotMobile"></span>
       </button>
       <button class="mh-burger" id="btnOpenDrawer" aria-label="Menu">☰</button>
     </div>
@@ -3041,7 +3055,7 @@ function buildCategoryRing(categories, total){
     const rotate = (startDeg-90).toFixed(2);
     return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${segLen.toFixed(2)} ${restLen.toFixed(2)}" transform="rotate(${rotate} ${cx} ${cy})"/>`;
   }).join('');
-  return `<svg viewBox="0 0 120 120" class="summary-ring">${arcs}</svg>`;
+  return `<svg viewBox="0 0 120 120" class="summary-ring" role="button" tabindex="0" aria-label="Ver porcentagem por categoria">${arcs}</svg>`;
 }
 
 /* =========================================================
@@ -3391,6 +3405,49 @@ function gxSetErr(m, msg){ const e = m.el.querySelector('.gx-err'); if(e) e.text
 function gxBindMoney(input){
   input.addEventListener('blur', ()=>{ if(input.value.trim()) input.value = moneyDisplay(parseMoney(input.value)); });
 }
+
+
+/* ---------- clique no anel: gráfico ampliado com % por categoria ---------- */
+function gxShowRingModal(){
+  const month = gxSelMonth();
+  if(!month) return;
+  const total = monthTotal(month);
+  const list = (month.categories||[]).map((c,i)=>({name:c.name||'Sem nome', val:categoryTotal(c), color:catColor(c,i)}))
+    .filter(x=>x.val>0).sort((a,b)=>b.val-a.val);
+  if(!total || !list.length){
+    const m = gxModal(`<h3>Despesas por categoria</h3><p class="settings-desc">Ainda não há despesas lançadas neste mês.</p><div class="gx-modal-actions"><button class="btn secondary" data-close>Fechar</button></div>`);
+    return m;
+  }
+  const r=50, cx=60, cy=60, C=2*Math.PI*r, sw=18;
+  let cursor=0;
+  const arcs = list.map(x=>{
+    const frac=x.val/total, sweep=frac*360, start=cursor; cursor+=sweep;
+    const gap = list.length>1 ? 2 : 0;
+    const segLen=Math.max((sweep-gap)/360*C,0);
+    x.frac=frac;
+    return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${x.color}" stroke-width="${sw}" stroke-dasharray="${segLen.toFixed(2)} ${(C-segLen).toFixed(2)}" transform="rotate(${(start-90).toFixed(2)} ${cx} ${cy})"/>`;
+  });
+  const labels = list.map((x,i)=>{
+    const before = list.slice(0,i).reduce((s,y)=>s+y.frac,0);
+    const mid=((before+x.frac/2)*360-90)*Math.PI/180;
+    const px=cx+r*Math.cos(mid), py=cy+r*Math.sin(mid)+3;
+    return x.frac>=0.06 ? `<text class="rb-pct" x="${px.toFixed(2)}" y="${py.toFixed(2)}" text-anchor="middle">${Math.round(x.frac*100)}%</text>` : '';
+  }).join('');
+  const svg = `<svg viewBox="0 0 120 120" class="ring-big" role="img" aria-label="Porcentagem das despesas por categoria">${arcs.join('')}${labels}<text class="rb-total" x="60" y="59" text-anchor="middle">${escapeHtml(fmt(total))}</text><text class="rb-sub" x="60" y="67" text-anchor="middle">total gasto</text></svg>`;
+  const legend = list.map(x=>{
+    const p = x.frac*100;
+    const pt = (p>0 && p<1) ? '<1%' : Math.round(p)+'%';
+    return `<div class="ring-leg-row"><span class="ring-leg-dot" style="background:${x.color}"></span><span class="ring-leg-name" title="${escAttr(x.name)}">${escapeHtml(x.name)}</span><span class="ring-leg-val">${escapeHtml(fmt(x.val))}</span><span class="ring-leg-pct">${pt}</span></div>`;
+  }).join('');
+  return gxModal(`<h3>Despesas por categoria</h3><p class="settings-desc">${escapeHtml(month.label||'')} · quanto cada categoria pesa no total</p>${svg}<div class="ring-legend">${legend}</div><div class="gx-modal-actions"><button class="btn secondary" data-close>Fechar</button></div>`);
+}
+document.addEventListener('click', (e)=>{
+  const ring = e.target.closest && e.target.closest('.summary-ring');
+  if(ring) gxShowRingModal();
+});
+document.addEventListener('keydown', (e)=>{
+  if((e.key==='Enter' || e.key===' ') && e.target.classList && e.target.classList.contains('summary-ring')){ e.preventDefault(); gxShowRingModal(); }
+});
 
 /* ---------- menu de três pontos ---------- */
 let gxMenuEl = null;
