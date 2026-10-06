@@ -186,6 +186,7 @@ input,select{font-family:inherit;}
   height:38px; padding:0 12px; display:flex; align-items:center; justify-content:center; gap:6px;
   font-size:14px; color:var(--forest); flex-shrink:0;
 }
+.hdr-icon-btn:disabled{opacity:.4; cursor:default;}
 .hdr-icon-btn .js-save-label{display:inline; font-size:11.5px; font-family:'JetBrains Mono',monospace; text-transform:lowercase;}
 @media (hover:hover) and (pointer:fine){ .hdr-icon-btn:hover{background:var(--forest-pale);} }
 .hdr-icon-btn.js-save-btn.is-dirty{background:var(--gold-light); border-color:var(--gold-light); color:var(--forest);}
@@ -1444,6 +1445,9 @@ body.theme-dark .gx-crumb.current, body.theme-dark .gx-avg .v, body.theme-dark .
       <div class="mh-title" id="mobileHeaderTitle">Balance</div>
     </div>
     <div class="header-actions">
+      <button class="hdr-icon-btn js-undo-btn" id="btnUndoMobile" title="Desfazer última alteração" aria-label="Desfazer" disabled style="border-color:rgba(251,249,241,0.3); color:var(--on-dark); padding:0 10px;">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>
+      </button>
       <button class="hdr-icon-btn js-save-btn" id="btnSaveMobile" title="Salvar alterações" style="border-color:rgba(251,249,241,0.3); color:var(--on-dark);">
         💾<span class="js-save-label">salvar</span><span class="save-dot"></span>
       </button>
@@ -6245,6 +6249,7 @@ function wireAppButtons(){
 
   document.getElementById('btnUndoDesktop').onclick = performUndo;
   document.getElementById('btnUndoDrawer').onclick = performUndo;
+  document.getElementById('btnUndoMobile').onclick = performUndo;
   document.getElementById('btnRedoDesktop').onclick = performRedo;
   document.getElementById('btnRedoDrawer').onclick = performRedo;
   updateUndoRedoButtons();
