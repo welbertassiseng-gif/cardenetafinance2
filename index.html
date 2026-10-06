@@ -1925,6 +1925,8 @@ async function persistState(){
     if(error) throw error;
     dirty = false;
     lastSyncedAt = state.lastUpdated;
+    undoStack = []; redoStack = []; // depois de salvar não há mais o que desfazer
+    updateUndoRedoButtons();
     showToast('✓ salvo', false);
     renderStampAll();
     renderNotifications();
@@ -6355,7 +6357,7 @@ const TOPICS = [
  n:["Use sempre mês e ano no nome: é por ele que o app ordena, acha o mês atual e lança parcelas.","Crie os meses em ordem cronológica, pois um novo mês entra no fim da lista.","Ao abrir o app, aparece o mês atual do calendário, se estiver cadastrado.","O topo mostra o total gasto, o gráfico por categoria, o nº de transações, a maior categoria e a variação contra o mês anterior."]},
 {id:"lancar",g:"Controle do mês",t:"Lançar, editar e excluir despesas",d:"Na aba Todas de Despesas.",
  s:["Toque em **+ Adicionar**.","Preencha **Descrição**, **Valor**, **Data**, **Categoria** e, se quiser, **Banco** (escolha uma sugestão ou digite).","Toque em **Adicionar** ou pressione Enter. O painel continua aberto para o próximo lançamento.","Para corrigir, toque na despesa: edite tudo (inclusive a categoria) e toque em **Salvar**, ou em **Excluir**.","A lixeira no fim da linha também exclui."],
- n:["A lista de categorias mostra só as já existentes. Crie novas em Categorias › + Nova categoria.","Decimais com vírgula (12,50). Um ponto sozinho conta como decimal: 1.500 vira R$ 1,50. Use 1500 ou 1.500,00.","Para registrar um estorno, use **Editar categorias** e digite o valor com sinal de menos.","Errou? Use ↶ desfazer."]},
+ n:["A lista de categorias mostra só as já existentes. Crie novas em Categorias › + Nova categoria.","Decimais com vírgula (12,50). Um ponto sozinho conta como decimal: 1.500 vira R$ 1,50. Use 1500 ou 1.500,00.","Para registrar um estorno, use **Editar categorias** e digite o valor com sinal de menos.","Errou? Use ↶ desfazer (antes de salvar)."]},
 {id:"parcelas",g:"Controle do mês",t:"Compras parceladas",d:"Lance uma vez e o app preenche os meses seguintes.",
  s:["Em **+ Adicionar**, mude **Tipo** para **Parcelas**.","Digite o valor **de cada parcela** e o **nº de parcelas** (2 a 48).","Confira o aviso, por exemplo “3x de R$ 100,00 = R$ 300,00”.","Toque em **Adicionar**: o app lança “descrição (1/3)”, “(2/3)”… nos meses seguintes, criando os que faltarem."],
  n:["O mês atual precisa ter mês e ano no nome (ex.: Novembro / 2026).","Cada parcela é um lançamento independente: edite ou exclua uma por vez (busque “(1/3)” no período Todo o histórico).","As parcelas seguintes usam o mesmo dia da data escolhida."]},
@@ -6389,8 +6391,9 @@ const TOPICS = [
  s:["Em cada item do menu aparecem ⧉ duplicar, ✎ renomear e ✕ excluir (no computador, ao passar o mouse).","✕ numa aba padrão apenas **oculta**: ela vai para **seções ocultas**, de onde dá para **restaurar**.","Para apagar de vez, use a lixeira 🗑 em seções ocultas (irreversível, salva na hora)."],
  n:["Só Investimentos, Investimento Real e seções suas podem ser duplicadas.","Seções criadas por você são apagadas, com os dados, ao excluir.","Sempre deve sobrar ao menos um item no menu."]},
 {id:"salvar",g:"Ferramentas",t:"Salvar, desfazer e refazer",d:"O app só grava quando você manda.",
- s:["Faça suas alterações.","Toque em **salvar** (💾). Ele pulsa em verde quando há algo pendente e mostra **salvo** depois.","Errou? **↶ desfazer** volta até 50 passos e **↷ refazer** reaplica."],
- n:["O app **não salva sozinho**. Fechar a aba com pendências gera um aviso.","Depois de desfazer, salve de novo.","O histórico de desfazer zera ao recarregar, sair ou quando chegam dados de outro aparelho.","Exclusão permanente, apagar nota e importar backup salvam na hora."]},
+ s:["Faça suas alterações.","Toque em **salvar** (💾). Ele pulsa em verde quando há algo pendente e mostra **salvo** depois.","Errou? **↶ desfazer** volta até 50 passos e **↷ refazer** reaplica, mas só enquanto você não salvou."],
+ n:["O app **não salva sozinho**. Fechar a aba com pendências gera um aviso.","Depois de desfazer, salve para gravar a versão corrigida.","**Depois de salvar, o desfazer zera:** o que já foi salvo não pode mais ser desfeito por ↶."
+,"O histórico de desfazer também zera ao recarregar, sair ou quando chegam dados de outro aparelho.","Exclusão permanente, apagar nota e importar backup salvam na hora."]},
 {id:"aparelhos",g:"Ferramentas",t:"Usar em mais de um aparelho",d:"Celular e computador com os mesmos dados.",
  n:["Entre com a mesma conta: os dados salvos aparecem em todos os aparelhos.","Quando você salva, os outros aparelhos abertos se atualizam sozinhos.","Se você tem alterações sem salvar, aparece “Há dados novos em outro aparelho”: salve ou recarregue.","Ao salvar tendo dados mais novos em outro lugar, o app pergunta se quer sobrescrever."]},
 {id:"privado",g:"Ferramentas",t:"Modo privado (olhinho)",d:"Esconda valores sensíveis quando outras pessoas estiverem olhando.",
@@ -6405,7 +6408,7 @@ const TOPICS = [
 ];
 const FAQ = [
 ["Salvar e dados","Perdi o que digitei","O app só grava quando você toca em salvar (💾). O que ficou pendente ao fechar sem salvar se perde. O navegador avisa antes de fechar."],
-["Salvar e dados","Apaguei algo sem querer","Toque em ↶ desfazer logo em seguida (até 50 passos) e salve. Abas ocultas voltam em seções ocultas › restaurar. Exclusão permanente e backup importado não têm volta."],
+["Salvar e dados","Apaguei algo sem querer","Se ainda não salvou, toque em ↶ desfazer (até 50 passos) e depois salve. Depois de salvar, o desfazer não volta mais. Abas ocultas voltam em seções ocultas › restaurar. Exclusão permanente e backup importado não têm volta."],
 ["Salvar e dados","O que significa “Os dados foram alterados em outro aparelho”?","Outro aparelho salvou depois da última vez que este sincronizou. OK sobrescreve tudo com o que está nesta tela; Cancelar mantém suas alterações sem salvar, e você recarrega para ver as novas."],
 ["Salvar e dados","Deu erro ao salvar","Em geral é falta de conexão. Suas alterações continuam na tela: confira a internet e toque em salvar de novo."],
 ["Salvar e dados","Como faço backup e restauro?","Abra ⚙️ ajustes e, em Dados do app, toque em Exportar backup. Para restaurar, toque em Importar: isso substitui todos os dados atuais e salva na hora, sem pedir confirmação."],
