@@ -1286,7 +1286,7 @@ body.theme-dark .gx-crumb.current, body.theme-dark .gx-avg .v, body.theme-dark .
       <div class="landing-logo">B</div>
       <span class="landing-brand-name">Balance</span>
     </div>
-    <div class="landing-actions"><button type="button" class="landing-btn-help js-help-btn" data-no-undo>Ajuda</button><button type="button" class="landing-btn-login" id="btnLandingLogin">Entrar</button></div>
+    <div class="landing-actions"><button type="button" class="landing-btn-login" id="btnLandingLogin">Entrar</button></div>
   </header>
 
   <main class="landing-main">
@@ -1393,7 +1393,6 @@ body.theme-dark .gx-crumb.current, body.theme-dark .gx-avg .v, body.theme-dark .
     </form>
 
     <div class="auth-note" id="authNote">Seus dados ficam salvos com segurança na sua conta e acompanham você em qualquer navegador ou aparelho.</div>
-    <button type="button" class="btn link js-help-btn" data-no-undo style="margin-top:8px;">Precisa de ajuda?</button>
   </div>
 </div>
 
@@ -1964,7 +1963,7 @@ function showToast(msg, isError){
 ========================================================= */
 const DEFAULT_NAV = [
   {id:'dashboard', label:'Início'},
-  {id:'gastos', label:'Gastos Mensais'},
+  {id:'gastos', label:'Despesas'},
   {id:'fixos', label:'Gastos Fixos'},
   {id:'salarios', label:'Salários'},
   {id:'receber', label:'Dinheiro a Receber'},
@@ -2052,7 +2051,7 @@ function buildNavInto(containerId, visible, hidden, withManage){
     </div>`;
   };
   const html = visible.map(itemHtml).join('');
-  const addBtn = withManage ? `<div class="nav-add-btn" data-addsection="1">+ adicionar item</div>` : '';
+  const addBtn = '';
   const hiddenBlock = (withManage && hidden.length) ? `
     <div class="nav-hidden-toggle" data-hiddentoggle="1">seções ocultas (${hidden.length}) ▾</div>
     <div class="nav-hidden-list" data-hiddenlist="1" style="display:none;">
@@ -2828,9 +2827,9 @@ function renderDashboard(){
         </div>
         <div id="chartCardBody">
           ${!months.length ? `
-            <div class="empty-state">Assim que você cadastrar um mês em "Gastos Mensais", esse gráfico aparece aqui sozinho.<br><br><button class="btn secondary small" id="btnGoToGastos">Ir para Gastos Mensais</button></div>
+            <div class="empty-state">Assim que você cadastrar um mês em "Despesas", esse gráfico aparece aqui sozinho.<br><br><button class="btn secondary small" id="btnGoToGastos">Ir para Despesas</button></div>
           ` : !hasRealData ? `
-            <div class="empty-state">Seus meses ainda estão sem gastos ou salário lançado. Preencha algum valor para o gráfico ganhar vida.<br><br><button class="btn secondary small" id="btnGoToGastos">Ir para Gastos Mensais</button></div>
+            <div class="empty-state">Seus meses ainda estão sem gastos ou salário lançado. Preencha algum valor para o gráfico ganhar vida.<br><br><button class="btn secondary small" id="btnGoToGastos">Ir para Despesas</button></div>
           ` : `
             <div class="chart-wrap" id="chartWrap">
               <div class="chart-skeleton" id="chartSkeleton">
@@ -2855,7 +2854,7 @@ function renderDashboard(){
     </div>
 
     <div class="card">
-      <h3>Todos os meses <span class="hint">clique em "Gastos Mensais" para editar cada um</span></h3>
+      <h3>Todos os meses <span class="hint">clique em "Despesas" para editar cada um</span></h3>
       <div class="table-wrap"><table class="responsive-table">
         <thead><tr><th>Mês</th><th class="num">Gastos</th><th class="num">Receita</th><th class="num">Sobra</th></tr></thead>
         <tbody>
@@ -4317,7 +4316,7 @@ function gxChartHTML(key, color){
         <div class="gx-val ${(!s.registered||s.total<=0)?'muted':''}">${label}</div></div>`;
     }).join('');
     const xl = series.map(s=>`<div class="${s.sel?'sel':''}">${escapeHtml(s.label)}${s.partial?'<small>parcial</small>':''}</div>`).join('');
-    chart = `<div class="gx-chart" style="--n:${series.length}; --cc:${color};" role="img" aria-label="Gastos mensais da categoria nos últimos ${series.length} meses">
+    chart = `<div class="gx-chart" style="--n:${series.length}; --cc:${color};" role="img" aria-label="Despesas da categoria nos últimos ${series.length} meses">
       <div class="gx-plot"><div class="gx-base"></div>
         ${avg>0 ? `<div class="gx-avgline" style="--p:${Math.min(1,avg/max).toFixed(4)};"><span>média</span></div>` : ''}
         <div class="gx-cols">${cols}</div></div>
@@ -4412,7 +4411,7 @@ function renderGastos(){
 
   el.innerHTML = `
     <div class="page-header">
-      <div><h2>Gastos Mensais</h2><div class="desc">Veja o mês inteiro, explore por categoria e lance novas despesas. Totais, médias e gráficos somam sozinhos.</div></div>
+      <div><h2>Despesas</h2><div class="desc">Veja o mês inteiro, explore por categoria e lance novas despesas. Totais, médias e gráficos somam sozinhos.</div></div>
     </div>
     <div class="month-nav" data-no-undo>
       <button class="month-nav-arrow" id="btnPrevMonth" title="mês anterior" ${idx<=0?'disabled':''}>‹</button>
@@ -4593,7 +4592,7 @@ function renderSalarios(){
 
   const content = el.querySelector('#salContent');
   if(!month){
-    content.innerHTML = `<div class="card"><div class="empty-state">Cadastre um mês em "Gastos Mensais" primeiro.</div></div>`;
+    content.innerHTML = `<div class="card"><div class="empty-state">Cadastre um mês em "Despesas" primeiro.</div></div>`;
     return el;
   }
   if(!sal){
@@ -6318,7 +6317,7 @@ function stopNotificationWatcher(){
 (function(){
 const TOPICS = [
 {id:"roteiro",g:"Primeiros passos",t:"Comece por aqui",d:"Roteiro rápido para deixar o app funcionando em poucos minutos.",
- s:["Crie sua conta (ou entre) e, se o app pedir, confirme o e-mail.","Abra **Gastos Mensais**, toque em **+ novo mês** e digite o mês com ano, por exemplo **Novembro / 2026**.","Toque em **+ Adicionar**, preencha descrição, valor, data e categoria e toque em **Adicionar**. Repita para cada gasto.","Abra **Salários**, escolha o mês e toque em **criar salário deste mês**. Informe seu salário (e extras, se houver).","Se tem contas que se repetem todo mês, cadastre em **Gastos Fixos** e, dentro do mês, toque em **aplicar gastos fixos**.","Veja o resultado em **Início**: receita, gastos e quanto sobrou.","Toque em **salvar** (💾). O app não salva sozinho."],
+ s:["Crie sua conta (ou entre) e, se o app pedir, confirme o e-mail.","Abra **Despesas**, toque em **+ novo mês** e digite o mês com ano, por exemplo **Novembro / 2026**.","Toque em **+ Adicionar**, preencha descrição, valor, data e categoria e toque em **Adicionar**. Repita para cada gasto.","Abra **Salários**, escolha o mês e toque em **criar salário deste mês**. Informe seu salário (e extras, se houver).","Se tem contas que se repetem todo mês, cadastre em **Gastos Fixos** e, dentro do mês, toque em **aplicar gastos fixos**.","Veja o resultado em **Início**: receita, gastos e quanto sobrou.","Toque em **salvar** (💾). O app não salva sozinho."],
  n:["O botão salvar pulsa em verde quando há algo por salvar."]},
 {id:"conta",g:"Primeiros passos",t:"Conta, login e senha",d:"Criar conta, entrar, recuperar a senha e sair.",
  s:["Na tela inicial, toque em **Entrar** ou **Começar agora**.","Para criar conta, use a aba **Criar conta**: nome, e-mail e senha (mínimo 6 caracteres) duas vezes.","Se o app avisar que enviou um link, abra seu e-mail e confirme antes de entrar.","Para entrar, use a aba **Entrar** com e-mail e senha.","Esqueceu a senha? Toque em **Esqueci minha senha**, informe o e-mail, abra o link recebido e defina a nova senha."],
@@ -6326,12 +6325,12 @@ const TOPICS = [
 {id:"navegacao",g:"Primeiros passos",t:"Menu e navegação",d:"Onde fica cada coisa no computador e no celular.",
  n:["**Computador:** o menu fica à esquerda. A seta ‹ no topo recolhe o menu (o app lembra sua escolha).","**Celular:** a barra de baixo mostra as primeiras abas e um atalho para a Carteira. Toque em ☰ para abrir o menu completo.","No menu ficam também: 🔔 avisos, ↶ desfazer, ↷ refazer, 💾 salvar, ⚙️ ajustes, ❓ ajuda, exportar/importar backup e sair."]},
 {id:"inicio",g:"Controle do mês",t:"Início",d:"Painel que compara receita e gastos de um mês.",
- s:["Escolha o mês na lista no topo.","Leia os quadros: **Receita** (total de Salários do mês), **Gastos** (total de Gastos Mensais) e **Sobra do mês** (receita − gastos).","Veja o gráfico **Receita × Gastos por mês**. Toque em Receita ou Gastos para trocar a cor das barras.","Confira o **Resumo geral**: a receber pendente, Carteira, gastos fixos e empréstimos em aberto.","A tabela **Todos os meses** lista cada mês."],
+ s:["Escolha o mês na lista no topo.","Leia os quadros: **Receita** (total de Salários do mês), **Gastos** (total de Despesas) e **Sobra do mês** (receita − gastos).","Veja o gráfico **Receita × Gastos por mês**. Toque em Receita ou Gastos para trocar a cor das barras.","Confira o **Resumo geral**: a receber pendente, Carteira, gastos fixos e empréstimos em aberto.","A tabela **Todos os meses** lista cada mês."],
  n:["Tudo vem das outras abas: para mudar um número, edite na aba de origem.","O gráfico só aparece quando há gastos ou salário lançados.","“Atualizado” mostra a data do último salvamento."]},
-{id:"gastos",g:"Controle do mês",t:"Gastos Mensais: os meses",d:"Cada mês tem seu próprio conjunto de despesas.",
+{id:"gastos",g:"Controle do mês",t:"Despesas: os meses",d:"Cada mês tem seu próprio conjunto de despesas.",
  s:["Toque em **+ novo mês** e digite **Mês / Ano** (ex.: Novembro / 2026).","Troque de mês pelas setas ‹ › ou pela lista.","**duplicar mês atual** copia categorias e despesas para um novo mês.","**aplicar gastos fixos** traz os itens da aba Gastos Fixos para a categoria Gastos Fixos do mês, sem repetir os que já estão lá.","**excluir mês** remove o mês, as despesas dele e o salário lançado para ele."],
  n:["Use sempre mês e ano no nome: é por ele que o app ordena, acha o mês atual e lança parcelas.","Crie os meses em ordem cronológica, pois um novo mês entra no fim da lista.","Ao abrir o app, aparece o mês atual do calendário, se estiver cadastrado.","O topo mostra o total gasto, o gráfico por categoria, o nº de transações, a maior categoria e a variação contra o mês anterior."]},
-{id:"lancar",g:"Controle do mês",t:"Lançar, editar e excluir despesas",d:"Na aba Todas de Gastos Mensais.",
+{id:"lancar",g:"Controle do mês",t:"Lançar, editar e excluir despesas",d:"Na aba Todas de Despesas.",
  s:["Toque em **+ Adicionar**.","Preencha **Descrição**, **Valor**, **Data**, **Categoria** e, se quiser, **Banco** (escolha uma sugestão ou digite).","Toque em **Adicionar** ou pressione Enter. O painel continua aberto para o próximo lançamento.","Para corrigir, toque na despesa: edite tudo (inclusive a categoria) e toque em **Salvar**, ou em **Excluir**.","A lixeira no fim da linha também exclui."],
  n:["A lista de categorias mostra só as já existentes. Crie novas em Categorias › + Nova categoria.","Decimais com vírgula (12,50). Um ponto sozinho conta como decimal: 1.500 vira R$ 1,50. Use 1500 ou 1.500,00.","Para registrar um estorno, use **Editar categorias** e digite o valor com sinal de menos.","Errou? Use ↶ desfazer."]},
 {id:"parcelas",g:"Controle do mês",t:"Compras parceladas",d:"Lance uma vez e o app preenche os meses seguintes.",
@@ -6344,11 +6343,11 @@ const TOPICS = [
  s:["Abra a aba **Categorias** e escolha o período.","Toque em **+ Nova categoria** para criar.","Toque no cartão para ver as despesas, o gráfico dos últimos 6 meses e a média mensal.","Nos três pontos (⋯) você pode definir **orçamento**, editar descrição, alterar ícone ou emoji, alterar cor, renomear ou remover.","Em **Definir orçamento**, informe o valor mensal. A barra mostra quanto foi usado (amarela a partir de 85%, vermelha acima de 100%)."],
  n:["Renomear vale para todos os meses.","Remover pergunta se vale só para o mês atual ou para todos; as despesas da categoria saem junto.","**Negativas** são categorias com gasto no período; **Zeradas** não tiveram gasto.","**Editar categorias** (ao lado de Lista) abre o editor clássico: nome, cor e itens em linha."]},
 {id:"fixos",g:"Controle do mês",t:"Gastos Fixos",d:"Modelo das contas que se repetem todo mês.",
- s:["Toque em **+ novo gasto fixo**.","Digite a descrição e o valor mensal. O total soma sozinho.","Em **Gastos Mensais**, dentro do mês, toque em **aplicar gastos fixos**."],
+ s:["Toque em **+ novo gasto fixo**.","Digite a descrição e o valor mensal. O total soma sozinho.","Em **Despesas**, dentro do mês, toque em **aplicar gastos fixos**."],
  n:["Alterar o modelo não muda meses já aplicados.","Remova um item com ✕."]},
 {id:"salarios",g:"Controle do mês",t:"Salários e horas extras",d:"A receita do mês vem daqui.",
- s:["Escolha o mês (ele precisa existir em Gastos Mensais).","Toque em **criar salário deste mês**.","Para valor normal, digite em **Valor**.","Para hora extra, preencha **Valor h.e.** (valor da hora) e **Horas**: o valor é calculado.","Use **+ novo item** para bônus, 13º, freelas etc."],
- n:["A soma dos itens do mês é a **Receita** do Início.","Excluir um mês em Gastos Mensais apaga o salário dele."]},
+ s:["Escolha o mês (ele precisa existir em Despesas).","Toque em **criar salário deste mês**.","Para valor normal, digite em **Valor**.","Para hora extra, preencha **Valor h.e.** (valor da hora) e **Horas**: o valor é calculado.","Use **+ novo item** para bônus, 13º, freelas etc."],
+ n:["A soma dos itens do mês é a **Receita** do Início.","Excluir um mês em Despesas apaga o salário dele."]},
 {id:"receber",g:"Controle do mês",t:"Dinheiro a Receber e empréstimos",d:"O que devem a você e empréstimos parcelados que você fez.",
  s:["Em **A receber de terceiros**, toque em **+ novo registro**: data, devedor, descrição e valor.","Quando receber, mude **Status** para **Recebido**.","Em **Empréstimos parcelados**, toque em **+ novo empréstimo**: nome, valor total, nº de parcelas e valor por parcela.","A cada parcela paga, aumente o campo **Pagas**."],
  n:["Restante = (parcelas − pagas) × valor por parcela. O **Valor total** é só informativo.","Valores recebidos não entram na Receita. Lance também em Salários se quiser contá-los."]},
@@ -6364,7 +6363,7 @@ const TOPICS = [
 {id:"notas",g:"Ferramentas",t:"Bloco de Notas",d:"Anotações livres, no estilo do app Notas.",
  s:["Toque em **+ nova nota**.","Digite título (opcional) e texto. Sem título, a primeira linha vira o título.","Volte em **todas as notas** e toque numa nota para reabrir.","A lixeira exclui a nota (pede confirmação e salva na hora)."]},
 {id:"menu",g:"Ferramentas",t:"Personalizar o menu",d:"Renomear, ocultar, criar e duplicar seções.",
- s:["Em cada item do menu aparecem ⧉ duplicar, ✎ renomear e ✕ excluir (no computador, ao passar o mouse).","**+ adicionar item** cria uma seção em branco (descrição e valor) ou duplica uma criada por você.","✕ numa aba padrão apenas **oculta**: ela vai para **seções ocultas**, de onde dá para **restaurar**.","Para apagar de vez, use a lixeira 🗑 em seções ocultas (irreversível, salva na hora)."],
+ s:["Em cada item do menu aparecem ⧉ duplicar, ✎ renomear e ✕ excluir (no computador, ao passar o mouse).","✕ numa aba padrão apenas **oculta**: ela vai para **seções ocultas**, de onde dá para **restaurar**.","Para apagar de vez, use a lixeira 🗑 em seções ocultas (irreversível, salva na hora)."],
  n:["Só Investimentos, Investimento Real e seções suas podem ser duplicadas.","Seções criadas por você são apagadas, com os dados, ao excluir.","Sempre deve sobrar ao menos um item no menu."]},
 {id:"salvar",g:"Ferramentas",t:"Salvar, desfazer e refazer",d:"O app só grava quando você manda.",
  s:["Faça suas alterações.","Toque em **salvar** (💾). Ele pulsa em verde quando há algo pendente e mostra **salvo** depois.","Errou? **↶ desfazer** volta até 50 passos e **↷ refazer** reaplica."],
