@@ -435,6 +435,24 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
 
 .empty-state{text-align:center; padding:34px 20px; color:var(--ink-soft); font-size:14px;}
 
+/* ---------- Salários: proventos x descontos ---------- */
+.sal-summary{margin-bottom:18px;}
+.sal-summary .stat .hint{display:block; margin-top:4px; font-size:11px; color:var(--ink-soft); font-family:'JetBrains Mono',monospace;}
+.sal-badge{font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:600; padding:3px 10px; border-radius:20px;}
+.sal-badge.prov{background:var(--green-pale); color:#047857;}
+.sal-badge.desc{background:var(--rust-pale); color:var(--rust);}
+body.theme-dark .sal-badge.prov{color:#6EE7B7;}
+.sal-card-desc h3{color:var(--rust);}
+.sal-card-desc td input.money{color:var(--rust);}
+.sal-card-desc .total-row td{color:#FDA4AF;}
+.sal-minus{color:var(--rust); font-weight:700; margin-right:2px;}
+.sal-actions{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:14px;}
+.sal-chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;}
+.sal-chip{border:1px dashed var(--paper-line); background:none; color:var(--ink-soft); border-radius:20px; padding:5px 11px; font-size:12px; cursor:pointer; font-family:inherit;}
+.sal-chip:hover{border-color:var(--gold); color:var(--gold);}
+.sal-tip{font-size:12px; color:var(--ink-soft); margin:10px 0 0; line-height:1.5;}
+.sal-move{font-size:13px !important;}
+
 .save-toast{position:fixed; bottom:22px; right:26px; background:var(--forest); color:var(--on-dark); padding:10px 18px; border-radius:3px; font-size:12.5px; font-family:'JetBrains Mono',monospace; opacity:0; transform:translateY(8px); transition:opacity .25s, transform .25s; pointer-events:none; box-shadow:var(--shadow); z-index:50; max-width:80vw;}
 .save-toast.show{opacity:1; transform:translateY(0);}
 .save-toast.error{background:var(--rust);}
@@ -590,6 +608,8 @@ td input:focus, td select:focus{border-color:var(--gold); outline:none; backgrou
 .auth-tabs{display:flex; border-bottom:1px solid var(--paper-line); margin-bottom:20px;}
 .auth-tab{flex:1; text-align:center; padding:9px 0; font-size:12.5px; font-family:'JetBrains Mono',monospace; color:var(--ink-soft); cursor:pointer; border-bottom:2px solid transparent; text-transform:uppercase; letter-spacing:0.03em;}
 .auth-tab.active{color:var(--forest); border-bottom-color:var(--gold); font-weight:600;}
+.auth-reset-intro{margin:0 0 14px; font-size:13.5px; line-height:1.5; color:var(--ink-soft);}
+.auth-reset-intro b{color:var(--ink);}
 .auth-invite-note{margin:16px 0 0; text-align:center; font-size:12.5px; line-height:1.5; color:var(--ink-soft);}
 .auth-field{margin-bottom:14px;}
 .auth-field label{display:block; font-size:11px; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-soft); font-family:'JetBrains Mono',monospace; margin-bottom:5px;}
@@ -1398,6 +1418,7 @@ body.theme-dark .gx-crumb.current, body.theme-dark .gx-avg .v, body.theme-dark .
     </form>
 
     <form class="auth-form" id="resetForm">
+      <p class="auth-reset-intro" id="resetIntro">Escolha uma nova senha para a sua conta.</p>
       <div class="auth-field"><label>Nova senha</label><input type="password" id="resetPass" autocomplete="new-password" required minlength="6"></div>
       <div class="auth-field"><label>Confirme a nova senha</label><input type="password" id="resetPass2" autocomplete="new-password" required minlength="6"></div>
       <button type="submit" class="btn gold auth-submit" id="resetSubmitBtn">Salvar nova senha</button>
@@ -1560,6 +1581,11 @@ body.theme-dark .gx-crumb.current, body.theme-dark .gx-avg .v, body.theme-dark .
 ========================================================= */
 const SUPABASE_URL = "https://apcspognnfymkemmqyzd.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_3EVv-sQvRcQAoebiCoUdFw_2FtXb_I8";
+
+// Guarda o endereço exatamente como chegou do link do e-mail (convite / recuperação de senha)
+// ANTES de criar o cliente: o SDK do Supabase limpa o #access_token da barra de endereço sozinho,
+// e sem esta cópia o app perdia a informação de que era um convite ou uma recuperação.
+const INITIAL_URL = { hash: window.location.hash || '', search: window.location.search || '' };
 
 const supabaseConfigured = SUPABASE_URL.startsWith('http') && SUPABASE_ANON_KEY.length > 20;
 // Além de configurado, o SDK do Supabase precisa ter realmente carregado do CDN — se a rede
@@ -2376,7 +2402,28 @@ function onAddCustomSection(){
 ========================================================= */
 function monthTotal(month){ return month.categories.reduce((sum,c)=> sum + c.items.reduce((s,i)=>s+(Number(i.value)||0),0), 0); }
 function categoryTotal(cat){ return cat.items.reduce((s,i)=>s+(Number(i.value)||0),0); }
-function salaryTotal(sal){ return sal.items.reduce((s,i)=>s+(Number(i.value)||0),0); }
+// Cada item do salário é "provento" (entra) ou "desconto" (sai). Descontos são digitados como número
+// positivo e subtraídos sozinhos. Itens antigos com valor negativo viram desconto automaticamente.
+function normalizeSalItem(item){
+  if(!item) return item;
+  if(item.tipo !== 'desconto' && item.tipo !== 'provento'){
+    const v = Number(item.value)||0;
+    item.tipo = v < 0 ? 'desconto' : 'provento';
+  }
+  if((Number(item.value)||0) < 0) item.value = Math.abs(Number(item.value));
+  if(item.valorHE !== null && item.valorHE !== undefined && item.valorHE < 0) item.valorHE = Math.abs(item.valorHE);
+  return item;
+}
+function salaryParts(sal){
+  let prov = 0, desc = 0;
+  ((sal && sal.items) || []).forEach(i=>{
+    normalizeSalItem(i);
+    const v = Math.abs(Number(i.value)||0);
+    if(i.tipo === 'desconto') desc += v; else prov += v;
+  });
+  return { prov: round2(prov), desc: round2(desc), liquido: round2(prov - desc) };
+}
+function salaryTotal(sal){ return salaryParts(sal).liquido; }
 function receivablesPendingTotal(){ return state.receivables.filter(r=>r.status!=='recebido').reduce((s,r)=>s+(Number(r.valor)||0),0); }
 function loanRemaining(loan){ const restantes = Math.max(0, loan.parcelas - loan.parcelasPagas); return restantes * (Number(loan.valorParcela)||0); }
 function futureValue(P, PMT, anos, taxaAnualPct){
@@ -2436,6 +2483,13 @@ function monthLabelRank(label){
   if(ym){ year = Number(ym[1]); if(year < 100) year += 2000; }
   else { year = new Date().getFullYear(); }
   return year * 12 + mi;
+}
+// Próximo mês a criar: o mês seguinte ao MAIS RECENTE já cadastrado (ex.: se já existe Março / 2027,
+// o próximo é Abril / 2027, mesmo que você esteja vendo Novembro / 2026). Sem meses: o mês atual.
+function nextMonthLabel(){
+  const ranks = (state.months||[]).map(m=>monthLabelRank(m.label)).filter(r=>r!==null);
+  const rank = ranks.length ? Math.max(...ranks) + 1 : currentMonthRank();
+  return PT_MONTH_NAMES[rank % 12] + ' / ' + Math.floor(rank / 12);
 }
 function currentMonthRank(){
   const now = new Date();
@@ -4378,7 +4432,6 @@ function renderGastos(){
       ${detail ? '' : `
       <button class="btn secondary small" id="btnNewMonth">+ novo mês</button>
       <button class="btn secondary small" id="btnDupMonth">duplicar mês atual</button>
-      <button class="btn gold small" id="btnApplyFixed">aplicar gastos fixos</button>
       ${month ? `<button class="btn secondary small" id="btnDelMonth" style="border-color:var(--rust); color:var(--rust);">excluir mês</button>` : ''}`}
     </div>
     <div id="gxContent"></div>
@@ -4399,8 +4452,7 @@ function renderGastos(){
 
   const on = (id, fn)=>{ const b = el.querySelector(id); if(b) b.addEventListener('click', fn); };
   on('#btnNewMonth', ()=>{
-    const label = prompt('Nome do novo mês (ex: Novembro / 2026):');
-    if(!label) return;
+    const label = nextMonthLabel();
     const id = uid();
     state.months.push({id, label, categories:[]});
     state.selectedMonth = id;
@@ -4408,7 +4460,7 @@ function renderGastos(){
   });
   on('#btnDupMonth', ()=>{
     if(!month) return;
-    const label = prompt('Nome do novo mês (cópia de ' + month.label + '):', '');
+    const label = prompt('Nome do novo mês (cópia de ' + month.label + '):', nextMonthLabel());
     if(!label) return;
     const clone = JSON.parse(JSON.stringify(month));
     clone.id = uid(); clone.label = label;
@@ -4475,7 +4527,7 @@ function renderFixos(){
   const total = state.fixedExpenses.reduce((s,f)=>s+(Number(f.value)||0),0);
   el.innerHTML = `
     <div class="page-header">
-      <div><h2>Gastos Fixos</h2><div class="desc">O modelo que se repete todo mês. Use o botão "aplicar gastos fixos" dentro de um mês para importar tudo de uma vez.</div></div>
+      <div><h2>Gastos Fixos</h2><div class="desc">As contas que se repetem todo mês. O total aparece no Início como "Gastos fixos mensais".</div></div>
     </div>
     <div class="card">
       <h3>Modelo de gastos fixos</h3>
@@ -4515,6 +4567,26 @@ function renderFixos(){
 /* =========================================================
    RENDER: SALÁRIOS
 ========================================================= */
+const SAL_PRESETS = {
+  provento: ['Salário','Hora extra','Adicional noturno','Bônus','Comissão','13º salário','Férias','Freela'],
+  desconto: ['INSS','IRRF','Vale-transporte','Vale-refeição','Plano de saúde','Adiantamento','Faltas/atrasos','Empréstimo consignado']
+};
+const SAL_HE_PRESETS = ['Hora extra','Adicional noturno','Faltas/atrasos'];
+
+function findPreviousSalary(month){
+  if(!month) return null;
+  const r = monthLabelRank(month.label);
+  const candidates = state.salaries
+    .filter(s=>s.monthId!==month.id && s.items && s.items.length)
+    .map(s=>{ const m = state.months.find(x=>x.id===s.monthId); return m ? { sal:s, m, rank: monthLabelRank(m.label) } : null; })
+    .filter(Boolean);
+  if(!candidates.length) return null;
+  const ranked = candidates.filter(c=>c.rank!==null && (r===null || c.rank < r)).sort((a,b)=>b.rank-a.rank);
+  if(ranked.length) return ranked[0];
+  if(r===null){ const idx = state.months.findIndex(x=>x.id===month.id); const before = candidates.filter(c=>state.months.indexOf(c.m) < idx); return before.length ? before[before.length-1] : null; }
+  return null;
+}
+
 function renderSalarios(){
   const el = document.createElement('div');
   if(!state.months.find(m=>m.id===state.selectedMonth) && state.months.length){
@@ -4522,14 +4594,16 @@ function renderSalarios(){
   }
   const month = state.months.find(m=>m.id===state.selectedMonth);
   let sal = state.salaries.find(s=>s.monthId===state.selectedMonth);
+  const prev = !sal ? findPreviousSalary(month) : null;
 
   el.innerHTML = `
     <div class="page-header">
-      <div><h2>Salários</h2><div class="desc">Horas extras calculam o valor sozinhas (valor da hora × quantidade de horas). O total soma automaticamente.</div></div>
+      <div><h2>Salários</h2><div class="desc">Lance o que entra em <b>Proventos</b> e o que é descontado em <b>Descontos</b> — sem precisar de sinal de menos. O líquido é calculado sozinho e vira a Receita do mês.</div></div>
     </div>
     <div class="toolbar">
       <select class="tag-select" id="monthSelect"></select>
       ${!sal && month ? `<button class="btn gold small" id="btnCreateSal">criar salário deste mês</button>` : ''}
+      <button class="btn secondary small" id="btnSalNewMonth" title="cria o mês seguinte ao último cadastrado">+ novo mês</button>
     </div>
     <div id="salContent"></div>
   `;
@@ -4540,7 +4614,21 @@ function renderSalarios(){
   const createBtn = el.querySelector('#btnCreateSal');
   if(createBtn){
     createBtn.addEventListener('click', ()=>{
-      state.salaries.push({monthId: month.id, items:[{desc:'Salário', valorHE:null, horas:null, value:0}]});
+      state.salaries.push({monthId: month.id, items:[{desc:'Salário', tipo:'provento', valorHE:null, horas:null, value:0}]});
+      scheduleSave(); renderSection();
+    });
+  }
+  el.querySelector('#btnSalNewMonth').addEventListener('click', ()=>{
+    const id = uid();
+    state.months.push({id, label: nextMonthLabel(), categories:[]});
+    state.selectedMonth = id;
+    scheduleSave(); renderSection();
+  });
+  const copyBtn = el.querySelector('#btnCopySal');
+  if(copyBtn){
+    copyBtn.addEventListener('click', ()=>{
+      const items = prev.sal.items.map(i=>{ const c = JSON.parse(JSON.stringify(normalizeSalItem(i))); return c; });
+      state.salaries.push({monthId: month.id, items});
       scheduleSave(); renderSection();
     });
   }
@@ -4554,83 +4642,153 @@ function renderSalarios(){
     content.innerHTML = `<div class="card"><div class="empty-state">Ainda não há salário lançado para ${escapeHtml(month.label)}.</div></div>`;
     return el;
   }
+  sal.items.forEach(normalizeSalItem);
+  const parts = salaryParts(sal);
 
-  const total = salaryTotal(sal);
-  const card = document.createElement('div');
-  card.className = 'card';
-  card.innerHTML = `
-    <h3>${escapeHtml(month.label)} ${eyeToggleBtn()}</h3>
-    <div class="table-wrap"><table class="responsive-table">
-      <thead><tr><th>Descrição</th><th class="num" style="width:100px">Valor h.e.</th><th class="num" style="width:90px">Horas</th><th class="num" style="width:120px">Valor</th><th style="width:50px"></th></tr></thead>
-      <tbody id="salBody"></tbody>
-      <tfoot><tr class="total-row"><td colspan="3">TOTAL</td><td class="num" data-label="Total" id="sal-total-cell">${fmtPriv(total)}</td><td></td></tr></tfoot>
-    </table></div>
-    <button class="btn secondary small" id="btnAddSalItem" style="margin-top:14px;">+ novo item</button>
+  const summary = document.createElement('div');
+  summary.className = 'grid-3 sal-summary';
+  summary.innerHTML = `
+    <div class="stat ${parts.liquido<0?'neg':'pos'}" id="sal-sum-liq-box"><div class="label">Líquido · ${escapeHtml(month.label)} ${eyeToggleBtn()}</div><div class="value mono" id="sal-sum-liq">${fmtPriv(parts.liquido)}</div><span class="hint">vai para a Receita do Início</span></div>
+    <div class="stat"><div class="label">Proventos</div><div class="value mono" id="sal-sum-prov">${fmtPriv(parts.prov)}</div></div>
+    <div class="stat neg"><div class="label">Descontos</div><div class="value mono" id="sal-sum-desc">${parts.desc ? '− ' : ''}${fmtPriv(parts.desc)}</div></div>
   `;
-  content.appendChild(card);
-  bindEyeToggles(card);
-  const body = card.querySelector('#salBody');
-  sal.items.forEach((item,i)=>{
-    const isHE = item.valorHE !== null && item.valorHE !== undefined;
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td class="cell-plain"><input type="text" value="${escAttr(item.desc)}" data-role="desc"></td>
-      <td class="num" data-label="Valor h.e."><input type="text" inputmode="decimal" class="money" placeholder="—" data-role="valorHE"></td>
-      <td class="num" data-label="Horas"><input type="text" inputmode="decimal" class="money" placeholder="—" data-role="horas"></td>
-      <td class="num" data-label="Valor"><input type="text" inputmode="decimal" class="money" data-role="value" id="sal-value-${i}" ${isHE?'readonly style="color:var(--ink-soft)"':''}></td>
-      <td><button class="icon-btn" data-role="del">✕</button></td>
+  content.appendChild(summary);
+  bindEyeToggles(summary);
+
+  const buildGroup = (tipo)=>{
+    const isDesc = tipo === 'desconto';
+    const card = document.createElement('div');
+    card.className = 'card' + (isDesc ? ' sal-card-desc' : '');
+    card.style.marginBottom = '18px';
+    const groupTotal = isDesc ? parts.desc : parts.prov;
+    card.innerHTML = `
+      <h3><span>${isDesc ? 'Descontos' : 'Proventos'} <span class="sal-badge ${isDesc?'desc':'prov'}">${isDesc ? '− subtrai' : '+ soma'}</span></span></h3>
+      <div class="table-wrap"><table class="responsive-table">
+        <thead><tr><th>Descrição</th><th class="num" style="width:100px">Valor hora</th><th class="num" style="width:90px">Horas</th><th class="num" style="width:130px">Valor</th><th style="width:76px"></th></tr></thead>
+        <tbody></tbody>
+        <tfoot><tr class="total-row"><td colspan="3">TOTAL ${isDesc ? 'DESCONTOS' : 'PROVENTOS'}</td><td class="num" data-label="Total" id="sal-total-${tipo}">${isDesc && groupTotal ? '− ' : ''}${fmtPriv(groupTotal)}</td><td></td></tr></tfoot>
+      </table></div>
+      <div class="sal-actions">
+        <button class="btn secondary small" data-role="add">+ ${isDesc ? 'novo desconto' : 'novo provento'}</button>
+      </div>
+      <div class="sal-chips">${SAL_PRESETS[tipo].map(p=>`<button type="button" class="sal-chip" data-preset="${escAttr(p)}">+ ${escapeHtml(p)}</button>`).join('')}</div>
+      ${isDesc
+        ? `<p class="sal-tip">Digite os descontos como número normal (ex.: 350,00). O app já tira do total.</p>`
+        : `<p class="sal-tip">Para hora extra, preencha <b>Valor hora</b> e <b>Horas</b>: o valor é calculado. Digitou um valor com “−”? Ele vai sozinho para Descontos.</p>`}
     `;
-    tr.querySelector('[data-role=desc]').addEventListener('input', e=>{ item.desc=e.target.value; scheduleSave(); });
-    const heInput = tr.querySelector('[data-role=valorHE]');
-    const heDisplay = ()=> item.valorHE===null||item.valorHE===undefined ? '' : moneyDisplay(item.valorHE);
-    heInput.value = (privacyMode && heDisplay()!=='') ? PRIV_MASK : heDisplay();
-    heInput.addEventListener('focus', ()=>{ if(privacyMode) heInput.value = heDisplay(); });
-    heInput.addEventListener('input', e=>{
-      item.valorHE = e.target.value===''? null : parseMoney(e.target.value);
-      if(item.valorHE!==null && item.horas) item.value = round2(item.valorHE*item.horas);
-      scheduleSave(); recalcSalarios(sal, i);
-    });
-    heInput.addEventListener('blur', e=>{ e.target.value = (privacyMode && heDisplay()!=='') ? PRIV_MASK : heDisplay(); });
-
-    const horasInput = tr.querySelector('[data-role=horas]');
-    horasInput.value = item.horas===null||item.horas===undefined ? '' : moneyDisplay(item.horas);
-    horasInput.addEventListener('input', e=>{
-      item.horas = e.target.value===''? null : parseMoney(e.target.value);
-      if(item.valorHE!==null && item.horas) item.value = round2(item.valorHE*item.horas);
-      scheduleSave(); recalcSalarios(sal, i);
-    });
-    horasInput.addEventListener('blur', e=>{ e.target.value = item.horas===null||item.horas===undefined?'':moneyDisplay(item.horas); });
-
-    if(!isHE){
-      bindMoneyInputPriv(tr.querySelector('[data-role=value]'), ()=>item.value, v=>item.value=v, ()=>{
-        const cell = document.getElementById('sal-total-cell');
-        if(cell) cell.textContent = fmtPriv(salaryTotal(sal));
-      });
-    } else {
-      const valInput = tr.querySelector('[data-role=value]');
-      valInput.value = privacyMode ? PRIV_MASK : moneyDisplay(item.value);
-      valInput.addEventListener('focus', ()=>{ if(privacyMode) valInput.value = moneyDisplay(item.value); });
-      valInput.addEventListener('blur', ()=>{ if(privacyMode) valInput.value = PRIV_MASK; });
+    const body = card.querySelector('tbody');
+    const rows = sal.items.map((item,i)=>({item,i})).filter(x=>x.item.tipo===tipo);
+    if(!rows.length){
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td colspan="5" class="cell-plain" style="color:var(--ink-soft); font-weight:400; text-align:center; padding:14px 6px;">${isDesc ? 'Nenhum desconto lançado.' : 'Nenhum provento lançado.'}</td>`;
+      body.appendChild(tr);
     }
-    tr.querySelector('[data-role=del]').addEventListener('click', ()=>{ sal.items.splice(i,1); scheduleSave(); renderSection(); });
-    body.appendChild(tr);
-  });
-  card.querySelector('#btnAddSalItem').addEventListener('click', ()=>{
-    sal.items.push({desc:'', valorHE:null, horas:null, value:0}); scheduleSave(); renderSection();
-  });
+    rows.forEach(({item,i})=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="cell-plain"><input type="text" value="${escAttr(item.desc)}" data-role="desc" placeholder="${isDesc?'ex.: INSS':'ex.: Salário'}"></td>
+        <td class="num" data-label="Valor hora"><input type="text" inputmode="decimal" class="money" placeholder="—" data-role="valorHE"></td>
+        <td class="num" data-label="Horas"><input type="text" inputmode="decimal" class="money" placeholder="—" data-role="horas"></td>
+        <td class="num" data-label="Valor"><input type="text" inputmode="decimal" class="money" data-role="value" id="sal-value-${i}"></td>
+        <td style="white-space:nowrap;"><button class="icon-btn sal-move" data-role="move" title="${isDesc?'mover para Proventos':'mover para Descontos'}">⇄</button><button class="icon-btn" data-role="del" title="excluir">✕</button></td>
+      `;
+      tr.querySelector('[data-role=desc]').addEventListener('input', e=>{ item.desc=e.target.value; scheduleSave(); });
 
+      const valInput = tr.querySelector('[data-role=value]');
+      const isHE = ()=> item.valorHE !== null && item.valorHE !== undefined;
+      const syncReadonly = ()=>{
+        valInput.readOnly = isHE();
+        valInput.style.opacity = isHE() ? '0.75' : '';
+        valInput.title = isHE() ? 'calculado: valor hora × horas' : '';
+      };
+      const showVal = ()=>{
+        const focused = document.activeElement===valInput;
+        valInput.value = (privacyMode && !focused) ? PRIV_MASK : moneyDisplay(item.value);
+      };
+      const recalcHE = ()=>{
+        if(isHE()) item.value = round2(Math.abs(item.valorHE) * (Number(item.horas)||0));
+        syncReadonly(); showVal(); updateSalSummary(sal);
+      };
+
+      const heInput = tr.querySelector('[data-role=valorHE]');
+      const heDisplay = ()=> isHE() ? moneyDisplay(item.valorHE) : '';
+      heInput.value = (privacyMode && heDisplay()!=='') ? PRIV_MASK : heDisplay();
+      heInput.addEventListener('focus', ()=>{ if(privacyMode) heInput.value = heDisplay(); });
+      heInput.addEventListener('input', e=>{
+        item.valorHE = e.target.value.trim()==='' ? null : Math.abs(parseMoney(e.target.value));
+        scheduleSave(); recalcHE();
+      });
+      heInput.addEventListener('blur', e=>{ e.target.value = (privacyMode && heDisplay()!=='') ? PRIV_MASK : heDisplay(); });
+
+      const horasInput = tr.querySelector('[data-role=horas]');
+      const horasDisplay = ()=> item.horas===null||item.horas===undefined ? '' : moneyDisplay(item.horas);
+      horasInput.value = horasDisplay();
+      horasInput.addEventListener('input', e=>{
+        item.horas = e.target.value.trim()==='' ? null : Math.abs(parseMoney(e.target.value));
+        scheduleSave(); recalcHE();
+      });
+      horasInput.addEventListener('blur', e=>{ e.target.value = horasDisplay(); });
+
+      syncReadonly(); showVal();
+      valInput.addEventListener('focus', ()=>{ if(privacyMode) valInput.value = moneyDisplay(item.value); if(!isHE()) setTimeout(()=>{ try{ valInput.select(); }catch(e){} }, 0); });
+      let movedByMinus = false;
+      valInput.addEventListener('input', e=>{
+        if(isHE()) return;
+        const raw = e.target.value;
+        const n = parseMoney(raw);
+        movedByMinus = !isDesc && /[-−–]/.test(raw);
+        item.value = Math.abs(n);
+        scheduleSave(); updateSalSummary(sal, movedByMinus ? Math.abs(n) : 0);
+      });
+      valInput.addEventListener('blur', ()=>{
+        if(movedByMinus){ item.tipo = 'desconto'; movedByMinus = false; scheduleSave(); renderSection(); return; }
+        showVal();
+      });
+
+      tr.querySelector('[data-role=move]').addEventListener('click', ()=>{
+        item.tipo = isDesc ? 'provento' : 'desconto'; scheduleSave(); renderSection();
+      });
+      tr.querySelector('[data-role=del]').addEventListener('click', ()=>{ sal.items.splice(i,1); scheduleSave(); renderSection(); });
+      body.appendChild(tr);
+    });
+
+    const addItem = (desc)=>{
+      const he = SAL_HE_PRESETS.includes(desc);
+      sal.items.push({desc: desc||'', tipo, valorHE: he ? 0 : null, horas: null, value:0});
+      scheduleSave(); renderSection();
+      setTimeout(()=>{
+        const idx = sal.items.length-1;
+        const target = he ? document.querySelector(`#sal-value-${idx}`)?.closest('tr')?.querySelector('[data-role=valorHE]') : (desc ? document.getElementById('sal-value-'+idx) : document.getElementById('sal-value-'+idx)?.closest('tr')?.querySelector('[data-role=desc]'));
+        if(target) target.focus();
+      }, 30);
+    };
+    card.querySelector('[data-role=add]').addEventListener('click', ()=> addItem(''));
+    card.querySelectorAll('[data-preset]').forEach(b=> b.addEventListener('click', ()=> addItem(b.dataset.preset)));
+    return card;
+  };
+
+  content.appendChild(buildGroup('provento'));
+  content.appendChild(buildGroup('desconto'));
   return el;
 }
 function round2(n){ return Math.round(n*100)/100; }
-function recalcSalarios(sal, i){
-  const valInput = document.getElementById('sal-value-'+i);
-  if(valInput){
-    const focused = document.activeElement===valInput;
-    valInput.value = (privacyMode && !focused) ? PRIV_MASK : moneyDisplay(sal.items[i].value);
-  }
-  const totalCell = document.getElementById('sal-total-cell');
-  if(totalCell) totalCell.textContent = fmtPriv(salaryTotal(sal));
+// pendingMinus: valor que está sendo digitado com "−" num provento (ainda não foi movido) — já conta como desconto
+function updateSalSummary(sal, pendingMinus){
+  const parts = salaryParts(sal);
+  let prov = parts.prov, desc = parts.desc;
+  if(pendingMinus){ prov = round2(prov - pendingMinus); desc = round2(desc + pendingMinus); }
+  const liq = round2(prov - desc);
+  const set = (id, txt)=>{ const n = document.getElementById(id); if(n) n.textContent = txt; };
+  set('sal-sum-prov', fmtPriv(prov));
+  set('sal-sum-desc', (desc ? '− ' : '') + fmtPriv(desc));
+  set('sal-sum-liq', fmtPriv(liq));
+  set('sal-total-provento', fmtPriv(prov));
+  set('sal-total-desconto', (desc ? '− ' : '') + fmtPriv(desc));
+  const box = document.getElementById('sal-sum-liq-box');
+  if(box){ box.classList.toggle('neg', liq < 0); box.classList.toggle('pos', liq >= 0); }
 }
+// compatibilidade: chamado por código antigo
+function recalcSalarios(sal){ updateSalSummary(sal); }
 
 /* =========================================================
    RENDER: DINHEIRO A RECEBER
@@ -5827,11 +5985,15 @@ function wirePasswordToggles(){
 
 /* ---------- link de recuperação de senha ---------- */
 function readAuthUrl(){
-  const hash = new URLSearchParams((window.location.hash||'').replace(/^#/,''));
-  const qs = new URLSearchParams(window.location.search);
+  const hash = new URLSearchParams((INITIAL_URL.hash||'').replace(/^#/,''));
+  const qs = new URLSearchParams(INITIAL_URL.search||'');
   const get = k => hash.get(k) || qs.get(k) || '';
+  const type = get('type');
   return {
-    isRecovery: qs.get('reset') === '1' || hash.get('type') === 'recovery',
+    type,
+    isRecovery: qs.get('reset') === '1' || type === 'recovery',
+    isInvite: type === 'invite',
+    tokenHash: qs.get('token_hash') || '',
     errCode: get('error_code') || get('error'),
     errDesc: get('error_description')
   };
@@ -5840,9 +6002,28 @@ function cleanAuthUrl(){
   try{ history.replaceState(null, '', window.location.pathname); }catch(e){}
 }
 function recoveryLinkErrorMsg(u){
-  if(/expired|otp/i.test(u.errCode + ' ' + u.errDesc))
-    return 'Este link de recuperação expirou ou já foi usado. Peça um novo link abaixo e abra-o logo depois de receber o e-mail.';
-  return 'Não foi possível validar o link de recuperação. Peça um novo link abaixo.';
+  if(/expired|otp|invalid/i.test((u.errCode||'') + ' ' + (u.errDesc||'')))
+    return 'Este link expirou ou já foi usado. Digite seu e-mail abaixo para receber um novo link e abra-o logo depois que chegar (vale também para convites).';
+  return 'Não foi possível validar o link do e-mail. Digite seu e-mail abaixo para receber um novo link.';
+}
+// Mostra a tela de "criar senha" (convite) ou "nova senha" (recuperação)
+let passwordFormMode = 'recovery';
+function showPasswordForm(mode){
+  passwordFormMode = mode === 'invite' ? 'invite' : 'recovery';
+  const landing = document.getElementById('landingScreen');
+  if(landing) landing.style.display = 'none';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('authScreen').style.display = 'flex';
+  setAuthForm('reset');
+  const intro = document.getElementById('resetIntro');
+  const btn = document.getElementById('resetSubmitBtn');
+  if(passwordFormMode === 'invite'){
+    if(intro) intro.innerHTML = '<b>Bem-vindo ao Balance!</b> Para terminar de ativar sua conta, crie uma senha. Você vai usá-la para entrar das próximas vezes.';
+    if(btn) btn.textContent = 'Criar senha e entrar';
+  } else {
+    if(intro) intro.textContent = 'Escolha uma nova senha para a sua conta.';
+    if(btn) btn.textContent = 'Salvar nova senha';
+  }
 }
 
 function wireAuthForm(){
@@ -5916,12 +6097,13 @@ function wireAuthForm(){
     const btn = document.getElementById('resetSubmitBtn');
     const { data:{ session:rs } } = await sb.auth.getSession();
     if(!rs){ setAuthForm('forgot'); showAuthError('A sessão de recuperação expirou. Peça um novo link abaixo.'); return; }
+    const idleLabel = passwordFormMode === 'invite' ? 'Criar senha e entrar' : 'Salvar nova senha';
     btn.disabled = true; btn.textContent = 'Salvando…';
     const { error } = await sb.auth.updateUser({ password: p1 });
-    btn.disabled = false; btn.textContent = 'Salvar nova senha';
+    btn.disabled = false; btn.textContent = idleLabel;
     if(error){ showAuthError(traduzErro(error)); return; }
     cleanAuthUrl();
-    showAuthSuccess('Senha alterada! Entrando…');
+    showAuthSuccess(passwordFormMode === 'invite' ? 'Senha criada! Entrando…' : 'Senha alterada! Entrando…');
     setTimeout(async ()=>{
       const { data:{ session:ns } } = await sb.auth.getSession();
       if(ns) enterApp(ns); else setAuthForm('login');
@@ -5936,6 +6118,9 @@ function traduzErro(error){
   if(/email not confirmed/i.test(msg)) return 'Confirme seu e-mail antes de entrar — verifique sua caixa de entrada.';
   if(/only request this after|security purposes/i.test(msg)) return 'Aguarde cerca de um minuto antes de pedir outro link.';
   if(/rate limit/i.test(msg)) return 'Muitas tentativas seguidas. Aguarde um pouco e tente de novo.';
+  if(/should be different|same password/i.test(msg)) return 'A nova senha precisa ser diferente da anterior.';
+  if(/password should be at least|weak password/i.test(msg)) return 'Senha muito fraca. Use pelo menos 6 caracteres, misturando letras e números.';
+  if(/expired|invalid.*(token|otp)|otp/i.test(msg)) return 'Este link expirou ou já foi usado. Peça um novo link.';
   if(/network/i.test(msg)) return 'Falha de conexão. Verifique sua internet e tente novamente.';
   return msg || 'Não foi possível concluir. Tente novamente.';
 }
@@ -6062,23 +6247,34 @@ async function boot(){
   }
 
   sb.auth.onAuthStateChange((event, session)=>{
-    if(event === 'PASSWORD_RECOVERY'){
+    if(event === 'PASSWORD_RECOVERY') showPasswordForm('recovery');
+  });
+
+  // Links no formato ?token_hash=...&type=... (modelo de e-mail recomendado: não depende de redirecionamento)
+  if(authUrl.tokenHash && authUrl.type){
+    const { error: otpErr } = await sb.auth.verifyOtp({ token_hash: authUrl.tokenHash, type: authUrl.type });
+    if(otpErr){
+      cleanAuthUrl();
       document.getElementById('landingScreen').style.display = 'none';
       document.getElementById('authScreen').style.display = 'flex';
-      setAuthForm('reset');
+      setAuthForm('forgot');
+      showAuthError(recoveryLinkErrorMsg({ errCode:'otp_expired', errDesc: otpErr.message }));
+      return;
     }
-  });
+  }
 
   const { data: { session } } = await sb.auth.getSession();
 
-  if(authUrl.isRecovery){
+  // Convite (precisa criar a senha) ou recuperação de senha
+  if(authUrl.isRecovery || authUrl.isInvite){
     cleanAuthUrl();
     document.getElementById('landingScreen').style.display = 'none';
     document.getElementById('authScreen').style.display = 'flex';
-    if(session){ setAuthForm('reset'); }
+    if(session){ showPasswordForm(authUrl.isInvite ? 'invite' : 'recovery'); }
     else { setAuthForm('forgot'); showAuthError(recoveryLinkErrorMsg(authUrl)); }
     return;
   }
+  if(authUrl.tokenHash || /access_token/.test(INITIAL_URL.hash)) cleanAuthUrl();
 
   if(session){
     await enterApp(session);
@@ -6241,7 +6437,7 @@ function stopNotificationWatcher(){
 (function(){
 const TOPICS = [
 {id:"roteiro",g:"Primeiros passos",t:"Comece por aqui",d:"Roteiro rápido para deixar o app funcionando em poucos minutos.",
- s:["Entre com o e-mail e a senha que você recebeu no convite.","Abra **Despesas**, toque em **+ novo mês** e digite o mês com ano, por exemplo **Novembro / 2026**.","Toque em **+ Adicionar**, preencha descrição, valor, data e categoria e toque em **Adicionar**. Repita para cada gasto.","Abra **Salários**, escolha o mês e toque em **criar salário deste mês**. Informe seu salário (e extras, se houver).","Se tem contas que se repetem todo mês, cadastre em **Gastos Fixos** e, dentro do mês, toque em **aplicar gastos fixos**.","Veja o resultado em **Início**: receita, gastos e quanto sobrou.","Toque em **salvar** (💾). O app não salva sozinho."],
+ s:["Entre com o e-mail e a senha que você recebeu no convite.","Abra **Despesas** e toque em **+ novo mês**: o primeiro é o mês atual e os próximos seguem em ordem.","Toque em **+ Adicionar**, preencha descrição, valor, data e categoria e toque em **Adicionar**. Repita para cada gasto.","Abra **Salários**, escolha o mês e toque em **criar salário deste mês**. Informe seu salário (e extras, se houver).","Se tem contas que se repetem todo mês, cadastre em **Gastos Fixos** para acompanhar o total.","Veja o resultado em **Início**: receita, gastos e quanto sobrou.","Toque em **salvar** (💾). O app não salva sozinho."],
  n:["O botão salvar pulsa em verde quando há algo por salvar."]},
 {id:"conta",g:"Primeiros passos",t:"Conta, login e senha",d:"Entrar, recuperar a senha e sair.",
  s:["Na tela inicial, toque em **Entrar** ou **Acessar minha conta**.","O acesso ao Balance é feito por convite: use o e-mail e a senha que você recebeu de quem te convidou.","Se o app avisar que enviou um link, abra seu e-mail e confirme antes de entrar.","Esqueceu a senha? Toque em **Esqueci minha senha**, informe o e-mail, abra o link recebido e defina a nova senha."],
@@ -6252,8 +6448,8 @@ const TOPICS = [
  s:["Escolha o mês na lista no topo.","Leia os quadros: **Receita** (total de Salários do mês), **Gastos** (total de Despesas) e **Sobra do mês** (receita − gastos).","Veja o gráfico **Receita × Gastos por mês**. Toque em Receita ou Gastos para trocar a cor das barras.","Confira o **Resumo geral**: a receber pendente, Carteira, gastos fixos e empréstimos em aberto.","A tabela **Todos os meses** lista cada mês."],
  n:["Tudo vem das outras abas: para mudar um número, edite na aba de origem.","O gráfico só aparece quando há gastos ou salário lançados.","“Atualizado” mostra a data do último salvamento."]},
 {id:"gastos",g:"Controle do mês",t:"Despesas: os meses",d:"Cada mês tem seu próprio conjunto de despesas.",
- s:["Toque em **+ novo mês** e digite **Mês / Ano** (ex.: Novembro / 2026).","Troque de mês pelas setas ‹ › ou pela lista.","**duplicar mês atual** copia categorias e despesas para um novo mês.","**aplicar gastos fixos** traz os itens da aba Gastos Fixos para a categoria Gastos Fixos do mês, sem repetir os que já estão lá.","**excluir mês** remove o mês, as despesas dele e o salário lançado para ele."],
- n:["Use sempre mês e ano no nome: é por ele que o app ordena, acha o mês atual e lança parcelas.","Crie os meses em ordem cronológica, pois um novo mês entra no fim da lista.","Ao abrir o app, aparece o mês atual do calendário, se estiver cadastrado.","O topo mostra o total gasto, o gráfico por categoria, o nº de transações, a maior categoria e a variação contra o mês anterior."]},
+ s:["Toque em **+ novo mês**: o app cria sozinho o mês seguinte ao último cadastrado (ex.: depois de Novembro / 2026 vem Dezembro / 2026).","Troque de mês pelas setas ‹ › ou pela lista.","**duplicar mês atual** copia categorias e despesas para um novo mês.","**excluir mês** remove o mês, as despesas dele e o salário lançado para ele."],
+ n:["Use sempre mês e ano no nome: é por ele que o app ordena, acha o mês atual e lança parcelas.","O **+ novo mês** sempre cria o mês seguinte ao mais recente, então a lista fica em ordem sozinha.","Ao abrir o app, aparece o mês atual do calendário, se estiver cadastrado.","O topo mostra o total gasto, o gráfico por categoria, o nº de transações, a maior categoria e a variação contra o mês anterior."]},
 {id:"lancar",g:"Controle do mês",t:"Lançar, editar e excluir despesas",d:"Na aba Todas de Despesas.",
  s:["Toque em **+ Adicionar**.","Preencha **Descrição**, **Valor**, **Data**, **Categoria** e, se quiser, **Banco** (escolha uma sugestão ou digite).","Toque em **Adicionar** ou pressione Enter. O painel continua aberto para o próximo lançamento.","Para corrigir, toque na despesa: edite tudo (inclusive a categoria) e toque em **Salvar**, ou em **Excluir**.","A lixeira no fim da linha também exclui."],
  n:["A lista de categorias mostra só as já existentes. Crie novas em Categorias › + Nova categoria.","Decimais com vírgula (12,50). Um ponto sozinho conta como decimal: 1.500 vira R$ 1,50. Use 1500 ou 1.500,00.","Para registrar um estorno, lance a despesa com o valor em sinal de menos (ex.: -50,00).","Errou? Use ↶ desfazer (antes de salvar)."]},
@@ -6267,11 +6463,11 @@ const TOPICS = [
  s:["Abra a aba **Categorias** e escolha o período.","Toque em **+ Nova categoria** para criar.","Toque no cartão para ver as despesas, o gráfico dos últimos 6 meses e a média mensal.","Nos três pontos (⋯) você pode definir **orçamento**, editar descrição, alterar ícone ou emoji, alterar cor, renomear ou remover.","Em **Definir orçamento**, informe o valor mensal. A barra mostra quanto foi usado (amarela a partir de 85%, vermelha acima de 100%)."],
  n:["Renomear vale para todos os meses.","Remover pergunta se vale só para o mês atual ou para todos; as despesas da categoria saem junto.","**Negativas** são categorias com gasto no período; **Zeradas** não tiveram gasto."]},
 {id:"fixos",g:"Controle do mês",t:"Gastos Fixos",d:"Modelo das contas que se repetem todo mês.",
- s:["Toque em **+ novo gasto fixo**.","Digite a descrição e o valor mensal. O total soma sozinho.","Em **Despesas**, dentro do mês, toque em **aplicar gastos fixos**."],
- n:["Alterar o modelo não muda meses já aplicados.","Remova um item com ✕."]},
+ s:["Toque em **+ novo gasto fixo**.","Digite a descrição e o valor mensal. O total soma sozinho.","O total aparece no **Início** como Gastos fixos mensais."],
+ n:["Remova um item com ✕."]},
 {id:"salarios",g:"Controle do mês",t:"Salários e horas extras",d:"A receita do mês vem daqui.",
- s:["Escolha o mês (ele precisa existir em Despesas).","Toque em **criar salário deste mês**.","Para valor normal, digite em **Valor**.","Para hora extra, preencha **Valor h.e.** (valor da hora) e **Horas**: o valor é calculado.","Use **+ novo item** para bônus, 13º, freelas etc."],
- n:["A soma dos itens do mês é a **Receita** do Início.","Excluir um mês em Despesas apaga o salário dele."]},
+ s:["Escolha o mês na lista ou toque em **+ novo mês** para criar o mês seguinte ao último cadastrado (ele aparece também em Despesas).","Toque em **criar salário deste mês**.","Em **Proventos** lance o que entra (salário, bônus, 13º, freelas). Os atalhos (+ Bônus, + Férias…) criam a linha pronta.","Em **Descontos** lance o que sai (INSS, IRRF, vale-transporte, adiantamento). Digite o número normal, **sem sinal de menos**: o app já subtrai.","Para hora extra, preencha **Valor hora** e **Horas**: o valor é calculado.","Use **⇄** para mover um item entre Proventos e Descontos."],
+ n:["O **Líquido** (proventos − descontos) é a **Receita** do Início.","Se digitar um valor com “−” em Proventos, ele vai sozinho para Descontos.","Excluir um mês em Despesas apaga o salário dele."]},
 {id:"receber",g:"Controle do mês",t:"Dinheiro a Receber e empréstimos",d:"O que devem a você e empréstimos parcelados que você fez.",
  s:["Em **A receber de terceiros**, toque em **+ novo registro**: data, devedor, descrição e valor.","Quando receber, mude **Status** para **Recebido**.","Em **Empréstimos parcelados**, toque em **+ novo empréstimo**: nome, valor total, nº de parcelas e valor por parcela.","A cada parcela paga, aumente o campo **Pagas**."],
  n:["Restante = (parcelas − pagas) × valor por parcela. O **Valor total** é só informativo.","Valores recebidos não entram na Receita. Lance também em Salários se quiser contá-los."]},
